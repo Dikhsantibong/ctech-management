@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\File;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
+class FileController extends Controller
+{
+    public function index()
+    {
+        $files = File::with('creator')->latest()->get();
+        return Inertia::render('files/index', [
+            'files' => $files
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|max:10240', // 10MB max
+        ]);
+
+        $uploadedFile = $request->file('file');
+        $name = $uploadedFile->getClientOriginalName();
+        $extension = $uploadedFile->getClientOriginalExtension();
+        $size = $uploadedFile->getSize();
+        
+        $path = $uploadedFile->store('company-files', 'public');
+
+        File::create([
+            'name' => $name,
+            'path' => $path,
+            'extension' => $extension,
+            'size' => $size,
+            'created_by' => Auth::id(),
+        ]);
+
+        return redirect()->back()->with('success', 'File uploaded successfully.');
+    }
+
+    public function download(File $file)
+    {
+        return Storage::disk('public')->download($file->path, $file->name);
+    }
+
+    public function destroy(File $file)
+    {
+        Storage::disk('public')->delete($file->path);
+        $file->delete();
+        
+        return redirect()->back()->with('success', 'File deleted.');
+    }
+}

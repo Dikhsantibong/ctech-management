@@ -1,0 +1,61 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Document;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+
+class DocumentController extends Controller
+{
+    public function index()
+    {
+        $documents = Document::with('creator')->latest()->get();
+        return Inertia::render('documents/index', [
+            'documents' => $documents
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'nullable|string',
+        ]);
+
+        Document::create([
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'created_by' => Auth::id(),
+        ]);
+
+        return redirect()->back()->with('success', 'Document created successfully.');
+    }
+
+    public function show(Document $document)
+    {
+        $document->load('creator');
+        return Inertia::render('documents/show', [
+            'document' => $document
+        ]);
+    }
+
+    public function update(Request $request, Document $document)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'nullable|string',
+        ]);
+
+        $document->update($validated);
+
+        return redirect()->back()->with('success', 'Document updated successfully.');
+    }
+
+    public function destroy(Document $document)
+    {
+        $document->delete();
+        return redirect()->back()->with('success', 'Document deleted.');
+    }
+}
