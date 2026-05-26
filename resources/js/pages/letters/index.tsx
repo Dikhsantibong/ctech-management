@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, MoreVertical, Mail, Trash2, Eye, Download, Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +22,300 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 
+const LETTER_TEMPLATES = {
+    'Surat Keputusan': {
+        subject: 'Keputusan tentang [isi perihal]',
+        content: `DENGAN RAHMAT TUHAN YANG MAHA ESA
+
+DIREKTUR UTAMA
+
+Telah mempertimbangkan:
+Bahwa dalam rangka [alasan/tujuan], perlu ditetapkan Surat Keputusan ini.
+
+MEMUTUSKAN:
+
+Kesatu  : [Keputusan utama yang diambil]
+Kedua   : [Ketentuan tambahan jika ada]
+Ketiga  : [Ketentuan lainnya]
+
+Keputusan ini berlaku sejak tanggal ditetapkan.
+
+[Tempat], [Tanggal]
+
+[Nama Direktur]
+[Jabatan]`,
+    },
+    'Surat Tugas': {
+        subject: 'Surat Tugas untuk [nama/tujuan]',
+        content: `Dasar:
+1. [Peraturan/Perundangan yang menjadi dasar]
+2. [Ketentuan atau keputusan terkait]
+
+Kami perintahkan kepada:
+Nama            : [Nama Pegawai]
+Jabatan         : [Jabatan]
+Tanggal Lahir   : [Tanggal Lahir]
+NIP             : [NIP]
+
+Untuk melaksanakan tugas sebagai berikut:
+[Uraian tugas yang harus dilaksanakan]
+
+Waktu pelaksanaan: [Mulai tanggal] s.d. [Tanggal selesai]
+Tempat pelaksanaan: [Lokasi]
+
+Biaya operasional ditanggung oleh [Sumber pembiayaan]
+
+Demikian Surat Tugas ini diberikan untuk dijalankan dengan sebaik-baiknya.
+
+[Tempat], [Tanggal]
+
+[Nama Pemberi Tugas]
+[Jabatan]`,
+    },
+    'Surat Keterangan': {
+        subject: 'Keterangan tentang [isi perihal]',
+        content: `Yang bertanda tangan di bawah ini:
+
+Nama            : [Nama Pemberi Keterangan]
+Jabatan         : [Jabatan]
+Instansi/Perusahaan : [Nama Instansi/Perusahaan]
+
+Dengan ini menerangkan bahwa:
+
+Nama            : [Nama Penerima Keterangan]
+[Identitas lainnya]: [Data]
+
+Telah [uraian keadaan/keterangan yang diberikan]
+
+Keterangan ini diberikan untuk keperluan [tujuan penggunaan].
+
+Demikian surat keterangan ini dibuat dengan sebenarnya dan dapat dipertanggungjawabkan.
+
+[Tempat], [Tanggal]
+
+[Nama Pemberi Keterangan]
+[Jabatan]`,
+    },
+    'Surat Penawaran': {
+        subject: 'Penawaran Produk/Layanan [nama produk/layanan]',
+        content: `Kepada Yth.
+[Nama Penerima]
+[Perusahaan/Institusi]
+[Alamat]
+
+Assalamu'alaikum Wr. Wb.
+
+Dengan hormat,
+
+Kami dengan ini menawarkan produk/layanan kami sebagai berikut:
+
+1. Deskripsi Produk/Layanan:
+   [Jelaskan produk/layanan secara detail]
+
+2. Spesifikasi/Fitur:
+   [Sebutkan spesifikasi dan fitur utama]
+
+3. Harga:
+   [Rincian harga]
+
+4. Syarat Pembayaran:
+   [Metode dan syarat pembayaran]
+
+5. Waktu Pengiriman:
+   [Estimasi pengiriman]
+
+Penawaran ini berlaku hingga [tanggal berlaku].
+
+Kami siap memberikan demonstrasi dan informasi lebih lanjut sesuai kebutuhan Anda.
+
+Demikian penawaran ini kami sampaikan. Atas perhatian dan pertimbangan Anda, kami ucapkan terima kasih.
+
+Wassalamu'alaikum Wr. Wb.
+
+[Tempat], [Tanggal]
+
+[Nama Penanda Tangan]
+[Jabatan]`,
+    },
+    'Surat Peringatan': {
+        subject: 'Surat Peringatan kepada [nama penerima]',
+        content: `Kepada Yth.
+[Nama Penerima]
+[Jabatan]
+[Perusahaan/Institusi]
+
+Dengan hormat,
+
+Berdasarkan laporan dan pengamatan yang telah kami lakukan, kami melihat adanya pelanggaran/ketidaksesuaian dalam hal:
+
+[Jelaskan pelanggaran atau ketidaksesuaian yang dilakukan]
+
+Hal ini bertentangan dengan:
+- [Peraturan/Kebijakan yang dilanggar]
+- [Kontrak/Perjanjian yang berlaku]
+
+Oleh karena itu, kami memberikan peringatan ini sebagai:
+☐ Peringatan Pertama
+☐ Peringatan Kedua
+☐ Peringatan Ketiga
+
+Kami mengharapkan perbaikan dalam waktu [jumlah hari] hari sejak surat ini diterima.
+
+Apabila dalam waktu yang ditetapkan tidak ada perbaikan, kami akan mengambil tindakan selanjutnya sesuai dengan ketentuan yang berlaku.
+
+Demikian surat peringatan ini kami sampaikan. Atas perhatian Anda, kami ucapkan terima kasih.
+
+[Tempat], [Tanggal]
+
+[Nama Penanda Tangan]
+[Jabatan]`,
+    },
+    'Surat Undangan': {
+        subject: 'Undangan [Acara] kepada [Nama Penerima]',
+        content: `Kepada Yth.
+[Nama Penerima]
+[Jabatan]
+[Organisasi]
+
+Dengan hormat,
+
+Sehubungan dengan akan diselenggarakannya [Acara] pada:
+Hari/Tanggal : [Hari, Tanggal]
+Waktu         : [Jam]
+Tempat        : [Lokasi]
+
+Kami mengundang Saudara/i untuk hadir dan berpartisipasi dalam acara tersebut.
+
+Demikian undangan ini kami sampaikan. Atas perhatian dan kehadiran Saudara/i, kami ucapkan terima kasih.
+
+[Tempat], [Tanggal]
+
+[Nama]
+[Jabatan]`,
+    },
+    'Surat Izin': {
+        subject: 'Permohonan Izin [keperluan] kepada [penerima]',
+        content: `Yang bertanda tangan di bawah ini:
+
+Nama    : [Nama Pemohon]
+Jabatan : [Jabatan]
+Instansi: [Instansi]
+
+Dengan ini mengajukan permohonan izin untuk [uraian izin] pada:
+Hari/Tanggal: [Tanggal]
+Waktu       : [Jam]
+Alasan      : [Alasan izin]
+
+Demikian permohonan ini kami sampaikan. Atas perhatian dan izin yang diberikan, kami ucapkan terima kasih.
+
+[Tempat], [Tanggal]
+
+[Nama Pemohon]
+[Jabatan]`,
+    },
+    'Surat Keterangan Kerja': {
+        subject: 'Keterangan Kerja untuk [nama karyawan]',
+        content: `Yang bertanda tangan di bawah ini menerangkan bahwa:
+
+Nama    : [Nama Karyawan]
+Jabatan : [Jabatan]
+NIP     : [NIP]
+Perusahaan/Instansi: [Nama Perusahaan]
+
+Adalah benar-benar bekerja pada perusahaan kami sejak [tanggal masuk] sampai dengan [tanggal selesai/present]. Surat keterangan ini dibuat untuk keperluan [tujuan].
+
+Demikian surat keterangan ini dibuat agar dapat dipergunakan sebagaimana mestinya.
+
+[Tempat], [Tanggal]
+
+[Nama Pemberi Keterangan]
+[Jabatan]`,
+    },
+    'Surat Pengantar': {
+        subject: 'Surat Pengantar [perihal] kepada [penerima]',
+        content: `Dengan hormat,
+
+Bersama surat ini kami sampaikan [dokumen/barang] kepada:
+
+Nama Penerima : [Nama]
+Alamat         : [Alamat]
+
+Mohon untuk diterima dan diproses sesuai dengan ketentuan yang berlaku.
+
+Demikian surat pengantar ini kami buat. Terima kasih.
+
+[Tempat], [Tanggal]
+
+[Nama Pengirim]
+[Jabatan]`,
+    },
+    'Surat Pemberitahuan': {
+        subject: 'Pemberitahuan tentang [isi pemberitahuan]',
+        content: `Kepada Yth.
+[Pihak Terkait]
+
+Dengan hormat,
+
+Sehubungan dengan [uraian singkat], kami memberitahukan bahwa [isi pemberitahuan].
+
+Demikian pemberitahuan ini kami sampaikan untuk diketahui.
+
+[Tempat], [Tanggal]
+
+[Nama]
+[Jabatan]`,
+    },
+    'Surat Rekomendasi': {
+        subject: 'Surat Rekomendasi untuk [nama]',
+        content: `Yang bertanda tangan di bawah ini memberikan rekomendasi kepada:
+
+Nama    : [Nama]
+Keterangan singkat mengenai kemampuan/kelayakan yang direkomendasikan.
+
+Rekomendasi ini diberikan untuk keperluan [tujuan].
+
+[Tempat], [Tanggal]
+
+[Nama Pemberi Rekomendasi]
+[Jabatan]`,
+    },
+    'Surat Permohonan': {
+        subject: 'Permohonan [jenis permohonan] kepada [penerima]',
+        content: `Dengan hormat,
+
+Kami bermaksud mengajukan permohonan [uraian permohonan] kepada [penerima] dengan rincian sebagai berikut:
+
+[Rincian permohonan]
+
+Demikian permohonan ini kami sampaikan. Atas perhatian dan kebijaksanaan Saudara, kami ucapkan terima kasih.
+
+[Tempat], [Tanggal]
+
+[Nama Pemohon]
+[Jabatan]`,
+    },
+    'Surat Kontrak': {
+        subject: 'Surat Perjanjian / Kontrak antara [pihak A] dan [pihak B]',
+        content: `Pada hari ini [Hari, Tanggal], yang bertanda tangan di bawah ini:
+
+Pihak Pertama  : [Nama / Perusahaan A]
+Pihak Kedua    : [Nama / Perusahaan B]
+
+Kedua belah pihak sepakat untuk mengadakan perjanjian dengan ketentuan sebagai berikut:
+1. [Ruang lingkup kerja]
+2. [Harga dan pembayaran]
+3. [Jangka waktu]
+4. [Ketentuan lain]
+
+Demikian perjanjian ini dibuat dalam rangkap 2 dan mempunyai kekuatan hukum yang sama.
+
+[Tempat], [Tanggal]
+
+[Nama Pihak Pertama]
+[Nama Pihak Kedua]`,
+    },
+};
+
 export default function LettersIndex({ letters }: { letters: any[] }) {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -39,8 +333,28 @@ export default function LettersIndex({ letters }: { letters: any[] }) {
     });
 
     const openCreateModal = () => {
+        const defaultType = 'Surat Keputusan';
+        const template = LETTER_TEMPLATES[defaultType as keyof typeof LETTER_TEMPLATES];
         reset();
+        setData({
+            type: defaultType,
+            letter_date: new Date().toISOString().split('T')[0],
+            sifat: 'Biasa',
+            recipient: '',
+            subject: template.subject,
+            content: template.content,
+            status: 'Draft',
+        });
         setIsCreateModalOpen(true);
+    };
+
+    const handleTypeChange = (newType: string) => {
+        setData('type', newType);
+        const template = LETTER_TEMPLATES[newType as keyof typeof LETTER_TEMPLATES];
+        if (template) {
+            setData('subject', template.subject);
+            setData('content', template.content);
+        }
     };
 
     const openEditModal = (letter: any) => {
@@ -208,7 +522,7 @@ export default function LettersIndex({ letters }: { letters: any[] }) {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2 col-span-2 md:col-span-1">
                                 <Label htmlFor="type">Jenis Surat</Label>
-                                <Select value={data.type} onValueChange={val => setData('type', val)}>
+                                <Select value={data.type} onValueChange={handleTypeChange}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Pilih jenis surat" />
                                     </SelectTrigger>
@@ -218,6 +532,14 @@ export default function LettersIndex({ letters }: { letters: any[] }) {
                                         <SelectItem value="Surat Keterangan">Surat Keterangan</SelectItem>
                                         <SelectItem value="Surat Penawaran">Surat Penawaran</SelectItem>
                                         <SelectItem value="Surat Peringatan">Surat Peringatan</SelectItem>
+                                        <SelectItem value="Surat Undangan">Surat Undangan</SelectItem>
+                                        <SelectItem value="Surat Izin">Surat Izin</SelectItem>
+                                        <SelectItem value="Surat Keterangan Kerja">Surat Keterangan Kerja</SelectItem>
+                                        <SelectItem value="Surat Pengantar">Surat Pengantar</SelectItem>
+                                        <SelectItem value="Surat Pemberitahuan">Surat Pemberitahuan</SelectItem>
+                                        <SelectItem value="Surat Rekomendasi">Surat Rekomendasi</SelectItem>
+                                        <SelectItem value="Surat Permohonan">Surat Permohonan</SelectItem>
+                                        <SelectItem value="Surat Kontrak">Surat Kontrak</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
@@ -279,7 +601,7 @@ export default function LettersIndex({ letters }: { letters: any[] }) {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2 col-span-2 md:col-span-1">
                                 <Label htmlFor="edit-type">Jenis Surat</Label>
-                                <Select value={data.type} onValueChange={val => setData('type', val)}>
+                                <Select value={data.type} onValueChange={handleTypeChange}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Pilih jenis surat" />
                                     </SelectTrigger>

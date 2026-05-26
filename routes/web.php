@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 
 Route::inertia('/', 'welcome')->name('home');
 
@@ -14,6 +15,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 'team_members' => \App\Models\User::count(),
             ],
             'upcoming_tasks' => \App\Models\Task::with('project')->where('status', '!=', 'Done')->whereNotNull('deadline')->orderBy('deadline')->take(5)->get(),
+            // task counts grouped by status for dashboard charts
+            'task_status_counts' => DB::table('tasks')
+                ->select('status', DB::raw('count(*) as count'))
+                ->groupBy('status')
+                ->pluck('count', 'status'),
+            // tasks created per day for last 7 days (time-series)
+            'tasks_last_7_days' => (function () {
+                $rows = DB::table('tasks')
+                    ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
+                    ->where('created_at', '>=', now()->subDays(6))
+                    ->groupBy(DB::raw('DATE(created_at)'))
+                    ->orderBy(DB::raw('DATE(created_at)'))
+                    ->get()
+                    ->pluck('count', 'date')
+                    ->toArray();
+
+                $labels = [];
+                $data = [];
+                for ($i = 6; $i >= 0; $i--) {
+                    $d = now()->subDays($i)->format('Y-m-d');
+                    $labels[] = now()->subDays($i)->format('M j');
+                    $data[] = isset($rows[$d]) ? (int) $rows[$d] : 0;
+                }
+
+                return ['labels' => $labels, 'data' => $data];
+            })(),
         ]);
     })->name('dashboard');
     Route::resource('users', \App\Http\Controllers\UserController::class);

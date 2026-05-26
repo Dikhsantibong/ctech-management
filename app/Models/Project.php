@@ -14,6 +14,12 @@ class Project extends Model
         'start_date',
         'deadline',
         'status',
+        'project_type',
+        'metadata',
+    ];
+
+    protected $casts = [
+        'metadata' => 'array',
     ];
 
     public function members(): BelongsToMany

@@ -61,6 +61,13 @@ class LetterController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        return Inertia::render('letters/form', [
+            'letter' => null,
+        ]);
+    }
+
     public function update(Request $request, Letter $letter)
     {
         $validated = $request->validate([
@@ -80,6 +87,14 @@ class LetterController extends Controller
         return redirect()->back()->with('success', 'Letter updated successfully.');
     }
 
+    public function edit(Letter $letter)
+    {
+        $letter->load('creator');
+        return Inertia::render('letters/form', [
+            'letter' => $letter,
+        ]);
+    }
+
     public function destroy(Letter $letter)
     {
         $this->logActivity('deleted', 'Letter', $letter->id, "Menghapus surat: {$letter->reference_number}");
@@ -91,6 +106,7 @@ class LetterController extends Controller
     {
         $letter->load('creator');
         $pdf = Pdf::loadView('pdf.letter', ['letter' => $letter]);
+        $pdf->setPaper('a4', 'portrait');
         return $pdf->download(str_replace('/', '-', $letter->reference_number) . '.pdf');
     }
 }

@@ -14,9 +14,9 @@ class TaskController extends Controller
     use LogsActivity;
     public function index(Request $request)
     {
-        $query = Task::with(['project', 'assignee'])->latest();
+        $query = Task::with(['project', 'assignee'])->orderBy('created_at', 'desc');
 
-        if ($request->has('project_id')) {
+        if ($request->has('project_id') && $request->project_id) {
             $query->where('project_id', $request->project_id);
         }
 

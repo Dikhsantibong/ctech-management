@@ -31,6 +31,8 @@ class ProjectController extends Controller
             'start_date' => 'required|date',
             'deadline' => 'required|date|after_or_equal:start_date',
             'status' => 'required|in:Planning,Progress,Review,Completed',
+            'project_type' => 'required|string|max:255',
+            'metadata' => 'nullable|array',
             'members' => 'nullable|array',
             'members.*' => 'exists:users,id'
         ]);
@@ -63,6 +65,8 @@ class ProjectController extends Controller
             'start_date' => 'required|date',
             'deadline' => 'required|date|after_or_equal:start_date',
             'status' => 'required|in:Planning,Progress,Review,Completed',
+            'project_type' => 'required|string|max:255',
+            'metadata' => 'nullable|array',
             'members' => 'nullable|array',
             'members.*' => 'exists:users,id'
         ]);

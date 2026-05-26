@@ -100,7 +100,15 @@ export default function TasksIndex({ tasks, projects, users, filters }: { tasks:
     };
 
     const updateTaskStatus = (task: any, newStatus: string) => {
-        router.put(`/tasks/${task.id}`, { ...task, status: newStatus }, { preserveScroll: true });
+        router.put(`/tasks/${task.id}`, {
+            project_id: task.project_id,
+            user_id: task.user_id || null,
+            title: task.title,
+            description: task.description || '',
+            status: newStatus,
+            priority: task.priority,
+            deadline: task.deadline || null,
+        }, { preserveScroll: true });
     };
 
     // Drag & Drop handlers
