@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Letter;
+use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class LetterController extends Controller
 {
+    use LogsActivity;
     public function index()
     {
         $letters = Letter::with('creator')->latest()->get();
@@ -34,7 +36,7 @@ class LetterController extends Controller
         $typeCode = strtoupper(substr($validated['type'], 0, 2));
         $refNumber = str_pad($count, 3, '0', STR_PAD_LEFT) . '/CT/' . $typeCode . '/' . date('Y');
 
-        Letter::create([
+        $letter = Letter::create([
             'reference_number' => $refNumber,
             'type' => $validated['type'],
             'letter_date' => $validated['letter_date'],
@@ -45,6 +47,8 @@ class LetterController extends Controller
             'status' => 'Draft',
             'created_by' => Auth::id(),
         ]);
+
+        $this->logActivity('created', 'Letter', $letter->id, "Membuat surat baru: {$letter->reference_number}");
 
         return redirect()->back()->with('success', 'Letter created successfully.');
     }
@@ -71,11 +75,14 @@ class LetterController extends Controller
 
         $letter->update($validated);
 
+        $this->logActivity('updated', 'Letter', $letter->id, "Mengupdate surat: {$letter->reference_number}");
+
         return redirect()->back()->with('success', 'Letter updated successfully.');
     }
 
     public function destroy(Letter $letter)
     {
+        $this->logActivity('deleted', 'Letter', $letter->id, "Menghapus surat: {$letter->reference_number}");
         $letter->delete();
         return redirect()->back()->with('success', 'Letter deleted.');
     }

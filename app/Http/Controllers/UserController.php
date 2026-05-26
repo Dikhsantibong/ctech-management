@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
+    use LogsActivity;
     public function index()
     {
         $users = User::latest()->get();
@@ -26,7 +28,9 @@ class UserController extends Controller
             'password' => ['required', Password::defaults()],
         ]);
 
-        User::create($validated);
+        $user = User::create($validated);
+
+        $this->logActivity('created', 'User', $user->id, "Menambahkan pengguna baru: {$user->name}");
 
         return redirect()->back()->with('success', 'User created successfully.');
     }
@@ -46,11 +50,14 @@ class UserController extends Controller
 
         $user->update($validated);
 
+        $this->logActivity('updated', 'User', $user->id, "Mengupdate data pengguna: {$user->name}");
+
         return redirect()->back()->with('success', 'User updated successfully.');
     }
 
     public function destroy(User $user)
     {
+        $this->logActivity('deleted', 'User', $user->id, "Menghapus pengguna: {$user->name}");
         $user->delete();
         return redirect()->back()->with('success', 'User deleted successfully.');
     }

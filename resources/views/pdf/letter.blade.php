@@ -82,10 +82,22 @@
     </style>
 </head>
 <body>
+    @php
+        $settings = \App\Models\CompanySetting::first();
+    @endphp
     <div class="header">
-        <h1>PT C-TECH SOLUTIONS</h1>
-        <p>Gedung C-Tech Lantai 5, Jl. Teknologi No. 99, Jakarta Selatan</p>
-        <p>Telp: (021) 1234567 | Email: info@ctech.com | Web: www.ctech.com</p>
+        <table style="width: 100%; text-align: center; margin-bottom: 5px;">
+            <tr>
+                <td style="width: 15%; text-align: left; vertical-align: middle;">
+                    <img src="{{ public_path('letter/main-logo.png') }}" style="max-height: 80px;" alt="Logo">
+                </td>
+                <td style="width: 85%; text-align: center; vertical-align: middle;">
+                    <h1 style="margin: 0; font-size: 22px; color: #2563eb; letter-spacing: 1px;">{{ $settings->company_name ?? 'PT KREATIF TEKNOLOGI MAJU BERSAMA' }}</h1>
+                    <p style="margin: 5px 0 0 0;">{{ $settings->address ?? 'Gedung C-Tech Lantai 5, Jl. Teknologi No. 99, Jakarta Selatan' }}</p>
+                    <p style="margin: 2px 0 0 0;">Telp: {{ $settings->phone ?? '(021) 1234567' }} | Email: {{ $settings->email ?? 'info@ctech.com' }} | Web: {{ $settings->website ?? 'www.ctech.com' }}</p>
+                </td>
+            </tr>
+        </table>
         <div class="header-line"></div>
     </div>
 
@@ -128,8 +140,8 @@
     <div class="signature">
         <p>Hormat Kami,</p>
         <div class="signature-space"></div>
-        <p style="font-weight: bold; text-decoration: underline; margin-bottom: 0;">{{ $letter->creator->name }}</p>
-        <p style="margin-top: 5px;">{{ $letter->creator->role }}</p>
+        <p style="font-weight: bold; text-decoration: underline; margin-bottom: 0;">{{ $settings->leader_name ?? $letter->creator->name }}</p>
+        <p style="margin-top: 5px;">Direktur</p>
     </div>
 
 </body>

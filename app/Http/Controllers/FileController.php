@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\File;
+use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
+    use LogsActivity;
     public function index()
     {
         $files = File::with('creator')->latest()->get();
@@ -31,13 +33,15 @@ class FileController extends Controller
         
         $path = $uploadedFile->store('company-files', 'public');
 
-        File::create([
+        $file = File::create([
             'name' => $name,
             'path' => $path,
             'extension' => $extension,
             'size' => $size,
             'created_by' => Auth::id(),
         ]);
+
+        $this->logActivity('created', 'File', $file->id, "Mengupload file baru: {$file->name}");
 
         return redirect()->back()->with('success', 'File uploaded successfully.');
     }
@@ -50,6 +54,8 @@ class FileController extends Controller
     public function destroy(File $file)
     {
         Storage::disk('public')->delete($file->path);
+        
+        $this->logActivity('deleted', 'File', $file->id, "Menghapus file: {$file->name}");
         $file->delete();
         
         return redirect()->back()->with('success', 'File deleted.');

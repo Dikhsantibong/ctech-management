@@ -126,15 +126,25 @@
 </head>
 <body>
     <div class="invoice-box">
-        <div class="header">
-            <div class="header-left">
-                <h1 style="margin:0; color:#2563eb;">C-TECH</h1>
-                <p style="margin:5px 0 0 0; color:#666;">Technology Solutions</p>
-            </div>
-            <div class="header-right">
-                <div class="title">INVOICE</div>
-                <p style="margin:0;"># {{ $invoice->invoice_number }}</p>
-            </div>
+        @php
+            $settings = \App\Models\CompanySetting::first();
+        @endphp
+        <div class="header" style="border-bottom: 2px solid #ddd; padding-bottom: 20px; margin-bottom: 40px;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 15%; text-align: left; vertical-align: middle;">
+                        <img src="{{ public_path('letter/main-logo.png') }}" style="max-height: 60px;" alt="Logo">
+                    </td>
+                    <td style="width: 45%; text-align: left; vertical-align: middle; padding-left: 10px;">
+                        <h1 style="margin:0; font-size: 20px; color:#2563eb;">{{ $settings->company_name ?? 'PT KREATIF TEKNOLOGI MAJU BERSAMA' }}</h1>
+                        <p style="margin:5px 0 0 0; color:#666; font-size: 12px;">{{ $settings->address ?? 'Technology Solutions' }}</p>
+                    </td>
+                    <td style="width: 40%; text-align: right; vertical-align: middle;">
+                        <div class="title" style="margin-bottom: 5px;">INVOICE</div>
+                        <p style="margin:0;"># {{ $invoice->invoice_number }}</p>
+                    </td>
+                </tr>
+            </table>
         </div>
 
         <table class="details">
@@ -190,9 +200,9 @@
 
         <div class="payment-info">
             <h4>Informasi Pembayaran</h4>
-            <p><strong>Bank:</strong> Bank Sultra</p>
-            <p><strong>No. Rekening:</strong>205.01.04.000531</p>
-            <p><strong>Atas Nama:</strong> PT KREATIF TEKNOLOGI MAJU BERSAMA</p>
+            <p><strong>Bank:</strong> {{ $settings->bank_name ?? 'Bank Sultra' }}</p>
+            <p><strong>No. Rekening:</strong> {{ $settings->bank_account_number ?? '(akan diisi manual)' }}</p>
+            <p><strong>Atas Nama:</strong> {{ $settings->bank_account_name ?? 'PT C-Tech Solutions' }}</p>
         </div>
 
         <div class="footer">

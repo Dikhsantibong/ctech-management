@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\User;
+use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
+    use LogsActivity;
     public function index()
     {
         $projects = Project::with('members')->latest()->get();
@@ -38,6 +40,8 @@ class ProjectController extends Controller
         if (isset($validated['members'])) {
             $project->members()->sync($validated['members']);
         }
+
+        $this->logActivity('created', 'Project', $project->id, "Membuat project baru: {$project->project_name}");
 
         return redirect()->back()->with('success', 'Project created successfully.');
     }
@@ -71,11 +75,14 @@ class ProjectController extends Controller
             $project->members()->detach();
         }
 
+        $this->logActivity('updated', 'Project', $project->id, "Mengupdate project: {$project->project_name}");
+
         return redirect()->back()->with('success', 'Project updated successfully.');
     }
 
     public function destroy(Project $project)
     {
+        $this->logActivity('deleted', 'Project', $project->id, "Menghapus project: {$project->project_name}");
         $project->delete();
         return redirect()->back()->with('success', 'Project deleted successfully.');
     }

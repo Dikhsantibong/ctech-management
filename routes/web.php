@@ -27,6 +27,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('documents', \App\Http\Controllers\DocumentController::class);
     Route::resource('files', \App\Http\Controllers\FileController::class)->except(['create', 'edit', 'update', 'show']);
     Route::get('files/{file}/download', [\App\Http\Controllers\FileController::class, 'download'])->name('files.download');
+    Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    Route::resource('content-plans', \App\Http\Controllers\ContentPlanController::class)->except(['create', 'edit', 'show']);
 });
 
 require __DIR__.'/settings.php';

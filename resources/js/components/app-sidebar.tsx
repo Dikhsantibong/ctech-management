@@ -1,7 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid, Briefcase, ListTodo, Receipt, Mail, FileStack, Files, Users, Activity, Settings } from 'lucide-react';
+import { LayoutGrid, Briefcase, ListTodo, Receipt, Mail, FileStack, Files, Users, Activity, Settings, Megaphone } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -16,70 +15,33 @@ import {
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Projects',
-        href: '/projects',
-        icon: Briefcase,
-    },
-    {
-        title: 'Tasks',
-        href: '/tasks',
-        icon: ListTodo,
-    },
-    {
-        title: 'Invoices',
-        href: '/invoices',
-        icon: Receipt,
-    },
-    {
-        title: 'Letters',
-        href: '/letters',
-        icon: Mail,
-    },
-    {
-        title: 'Documents',
-        href: '/documents',
-        icon: FileStack,
-    },
-    {
-        title: 'Files',
-        href: '/files',
-        icon: Files,
-    },
-    {
-        title: 'Team',
-        href: '/users',
-        icon: Users,
-    },
-    {
-        title: 'Activity Logs',
-        href: '/activity-logs',
-        icon: Activity,
-    },
-    {
-        title: 'Settings',
-        href: '/settings',
-        icon: Settings,
-    },
+const dashboardNav: NavItem[] = [
+    { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
 ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
+const operationsNav: NavItem[] = [
+    { title: 'Projects', href: '/projects', icon: Briefcase },
+    { title: 'Tasks', href: '/tasks', icon: ListTodo },
+];
+
+const financeNav: NavItem[] = [
+    { title: 'Invoices', href: '/invoices', icon: Receipt },
+];
+
+const administrationNav: NavItem[] = [
+    { title: 'Letters', href: '/letters', icon: Mail },
+    { title: 'Documents', href: '/documents', icon: FileStack },
+    { title: 'Files', href: '/files', icon: Files },
+];
+
+const marketingNav: NavItem[] = [
+    { title: 'Content Planning', href: '/content-plans', icon: Megaphone },
+];
+
+const systemNav: NavItem[] = [
+    { title: 'Team', href: '/users', icon: Users },
+    { title: 'Activity Logs', href: '/activity-logs', icon: Activity },
+    { title: 'Settings', href: '/settings', icon: Settings },
 ];
 
 export function AppSidebar() {
@@ -98,11 +60,15 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={dashboardNav} label="Overview" />
+                <NavMain items={operationsNav} label="Operations" />
+                <NavMain items={financeNav} label="Finance" />
+                <NavMain items={marketingNav} label="Marketing" />
+                <NavMain items={administrationNav} label="Administration" />
+                <NavMain items={systemNav} label="System" />
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use App\Models\Project;
 use App\Models\User;
+use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class TaskController extends Controller
 {
+    use LogsActivity;
     public function index(Request $request)
     {
         $query = Task::with(['project', 'assignee'])->latest();
@@ -42,7 +44,9 @@ class TaskController extends Controller
             'deadline' => 'nullable|date',
         ]);
 
-        Task::create($validated);
+        $task = Task::create($validated);
+
+        $this->logActivity('created', 'Task', $task->id, "Membuat task baru: {$task->title}");
 
         return redirect()->back()->with('success', 'Task created successfully.');
     }
@@ -61,11 +65,14 @@ class TaskController extends Controller
 
         $task->update($validated);
 
+        $this->logActivity('updated', 'Task', $task->id, "Mengupdate task: {$task->title}");
+
         return redirect()->back()->with('success', 'Task updated successfully.');
     }
 
     public function destroy(Task $task)
     {
+        $this->logActivity('deleted', 'Task', $task->id, "Menghapus task: {$task->title}");
         $task->delete();
         return redirect()->back()->with('success', 'Task deleted successfully.');
     }

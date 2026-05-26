@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
+use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoiceController extends Controller
 {
+    use LogsActivity;
     public function index()
     {
         $invoices = Invoice::latest()->get();
@@ -59,6 +61,8 @@ class InvoiceController extends Controller
             ]);
         }
 
+        $this->logActivity('created', 'Invoice', $invoice->id, "Membuat invoice baru: {$invoice->invoice_number}");
+
         return redirect()->back()->with('success', 'Invoice created successfully.');
     }
 
@@ -78,11 +82,14 @@ class InvoiceController extends Controller
 
         $invoice->update(['status' => $validated['status']]);
 
+        $this->logActivity('updated', 'Invoice', $invoice->id, "Mengupdate status invoice {$invoice->invoice_number} menjadi {$validated['status']}");
+
         return redirect()->back()->with('success', 'Invoice status updated.');
     }
 
     public function destroy(Invoice $invoice)
     {
+        $this->logActivity('deleted', 'Invoice', $invoice->id, "Menghapus invoice: {$invoice->invoice_number}");
         $invoice->delete();
         return redirect()->back()->with('success', 'Invoice deleted.');
     }

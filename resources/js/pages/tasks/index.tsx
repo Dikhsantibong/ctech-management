@@ -1,6 +1,6 @@
 import { Head, useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { Plus, MoreVertical, Edit2, Trash2, LayoutGrid, List } from 'lucide-react';
+import { Plus, MoreVertical, Edit2, Trash2, LayoutGrid, List, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -28,6 +28,8 @@ export default function TasksIndex({ tasks, projects, users, filters }: { tasks:
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState<any>(null);
+    const [draggedTask, setDraggedTask] = useState<any>(null);
+    const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
 
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         project_id: filters.project_id || (projects.length > 0 ? projects[0].id.toString() : ''),
@@ -101,6 +103,46 @@ export default function TasksIndex({ tasks, projects, users, filters }: { tasks:
         router.put(`/tasks/${task.id}`, { ...task, status: newStatus }, { preserveScroll: true });
     };
 
+    // Drag & Drop handlers
+    const handleDragStart = (e: React.DragEvent, task: any) => {
+        setDraggedTask(task);
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', task.id.toString());
+        const target = e.target as HTMLElement;
+        setTimeout(() => target.style.opacity = '0.5', 0);
+    };
+
+    const handleDragEnd = (e: React.DragEvent) => {
+        const target = e.target as HTMLElement;
+        target.style.opacity = '1';
+        setDraggedTask(null);
+        setDragOverColumn(null);
+    };
+
+    const handleDragOver = (e: React.DragEvent, status: string) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        setDragOverColumn(status);
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        const relatedTarget = e.relatedTarget as HTMLElement;
+        const currentTarget = e.currentTarget as HTMLElement;
+        if (!currentTarget.contains(relatedTarget)) {
+            setDragOverColumn(null);
+        }
+    };
+
+    const handleDrop = (e: React.DragEvent, newStatus: string) => {
+        e.preventDefault();
+        setDragOverColumn(null);
+
+        if (draggedTask && draggedTask.status !== newStatus) {
+            updateTaskStatus(draggedTask, newStatus);
+        }
+        setDraggedTask(null);
+    };
+
     const priorityBadgeColor = (priority: string) => {
         switch (priority) {
             case 'High': return 'destructive';
@@ -110,6 +152,13 @@ export default function TasksIndex({ tasks, projects, users, filters }: { tasks:
     };
 
     const statusColumns = ['Todo', 'Progress', 'Review', 'Done'];
+
+    const statusColumnColors: Record<string, string> = {
+        'Todo': 'border-t-zinc-400',
+        'Progress': 'border-t-blue-500',
+        'Review': 'border-t-yellow-500',
+        'Done': 'border-t-emerald-500',
+    };
 
     return (
         <>
@@ -241,45 +290,103 @@ export default function TasksIndex({ tasks, projects, users, filters }: { tasks:
                     </div>
                 ) : (
                     <div className="flex gap-4 overflow-x-auto pb-4">
-                        {statusColumns.map(status => (
-                            <div key={status} className="flex min-w-[300px] flex-col rounded-lg bg-muted/50 p-4">
-                                <h3 className="mb-4 font-semibold flex items-center justify-between">
-                                    {status} 
-                                    <span className="rounded-full bg-background px-2 py-0.5 text-xs text-muted-foreground">
-                                        {tasks.filter(t => t.status === status).length}
-                                    </span>
-                                </h3>
-                                <div className="flex flex-col gap-3">
-                                    {tasks.filter(t => t.status === status).map(task => (
-                                        <div key={task.id} className="rounded-lg border bg-card p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => openEditModal(task)}>
-                                            <div className="mb-2 flex items-center justify-between">
-                                                <Badge variant={priorityBadgeColor(task.priority)} className="text-[10px] px-1.5 py-0">
-                                                    {task.priority}
-                                                </Badge>
-                                                <div className="text-xs text-muted-foreground truncate max-w-[120px]" title={task.project?.project_name}>
+                        {statusColumns.map(status => {
+                            const columnTasks = tasks.filter(t => t.status === status);
+                            const isOver = dragOverColumn === status;
+
+                            return (
+                                <div 
+                                    key={status} 
+                                    className={`flex min-w-[300px] flex-1 flex-col rounded-xl border-t-4 bg-muted/30 transition-all duration-200 ${statusColumnColors[status] || 'border-t-zinc-400'} ${isOver ? 'ring-2 ring-primary ring-offset-2 bg-primary/5' : ''}`}
+                                    onDragOver={(e) => handleDragOver(e, status)}
+                                    onDragLeave={handleDragLeave}
+                                    onDrop={(e) => handleDrop(e, status)}
+                                >
+                                    <div className="flex items-center justify-between p-4 pb-2">
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="font-semibold text-sm">{status}</h3>
+                                            <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-muted px-1.5 text-xs font-medium text-muted-foreground">
+                                                {columnTasks.length}
+                                            </span>
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-7 w-7 p-0"
+                                            onClick={() => {
+                                                reset();
+                                                setData('status', status);
+                                                setIsCreateModalOpen(true);
+                                            }}
+                                        >
+                                            <Plus className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                    <div className="flex flex-col gap-2 p-3 pt-1 min-h-[200px]">
+                                        {columnTasks.map(task => (
+                                            <div 
+                                                key={task.id} 
+                                                draggable
+                                                onDragStart={(e) => handleDragStart(e, task)}
+                                                onDragEnd={handleDragEnd}
+                                                className={`group rounded-lg border bg-card p-3 shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing active:shadow-lg active:scale-[1.02] ${draggedTask?.id === task.id ? 'opacity-50' : ''}`}
+                                            >
+                                                <div className="mb-2 flex items-center justify-between">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <GripVertical className="h-3.5 w-3.5 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                        <Badge variant={priorityBadgeColor(task.priority)} className="text-[10px] px-1.5 py-0">
+                                                            {task.priority}
+                                                        </Badge>
+                                                    </div>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <MoreVertical className="h-3.5 w-3.5" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem onClick={() => openEditModal(task)}>
+                                                                <Edit2 className="mr-2 h-4 w-4" /> Edit
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => openDeleteModal(task)} className="text-destructive">
+                                                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
+                                                <h4 className="font-medium text-sm mb-1 line-clamp-2 cursor-pointer" onClick={() => openEditModal(task)}>{task.title}</h4>
+                                                <div className="text-xs text-muted-foreground truncate mb-2" title={task.project?.project_name}>
                                                     {task.project?.project_name}
                                                 </div>
+                                                <div className="flex items-center justify-between mt-3">
+                                                    {task.assignee ? (
+                                                        <div className="flex items-center gap-1.5">
+                                                            <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-medium border border-background" title={task.assignee.name}>
+                                                                {task.assignee.name.charAt(0)}
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="h-5 w-5"></div>
+                                                    )}
+                                                    {task.deadline && (
+                                                        <span className="text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">
+                                                            {new Date(task.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <h4 className="font-medium mb-1 line-clamp-2">{task.title}</h4>
-                                            <div className="mt-3 flex items-center justify-between">
-                                                {task.assignee ? (
-                                                    <div className="relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs border border-background" title={task.assignee.name}>
-                                                        {task.assignee.name.charAt(0)}
-                                                    </div>
-                                                ) : (
-                                                    <div className="h-6 w-6"></div>
-                                                )}
-                                                {task.deadline && (
-                                                    <span className="text-xs text-muted-foreground border rounded px-1">
-                                                        {new Date(task.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                                    </span>
-                                                )}
+                                        ))}
+                                        {columnTasks.length === 0 && (
+                                            <div className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 text-center transition-colors ${isOver ? 'border-primary bg-primary/5' : 'border-muted'}`}>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {isOver ? 'Lepaskan di sini' : 'Drag task ke sini'}
+                                                </p>
                                             </div>
-                                        </div>
-                                    ))}
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>
@@ -313,12 +420,12 @@ export default function TasksIndex({ tasks, projects, users, filters }: { tasks:
                         </div>
                         <div className="space-y-2 col-span-2 md:col-span-1">
                             <Label htmlFor="user_id">Assignee</Label>
-                            <Select value={data.user_id} onValueChange={value => setData('user_id', value)}>
+                            <Select value={data.user_id || 'none'} onValueChange={value => setData('user_id', value === 'none' ? '' : value)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Unassigned" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">Unassigned</SelectItem>
+                                    <SelectItem value="none">Unassigned</SelectItem>
                                     {users.map((u: any) => (
                                         <SelectItem key={u.id} value={u.id.toString()}>{u.name}</SelectItem>
                                     ))}
@@ -403,12 +510,12 @@ export default function TasksIndex({ tasks, projects, users, filters }: { tasks:
                         </div>
                         <div className="space-y-2 col-span-2 md:col-span-1">
                             <Label htmlFor="edit-user_id">Assignee</Label>
-                            <Select value={data.user_id} onValueChange={value => setData('user_id', value)}>
+                            <Select value={data.user_id || 'none'} onValueChange={value => setData('user_id', value === 'none' ? '' : value)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Unassigned" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">Unassigned</SelectItem>
+                                    <SelectItem value="none">Unassigned</SelectItem>
                                     {users.map((u: any) => (
                                         <SelectItem key={u.id} value={u.id.toString()}>{u.name}</SelectItem>
                                     ))}
