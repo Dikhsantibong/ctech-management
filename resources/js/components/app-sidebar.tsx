@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, Briefcase, ListTodo, Receipt, Mail, FileStack, Files, Users, Activity, Settings, Megaphone } from 'lucide-react';
+import { LayoutGrid, Briefcase, ListTodo, Receipt, Mail, FileStack, Files, Users, Activity, Settings, Megaphone, Building2 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -22,6 +22,7 @@ const dashboardNav: NavItem[] = [
 const operationsNav: NavItem[] = [
     { title: 'Projects', href: '/projects', icon: Briefcase },
     { title: 'Tasks', href: '/tasks', icon: ListTodo },
+    { title: 'Clients', href: '/clients', icon: Building2 },
 ];
 
 const financeNav: NavItem[] = [

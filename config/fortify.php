@@ -161,7 +161,7 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Features::registration(), // Disabled - no public registration
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication([
