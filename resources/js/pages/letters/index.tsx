@@ -1,6 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { Plus, MoreVertical, Mail, Trash2, Eye, Download, Edit2 } from 'lucide-react';
+import { Plus, MoreVertical, Mail, Trash2, Eye, Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -320,7 +320,9 @@ export default function LettersIndex({ letters }: { letters: any[] }) {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
     const [selectedLetter, setSelectedLetter] = useState<any>(null);
+    const [pdfUrl, setPdfUrl] = useState<string>('');
 
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         type: 'Surat Keputusan',
@@ -376,6 +378,25 @@ export default function LettersIndex({ letters }: { letters: any[] }) {
         setIsDeleteModalOpen(true);
     };
 
+    const openPreviewModal = (letter: any) => {
+        setSelectedLetter(letter);
+        fetch(`/letters/${letter.id}/pdf`, {
+            headers: {
+                'Accept': 'application/pdf'
+            }
+        })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+                setPdfUrl(url);
+                setIsPreviewModalOpen(true);
+            })
+            .catch(error => {
+                console.error('Error loading PDF:', error);
+                alert('Failed to load PDF');
+            });
+    };
+
     const submitCreate = (e: React.FormEvent) => {
         e.preventDefault();
         post('/letters', {
@@ -404,6 +425,14 @@ export default function LettersIndex({ letters }: { letters: any[] }) {
             },
         });
     };
+
+    useEffect(() => {
+        return () => {
+            if (pdfUrl) {
+                URL.revokeObjectURL(pdfUrl);
+            }
+        };
+    }, [pdfUrl]);
 
     const statusBadgeColor = (status: string) => {
         switch (status) {
@@ -484,10 +513,8 @@ export default function LettersIndex({ letters }: { letters: any[] }) {
                                                         <DropdownMenuItem onClick={() => openEditModal(letter)}>
                                                             <Edit2 className="mr-2 h-4 w-4" /> Edit
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem asChild>
-                                                            <a href={`/letters/${letter.id}/pdf`} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
-                                                                <Download className="mr-2 h-4 w-4" /> Download PDF
-                                                            </a>
+                                                        <DropdownMenuItem onClick={() => openPreviewModal(letter)}>
+                                                            <Eye className="mr-2 h-4 w-4" /> Preview PDF
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => openDeleteModal(letter)} className="text-destructive">
                                                             <Trash2 className="mr-2 h-4 w-4" /> Delete
@@ -689,6 +716,35 @@ export default function LettersIndex({ letters }: { letters: any[] }) {
                             <Button type="submit" variant="destructive" disabled={processing}>Delete</Button>
                         </DialogFooter>
                     </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Preview PDF Modal */}
+            <Dialog open={isPreviewModalOpen} onOpenChange={(open) => {
+                if (!open) {
+                    setPdfUrl('');
+                }
+                setIsPreviewModalOpen(open);
+            }}>
+                <DialogContent className="max-w-5xl w-[95vw] h-[85vh] p-0 flex flex-col">
+                    <DialogHeader className="px-6 py-4 border-b">
+                        <DialogTitle>Preview PDF - {selectedLetter?.reference_number}</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex-1 overflow-hidden w-full">
+                        {pdfUrl ? (
+                            <embed
+                                src={pdfUrl}
+                                type="application/pdf"
+                                width="100%"
+                                height="100%"
+                                className="w-full h-full"
+                            />
+                        ) : (
+                            <div className="flex items-center justify-center h-full">
+                                <p className="text-muted-foreground">Loading PDF...</p>
+                            </div>
+                        )}
+                    </div>
                 </DialogContent>
             </Dialog>
         </>

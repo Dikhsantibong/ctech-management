@@ -57,6 +57,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');
     Route::resource('content-plans', \App\Http\Controllers\ContentPlanController::class)->except(['create', 'edit', 'show']);
     Route::resource('clients', \App\Http\Controllers\ClientController::class);
+    Route::get('calendar', function () {
+        return inertia('calendar/index', [
+            // Dapat diperluas dengan data dari backend nanti
+        ]);
+    })->name('calendar.index');
 });
 
 require __DIR__.'/settings.php';
