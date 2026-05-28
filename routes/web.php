@@ -6,76 +6,70 @@ use Illuminate\Support\Facades\DB;
 Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return inertia('dashboard', [
-            'stats' => [
-                'active_projects' => \App\Models\Project::where('status', '!=', 'Completed')->count(),
-                'pending_tasks' => \App\Models\Task::where('status', '!=', 'Done')->count(),
-                'unpaid_invoices' => \App\Models\Invoice::where('status', '!=', 'Paid')->count(),
-                'team_members' => \App\Models\User::count(),
-            ],
-            'upcoming_tasks' => \App\Models\Task::with('project')->where('status', '!=', 'Done')->whereNotNull('deadline')->orderBy('deadline')->take(5)->get(),
-            // task counts grouped by status for dashboard charts
-            'task_status_counts' => DB::table('tasks')
-                ->select('status', DB::raw('count(*) as count'))
-                ->groupBy('status')
-                ->pluck('count', 'status'),
-            // tasks created per day for last 7 days (time-series)
-            'tasks_last_7_days' => (function () {
-                $rows = DB::table('tasks')
-                    ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
-                    ->where('created_at', '>=', now()->subDays(6))
-                    ->groupBy(DB::raw('DATE(created_at)'))
-                    ->orderBy(DB::raw('DATE(created_at)'))
-                    ->get()
-                    ->pluck('count', 'date')
-                    ->toArray();
+    // Accessible by all authenticated users (Staff, Admin Operasional, Admin)
+    Route::middleware('role:admin,admin_operasional,staff')->group(function () {
+        Route::get('/dashboard', function () {
+            return inertia('dashboard', [
+                'stats' => [
+                    'active_projects' => \App\Models\Project::where('status', '!=', 'Completed')->count(),
+                    'pending_tasks' => \App\Models\Task::where('status', '!=', 'Done')->count(),
+                    'unpaid_invoices' => \App\Models\Invoice::where('status', '!=', 'Paid')->count(),
+                    'team_members' => \App\Models\User::count(),
+                ],
+                'upcoming_tasks' => \App\Models\Task::with('project')->where('status', '!=', 'Done')->whereNotNull('deadline')->orderBy('deadline')->take(5)->get(),
+                'task_status_counts' => DB::table('tasks')
+                    ->select('status', DB::raw('count(*) as count'))
+                    ->groupBy('status')
+                    ->pluck('count', 'status'),
+                'tasks_last_7_days' => (function () {
+                    $rows = DB::table('tasks')
+                        ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
+                        ->where('created_at', '>=', now()->subDays(6))
+                        ->groupBy(DB::raw('DATE(created_at)'))
+                        ->orderBy(DB::raw('DATE(created_at)'))
+                        ->get()
+                        ->pluck('count', 'date')
+                        ->toArray();
 
-                $labels = [];
-                $data = [];
-                for ($i = 6; $i >= 0; $i--) {
-                    $d = now()->subDays($i)->format('Y-m-d');
-                    $labels[] = now()->subDays($i)->format('M j');
-                    $data[] = isset($rows[$d]) ? (int) $rows[$d] : 0;
-                }
+                    $labels = [];
+                    $data = [];
+                    for ($i = 6; $i >= 0; $i--) {
+                        $d = now()->subDays($i)->format('Y-m-d');
+                        $labels[] = now()->subDays($i)->format('M j');
+                        $data[] = isset($rows[$d]) ? (int) $rows[$d] : 0;
+                    }
 
-                return ['labels' => $labels, 'data' => $data];
-            })(),
-        ]);
-    })->name('dashboard');
+                    return ['labels' => $labels, 'data' => $data];
+                })(),
+            ]);
+        })->name('dashboard');
 
-    // System Routes (Admin only)
-    Route::middleware(['role:admin,superadmin'])->group(function () {
-        Route::resource('users', \App\Http\Controllers\UserController::class);
-        Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');
-    });
-
-    // Operations, Finance, Admin Routes (Admin & Admin Operasional)
-    Route::middleware(['role:admin_operasional'])->group(function () {
         Route::resource('projects', \App\Http\Controllers\ProjectController::class);
-        
-        Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
-        Route::put('invoices/{invoice}/status', [\App\Http\Controllers\InvoiceController::class, 'updateStatus'])->name('invoices.status');
-        Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
-        
-        Route::resource('letters', \App\Http\Controllers\LetterController::class);
-        Route::get('letters/{letter}/pdf', [\App\Http\Controllers\LetterController::class, 'downloadPdf'])->name('letters.pdf');
-        
-        Route::resource('documents', \App\Http\Controllers\DocumentController::class);
-        
-        Route::resource('files', \App\Http\Controllers\FileController::class)->except(['create', 'edit', 'update', 'show']);
-        Route::get('files/{file}/download', [\App\Http\Controllers\FileController::class, 'download'])->name('files.download');
-        
-        Route::resource('clients', \App\Http\Controllers\ClientController::class);
-        
+        Route::resource('tasks', \App\Http\Controllers\TaskController::class);
+        Route::resource('content-plans', \App\Http\Controllers\ContentPlanController::class)->except(['create', 'edit', 'show']);
         Route::get('calendar', function () {
-            return inertia('calendar/index');
+            return inertia('calendar/index', []);
         })->name('calendar.index');
     });
 
-    // Marketing & General Operations (Accessible by Staf)
-    Route::resource('tasks', \App\Http\Controllers\TaskController::class);
-    Route::resource('content-plans', \App\Http\Controllers\ContentPlanController::class)->except(['create', 'edit', 'show']);
+    // Accessible by Admin Operasional and Admin
+    Route::middleware('role:admin,admin_operasional')->group(function () {
+        Route::resource('clients', \App\Http\Controllers\ClientController::class);
+        Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
+        Route::put('invoices/{invoice}/status', [\App\Http\Controllers\InvoiceController::class, 'updateStatus'])->name('invoices.status');
+        Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
+        Route::resource('letters', \App\Http\Controllers\LetterController::class);
+        Route::get('letters/{letter}/pdf', [\App\Http\Controllers\LetterController::class, 'downloadPdf'])->name('letters.pdf');
+        Route::resource('documents', \App\Http\Controllers\DocumentController::class);
+        Route::resource('files', \App\Http\Controllers\FileController::class)->except(['create', 'edit', 'update', 'show']);
+        Route::get('files/{file}/download', [\App\Http\Controllers\FileController::class, 'download'])->name('files.download');
+    });
+
+    // Accessible only by Admin
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('users', \App\Http\Controllers\UserController::class);
+        Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    });
 });
 
 require __DIR__.'/settings.php';
