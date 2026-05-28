@@ -31,7 +31,7 @@ class FileController extends Controller
         $extension = $uploadedFile->getClientOriginalExtension();
         $size = $uploadedFile->getSize();
         
-        $path = $uploadedFile->store('company-files', 'public');
+        $path = $uploadedFile->store('company-files', 'local');
 
         $file = File::create([
             'name' => $name,
@@ -48,12 +48,20 @@ class FileController extends Controller
 
     public function download(File $file)
     {
-        return Storage::disk('public')->download($file->path, $file->name);
+        return Storage::disk('local')->download($file->path, $file->name);
+    }
+
+    public function preview(File $file)
+    {
+        if (!Storage::disk('local')->exists($file->path)) {
+            abort(404);
+        }
+        return Storage::disk('local')->response($file->path);
     }
 
     public function destroy(File $file)
     {
-        Storage::disk('public')->delete($file->path);
+        Storage::disk('local')->delete($file->path);
         
         $this->logActivity('deleted', 'File', $file->id, "Menghapus file: {$file->name}");
         $file->delete();

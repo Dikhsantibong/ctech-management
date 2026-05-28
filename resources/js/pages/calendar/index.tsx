@@ -99,15 +99,15 @@ const getEventIcon = (type: string) => {
 const getEventColor = (type: string) => {
     switch (type) {
         case 'project':
-            return 'bg-blue-100 text-blue-800 border-blue-300';
+            return 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800';
         case 'task':
-            return 'bg-green-100 text-green-800 border-green-300';
+            return 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
         case 'meeting':
-            return 'bg-purple-100 text-purple-800 border-purple-300';
+            return 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800';
         case 'invoice':
-            return 'bg-orange-100 text-orange-800 border-orange-300';
+            return 'bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
         default:
-            return 'bg-gray-100 text-gray-800 border-gray-300';
+            return 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700';
     }
 };
 
@@ -182,7 +182,7 @@ export default function CalendarIndex() {
         // Empty cells
         for (let i = 0; i < firstDay; i++) {
             days.push(
-                <div key={`empty-${i}`} className="aspect-square bg-gray-50"></div>
+                <div key={`empty-${i}`} className="aspect-square bg-muted/30"></div>
             );
         }
 
@@ -197,10 +197,10 @@ export default function CalendarIndex() {
                     key={day}
                     title={date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     className={`aspect-square border rounded-lg p-2 overflow-hidden cursor-pointer hover:shadow-md transition-shadow group relative ${
-                        isToday ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                        isToday ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-border'
                     }`}
                 >
-                    <div className={`text-sm font-semibold mb-1 ${isToday ? 'text-blue-600' : 'text-gray-700'}`}>
+                    <div className={`text-sm font-semibold mb-1 ${isToday ? 'text-blue-600 dark:text-blue-400' : 'text-foreground'}`}>
                         {day}
                     </div>
                     <div className="space-y-1">
@@ -215,7 +215,7 @@ export default function CalendarIndex() {
                         ))}
                     </div>
                     {events.length > 0 && (
-                        <div className="text-xs text-gray-500 mt-2 pt-1 border-t border-gray-200">
+                        <div className="text-xs text-muted-foreground mt-2 pt-1 border-t border-border">
                             {events.length} event{events.length > 1 ? 's' : ''}
                         </div>
                     )}
@@ -224,9 +224,9 @@ export default function CalendarIndex() {
         }
 
         return (
-            <div className="grid grid-cols-7 gap-1 bg-white rounded-lg border p-4">
+            <div className="grid grid-cols-7 gap-1 bg-card text-card-foreground rounded-lg border p-4">
                 {dayNames.map((day) => (
-                    <div key={day} className="text-center font-semibold text-gray-600 py-2">
+                    <div key={day} className="text-center font-semibold text-muted-foreground py-2">
                         {day}
                     </div>
                 ))}
@@ -241,13 +241,13 @@ export default function CalendarIndex() {
         const endDate = weekDays[6];
 
         return (
-            <div className="bg-white rounded-lg border p-4">
-                <div className="text-sm text-gray-600 mb-4 flex items-center justify-between">
+            <div className="bg-card text-card-foreground rounded-lg border p-4">
+                <div className="text-sm text-muted-foreground mb-4 flex items-center justify-between">
                     <div>
-                        <div className="font-semibold text-gray-900">
+                        <div className="font-semibold text-foreground">
                             {startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} - {endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs text-muted-foreground mt-1">
                             {startDate.toLocaleDateString('en-US', { weekday: 'short' })} to {endDate.toLocaleDateString('en-US', { weekday: 'short' })}
                         </div>
                     </div>
@@ -261,16 +261,16 @@ export default function CalendarIndex() {
                             <div
                                 key={index}
                                 className={`rounded-lg border p-3 min-h-[300px] overflow-y-auto ${
-                                    isToday ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                                    isToday ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-border'
                                 }`}
                             >
-                                <div className="text-sm font-semibold mb-1 text-gray-700">
+                                <div className="text-sm font-semibold mb-1 text-foreground">
                                     {dayNames[date.getDay()]}
                                 </div>
-                                <div className="text-lg font-bold text-gray-900 mb-1">
+                                <div className="text-lg font-bold text-foreground mb-1">
                                     {date.getDate()}
                                 </div>
-                                <div className="text-xs text-gray-500 mb-3">
+                                <div className="text-xs text-muted-foreground mb-3">
                                     {date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })}
                                 </div>
                                 <div className="space-y-2">
@@ -298,9 +298,9 @@ export default function CalendarIndex() {
         const upcomingEvents = getUpcomingEvents();
 
         return (
-            <div className="bg-white rounded-lg border p-4 space-y-3">
+            <div className="bg-card text-card-foreground rounded-lg border p-4 space-y-3">
                 {upcomingEvents.length === 0 ? (
-                    <div className="text-center text-gray-500 py-8">
+                    <div className="text-center text-muted-foreground py-8">
                         No upcoming events scheduled
                     </div>
                 ) : (
@@ -313,13 +313,13 @@ export default function CalendarIndex() {
                                 {getEventIcon(event.type)}
                             </div>
                             <div className="flex-grow">
-                                <div className="font-semibold text-gray-900 mb-1">{event.title}</div>
+                                <div className="font-semibold text-foreground mb-1">{event.title}</div>
                                 {event.description && (
-                                    <div className="text-sm text-gray-600 mb-2">{event.description}</div>
+                                    <div className="text-sm text-muted-foreground mb-2">{event.description}</div>
                                 )}
-                                <div className="space-y-1 text-sm text-gray-600">
+                                <div className="space-y-1 text-sm text-muted-foreground">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-xs font-semibold text-gray-500">DATE:</span>
+                                        <span className="text-xs font-semibold text-muted-foreground">DATE:</span>
                                         <span>
                                             {event.date.toLocaleDateString('en-US', {
                                                 weekday: 'short',
@@ -331,13 +331,13 @@ export default function CalendarIndex() {
                                     </div>
                                     {event.time && (
                                         <div className="flex items-center gap-2">
-                                            <Clock className="h-3 w-3 text-gray-400" />
+                                            <Clock className="h-3 w-3 text-muted-foreground" />
                                             <span className="text-xs">{event.time}</span>
                                         </div>
                                     )}
                                     {event.location && (
                                         <div className="flex items-center gap-2">
-                                            <span className="text-xs font-semibold text-gray-500">LOCATION:</span>
+                                            <span className="text-xs font-semibold text-muted-foreground">LOCATION:</span>
                                             <span className="text-xs">{event.location}</span>
                                         </div>
                                     )}
@@ -370,7 +370,7 @@ export default function CalendarIndex() {
                 </div>
 
                 {/* Controls */}
-                <div className="flex items-center justify-between bg-white rounded-lg border p-4">
+                <div className="flex items-center justify-between bg-card text-card-foreground rounded-lg border p-4">
                     <div className="flex items-center gap-4">
                         <Button
                             variant="outline"
@@ -391,7 +391,7 @@ export default function CalendarIndex() {
                             {viewMode === 'monthly' && (
                                 <div>
                                     <div>{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</div>
-                                    <div className="text-xs text-gray-500 mt-1">
+                                    <div className="text-xs text-muted-foreground mt-1">
                                         {mockEvents.filter(e => e.date.getMonth() === currentDate.getMonth() && e.date.getFullYear() === currentDate.getFullYear()).length} events this month
                                     </div>
                                 </div>
@@ -399,7 +399,7 @@ export default function CalendarIndex() {
                             {viewMode === 'weekly' && (
                                 <div>
                                     <div>Week of {getWeekStart(currentDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(getWeekStart(currentDate).getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-                                    <div className="text-xs text-gray-500 mt-1">
+                                    <div className="text-xs text-muted-foreground mt-1">
                                         {mockEvents.filter(e => {
                                             const eDate = e.date.getTime();
                                             const weekStart = getWeekStart(currentDate).getTime();
@@ -412,7 +412,7 @@ export default function CalendarIndex() {
                             {viewMode === 'agenda' && (
                                 <div>
                                     <div>Upcoming Events</div>
-                                    <div className="text-xs text-gray-500 mt-1">
+                                    <div className="text-xs text-muted-foreground mt-1">
                                         {mockEvents.length} total events scheduled
                                     </div>
                                 </div>
@@ -455,7 +455,7 @@ export default function CalendarIndex() {
                 </div>
 
                 {/* Legend */}
-                <div className="flex flex-wrap gap-4 bg-white rounded-lg border p-4">
+                <div className="flex flex-wrap gap-4 bg-card text-card-foreground rounded-lg border p-4">
                     <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded bg-blue-500"></div>
                         <span className="text-sm">Project Deadline</span>

@@ -3,7 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 
-Route::inertia('/', 'welcome')->name('home');
+Route::get('/', function () {
+    $news = \App\Models\News::where('status', 'Published')->latest()->take(3)->get();
+    $portfolios = \App\Models\Portfolio::latest()->take(6)->get();
+    return inertia('welcome', ['news' => $news, 'portfolios' => $portfolios]);
+})->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Accessible by all authenticated users (Staff, Admin Operasional, Direktur Utama)
@@ -48,6 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('tasks', \App\Http\Controllers\TaskController::class);
         Route::resource('content-plans', \App\Http\Controllers\ContentPlanController::class)->except(['create', 'edit', 'show']);
         Route::resource('news', \App\Http\Controllers\NewsController::class)->except(['create', 'edit', 'show']);
+        Route::resource('portfolios', \App\Http\Controllers\PortfolioController::class)->except(['create', 'edit', 'show']);
         Route::get('calendar', function () {
             return inertia('calendar/index', []);
         })->name('calendar.index');
@@ -64,6 +69,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('documents', \App\Http\Controllers\DocumentController::class);
         Route::resource('files', \App\Http\Controllers\FileController::class)->except(['create', 'edit', 'update', 'show']);
         Route::get('files/{file}/download', [\App\Http\Controllers\FileController::class, 'download'])->name('files.download');
+        Route::get('files/{file}/preview', [\App\Http\Controllers\FileController::class, 'preview'])->name('files.preview');
     });
 
     // Accessible only by Direktur Utama

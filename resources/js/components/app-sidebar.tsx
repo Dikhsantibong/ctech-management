@@ -37,6 +37,7 @@ const administrationNav: NavItem[] = [
 
 const marketingNav: NavItem[] = [
     { title: 'Berita', href: '/news', icon: Newspaper },
+    { title: 'Portfolio', href: '/portfolios', icon: Briefcase },
     { title: 'Content Planning', href: '/content-plans', icon: Megaphone },
 ];
 

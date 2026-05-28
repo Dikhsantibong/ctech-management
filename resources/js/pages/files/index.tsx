@@ -100,7 +100,7 @@ export default function FilesIndex({ files }: { files: any[] }) {
                     {files.map((file) => (
                         <Card key={file.id} className="group relative overflow-hidden flex flex-col transition-all hover:shadow-md hover:border-primary/50">
                             <CardHeader className="p-4 pb-2 border-b bg-muted/20 flex flex-row items-start justify-between space-y-0">
-                                <a href={`/storage/${file.path}`} target="_blank" rel="noreferrer" className="flex items-center justify-center w-full h-24 bg-card rounded-md border border-dashed hover:bg-muted transition-colors cursor-pointer">
+                                <a href={`/files/${file.id}/preview`} target="_blank" rel="noreferrer" className="flex items-center justify-center w-full h-24 bg-card rounded-md border border-dashed hover:bg-muted transition-colors cursor-pointer">
                                     {getFileIcon(file.extension)}
                                 </a>
                                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background rounded-md shadow-sm border">
@@ -113,7 +113,7 @@ export default function FilesIndex({ files }: { files: any[] }) {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuItem asChild>
-                                                <a href={`/storage/${file.path}`} target="_blank" rel="noreferrer" className="cursor-pointer">
+                                                <a href={`/files/${file.id}/preview`} target="_blank" rel="noreferrer" className="cursor-pointer">
                                                     <FileText className="mr-2 h-4 w-4" /> Preview
                                                 </a>
                                             </DropdownMenuItem>
