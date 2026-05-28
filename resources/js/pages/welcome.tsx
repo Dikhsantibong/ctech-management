@@ -6,7 +6,8 @@ import {
     Code2, Smartphone, Monitor, Database, Shield, Zap, 
     Cpu, Cloud, Menu, X, Star, Quote, Mail, Phone, MapPin, 
     Facebook, Twitter, Instagram, Linkedin,
-    Briefcase, Activity, Clock, Users, Building2, PlayCircle, BarChart3, LineChart
+    Briefcase, Activity, Clock, Users, Building2, PlayCircle, BarChart3, LineChart,
+    Package, Fingerprint, ShoppingCart, Calculator, PieChart, Wifi, WifiOff, Layers
 } from 'lucide-react';
 
 const ctechStyles = `
@@ -209,11 +210,7 @@ export default function Welcome({ news = [], portfolios = [] }: { news?: any[], 
                         </div>
 
                         <div className="hidden md:flex items-center gap-4">
-                            {auth.user ? (
-                                <Link href={dashboard()} className="text-sm font-medium text-blue-600 hover:text-blue-700">Dashboard</Link>
-                            ) : (
-                                <a href="#kontak" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">Login</a>
-                            )}
+
                             <a href="#kontak" className="bg-slate-900 hover:bg-blue-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md hover:shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5">
                                 Konsultasi Gratis
                             </a>
@@ -447,59 +444,74 @@ export default function Welcome({ news = [], portfolios = [] }: { news?: any[], 
                     </div>
                 </section>
 
-                {/* Produk / Solusi */}
-                <section id="produk" className="py-24 bg-slate-900 text-white relative overflow-hidden">
-                    {/* Dark Mode Decor */}
-                    <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-blue-900/40 to-transparent -z-10"></div>
-                    <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl -z-10"></div>
-
+                {/* Produk Unggulan — CTECH Paylo */}
+                <section id="produk" className="py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-6">
-                        <div className="grid lg:grid-cols-2 gap-16 items-center">
-                            <div className="reveal">
-                                <span className="text-blue-400 font-bold tracking-wider uppercase text-sm mb-2 block">Produk Unggulan</span>
-                                <h2 className="text-4xl font-extrabold mb-6">Digitalisasi Menyeluruh untuk Operasional Bisnis</h2>
-                                <p className="text-slate-300 text-lg mb-8 leading-relaxed">
-                                    Selain custom development, kami memiliki rangkaian produk enterprise-ready yang siap diimplementasikan untuk mendigitalisasi proses kerja Anda.
-                                </p>
-                                
-                                <ul className="space-y-4 mb-8">
-                                    {['Dashboard Monitoring Real-time', 'Sistem ERP Terintegrasi', 'Smart Attendance dengan AI Face Recognition', 'Digital Reporting Automation'].map((item, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-slate-200">
-                                            <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                                                <CheckCircle2 className="w-4 h-4 text-blue-400" />
-                                            </div>
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
+                        {/* Header */}
+                        <div className="max-w-2xl mb-16 reveal">
+                            <p className="text-blue-600 font-semibold text-sm mb-3">Produk Unggulan</p>
+                            <h2 className="text-4xl font-extrabold text-slate-900 mb-5">
+                                CTECH Paylo
+                            </h2>
+                            <p className="text-slate-600 text-lg leading-relaxed">
+                                Paket lengkap aplikasi bisnis siap pakai. Satu ekosistem yang menangani seluruh operasional perusahaan Anda — dari absensi hingga analisis bisnis.
+                            </p>
+                        </div>
 
-                                <a href="#kontak" className="inline-flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-full font-semibold transition-colors">
-                                    Minta Demo Produk <ArrowRight className="w-4 h-4" />
-                                </a>
-                            </div>
-
-                            <div className="relative reveal">
-                                <div className="glass-dark p-2 rounded-2xl border border-slate-700 shadow-2xl">
-                                    <div className="bg-slate-800 rounded-xl overflow-hidden aspect-[4/3] relative group">
-                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60"></div>
-                                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800" alt="Dashboard" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                                        
-                                        {/* Overlay UI elements */}
-                                        <div className="absolute bottom-6 left-6 right-6 glass-dark rounded-xl p-4 flex items-center justify-between">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
-                                                    <BarChart3 className="w-5 h-5 text-white" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-slate-400 font-medium">Revenue Growth</p>
-                                                    <p className="text-lg font-bold text-white">+124.5%</p>
-                                                </div>
-                                            </div>
-                                            <LineChart className="w-16 h-8 text-green-400" />
-                                        </div>
+                        {/* App Module Grid */}
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200 border border-slate-200 rounded-2xl overflow-hidden mb-16">
+                            {[
+                                {
+                                    icon: <Fingerprint className="w-5 h-5 text-blue-600" />,
+                                    name: 'Absensi Karyawan',
+                                    desc: 'GPS tracking, face recognition, dan laporan kehadiran otomatis secara real-time.',
+                                },
+                                {
+                                    icon: <Database className="w-5 h-5 text-blue-600" />,
+                                    name: 'Inventory',
+                                    desc: 'Barcode scanning, notifikasi stok minimum, multi-gudang dalam satu dashboard.',
+                                },
+                                {
+                                    icon: <ShoppingCart className="w-5 h-5 text-blue-600" />,
+                                    name: 'Kasir / POS',
+                                    desc: 'Offline-first, sinkronisasi otomatis saat online. Tetap berjalan tanpa internet.',
+                                },
+                                {
+                                    icon: <Calculator className="w-5 h-5 text-blue-600" />,
+                                    name: 'Akuntan',
+                                    desc: 'Pembukuan otomatis, laba-rugi, neraca, arus kas — sesuai standar akuntansi Indonesia.',
+                                },
+                                {
+                                    icon: <PieChart className="w-5 h-5 text-blue-600" />,
+                                    name: 'Owner Dashboard',
+                                    desc: 'Monitoring pendapatan, performa cabang, dan insight strategis untuk pemilik bisnis.',
+                                },
+                                {
+                                    icon: <BarChart3 className="w-5 h-5 text-blue-600" />,
+                                    name: 'Analisis Bisnis',
+                                    desc: 'Prediksi tren penjualan, analisis pelanggan, dan rekomendasi berbasis data.',
+                                },
+                            ].map((app, idx) => (
+                                <div key={idx} className="bg-white p-8 reveal" style={{ transitionDelay: `${idx * 60}ms` }}>
+                                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-4">
+                                        {app.icon}
                                     </div>
+                                    <h4 className="text-base font-bold text-slate-900 mb-2">{app.name}</h4>
+                                    <p className="text-sm text-slate-500 leading-relaxed">{app.desc}</p>
                                 </div>
+                            ))}
+                        </div>
+
+                        {/* Bottom row */}
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 reveal">
+                            <div className="flex flex-wrap gap-x-10 gap-y-4 text-sm text-slate-500">
+                                <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-blue-600" /> 6 aplikasi terintegrasi</span>
+                                <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-blue-600" /> Kasir offline-first</span>
+                                <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-blue-600" /> Siap pakai, deploy cepat</span>
                             </div>
+                            <a href="#kontak" className="inline-flex items-center gap-2 bg-slate-900 hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-semibold transition-colors shrink-0">
+                                Jadwalkan Demo <ArrowRight className="w-4 h-4" />
+                            </a>
                         </div>
                     </div>
                 </section>
