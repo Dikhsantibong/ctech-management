@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\DB;
 Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Accessible by all authenticated users (Staff, Admin Operasional, Admin)
-    Route::middleware('role:admin,admin_operasional,staff')->group(function () {
+    // Accessible by all authenticated users (Staff, Admin Operasional, Direktur Utama)
+    Route::middleware('role:direktur_utama,admin_operasional,staff')->group(function () {
         Route::get('/dashboard', function () {
             return inertia('dashboard', [
                 'stats' => [
@@ -47,25 +47,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('projects', \App\Http\Controllers\ProjectController::class);
         Route::resource('tasks', \App\Http\Controllers\TaskController::class);
         Route::resource('content-plans', \App\Http\Controllers\ContentPlanController::class)->except(['create', 'edit', 'show']);
+        Route::resource('news', \App\Http\Controllers\NewsController::class)->except(['create', 'edit', 'show']);
         Route::get('calendar', function () {
             return inertia('calendar/index', []);
         })->name('calendar.index');
     });
 
-    // Accessible by Admin Operasional and Admin
-    Route::middleware('role:admin,admin_operasional')->group(function () {
+    // Accessible by Admin Operasional and Direktur Utama
+    Route::middleware('role:direktur_utama,admin_operasional')->group(function () {
         Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
         Route::put('invoices/{invoice}/status', [\App\Http\Controllers\InvoiceController::class, 'updateStatus'])->name('invoices.status');
         Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
         Route::resource('letters', \App\Http\Controllers\LetterController::class);
+        Route::get('letters/{letter}/preview', [\App\Http\Controllers\LetterController::class, 'previewPdf'])->name('letters.preview');
         Route::get('letters/{letter}/pdf', [\App\Http\Controllers\LetterController::class, 'downloadPdf'])->name('letters.pdf');
         Route::resource('documents', \App\Http\Controllers\DocumentController::class);
         Route::resource('files', \App\Http\Controllers\FileController::class)->except(['create', 'edit', 'update', 'show']);
         Route::get('files/{file}/download', [\App\Http\Controllers\FileController::class, 'download'])->name('files.download');
     });
 
-    // Accessible only by Admin
-    Route::middleware('role:admin')->group(function () {
+    // Accessible only by Direktur Utama
+    Route::middleware('role:direktur_utama')->group(function () {
         Route::resource('users', \App\Http\Controllers\UserController::class);
         Route::resource('clients', \App\Http\Controllers\ClientController::class);
         Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');

@@ -513,8 +513,10 @@ export default function LettersIndex({ letters }: { letters: any[] }) {
                                                         <DropdownMenuItem onClick={() => openEditModal(letter)}>
                                                             <Edit2 className="mr-2 h-4 w-4" /> Edit
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => openPreviewModal(letter)}>
-                                                            <Eye className="mr-2 h-4 w-4" /> Preview PDF
+                                                        <DropdownMenuItem asChild>
+                                                            <a href={`/letters/${letter.id}/preview`} target="_blank" rel="noreferrer" className="cursor-pointer flex items-center">
+                                                                <Eye className="mr-2 h-4 w-4" /> Preview PDF
+                                                            </a>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => openDeleteModal(letter)} className="text-destructive">
                                                             <Trash2 className="mr-2 h-4 w-4" /> Delete
@@ -719,34 +721,6 @@ export default function LettersIndex({ letters }: { letters: any[] }) {
                 </DialogContent>
             </Dialog>
 
-            {/* Preview PDF Modal */}
-            <Dialog open={isPreviewModalOpen} onOpenChange={(open) => {
-                if (!open) {
-                    setPdfUrl('');
-                }
-                setIsPreviewModalOpen(open);
-            }}>
-                <DialogContent className="max-w-5xl w-[95vw] h-[85vh] p-0 flex flex-col">
-                    <DialogHeader className="px-6 py-4 border-b">
-                        <DialogTitle>Preview PDF - {selectedLetter?.reference_number}</DialogTitle>
-                    </DialogHeader>
-                    <div className="flex-1 overflow-hidden w-full">
-                        {pdfUrl ? (
-                            <embed
-                                src={pdfUrl}
-                                type="application/pdf"
-                                width="100%"
-                                height="100%"
-                                className="w-full h-full"
-                            />
-                        ) : (
-                            <div className="flex items-center justify-center h-full">
-                                <p className="text-muted-foreground">Loading PDF...</p>
-                            </div>
-                        )}
-                    </div>
-                </DialogContent>
-            </Dialog>
         </>
     );
 }

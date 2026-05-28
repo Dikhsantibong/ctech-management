@@ -109,4 +109,12 @@ class LetterController extends Controller
         $pdf->setPaper('a4', 'portrait');
         return $pdf->download(str_replace('/', '-', $letter->reference_number) . '.pdf');
     }
+
+    public function previewPdf(Letter $letter)
+    {
+        $letter->load('creator');
+        $pdf = Pdf::loadView('pdf.letter', ['letter' => $letter]);
+        $pdf->setPaper('a4', 'portrait');
+        return $pdf->stream(str_replace('/', '-', $letter->reference_number) . '.pdf');
+    }
 }

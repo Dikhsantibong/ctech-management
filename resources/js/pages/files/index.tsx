@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { Plus, MoreVertical, File, FileText, Image as ImageIcon, FileArchive, Trash2, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -52,7 +52,7 @@ export default function FilesIndex({ files }: { files: any[] }) {
 
     const submitDelete = (e: React.FormEvent) => {
         e.preventDefault();
-        destroy(`/files/${selectedFile?.id}`, {
+        router.delete(`/files/${selectedFile?.id}`, {
             onSuccess: () => {
                 setIsDeleteModalOpen(false);
             },
@@ -98,11 +98,11 @@ export default function FilesIndex({ files }: { files: any[] }) {
 
                 <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                     {files.map((file) => (
-                        <Card key={file.id} className="group overflow-hidden flex flex-col transition-all hover:shadow-md hover:border-primary/50">
+                        <Card key={file.id} className="group relative overflow-hidden flex flex-col transition-all hover:shadow-md hover:border-primary/50">
                             <CardHeader className="p-4 pb-2 border-b bg-muted/20 flex flex-row items-start justify-between space-y-0">
-                                <div className="flex items-center justify-center w-full h-24 bg-card rounded-md border border-dashed">
+                                <a href={`/storage/${file.path}`} target="_blank" rel="noreferrer" className="flex items-center justify-center w-full h-24 bg-card rounded-md border border-dashed hover:bg-muted transition-colors cursor-pointer">
                                     {getFileIcon(file.extension)}
-                                </div>
+                                </a>
                                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background rounded-md shadow-sm border">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -112,6 +112,11 @@ export default function FilesIndex({ files }: { files: any[] }) {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
+                                            <DropdownMenuItem asChild>
+                                                <a href={`/storage/${file.path}`} target="_blank" rel="noreferrer" className="cursor-pointer">
+                                                    <FileText className="mr-2 h-4 w-4" /> Preview
+                                                </a>
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem asChild>
                                                 <a href={`/files/${file.id}/download`} className="cursor-pointer">
                                                     <Download className="mr-2 h-4 w-4" /> Download
