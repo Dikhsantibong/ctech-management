@@ -23,7 +23,6 @@ const operationsNav: NavItem[] = [
     { title: 'Calendar', href: '/calendar', icon: Calendar },
     { title: 'Projects', href: '/projects', icon: Briefcase },
     { title: 'Tasks', href: '/tasks', icon: ListTodo },
-    { title: 'Clients', href: '/clients', icon: Building2 },
 ];
 
 const financeNav: NavItem[] = [
@@ -54,6 +53,11 @@ export function AppSidebar() {
     const isAdminOp = userRole === 'admin_operasional';
     const isAdmin = userRole === 'admin';
 
+    const currentOperationsNav = [...operationsNav];
+    if (isAdmin) {
+        currentOperationsNav.push({ title: 'Clients', href: '/clients', icon: Building2 });
+    }
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -70,7 +74,7 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={dashboardNav} label="Overview" />
-                <NavMain items={operationsNav} label="Operations" />
+                <NavMain items={currentOperationsNav} label="Operations" />
                 
                 {(isAdmin || isAdminOp) && (
                     <NavMain items={financeNav} label="Finance" />

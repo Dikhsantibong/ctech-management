@@ -54,7 +54,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Accessible by Admin Operasional and Admin
     Route::middleware('role:admin,admin_operasional')->group(function () {
-        Route::resource('clients', \App\Http\Controllers\ClientController::class);
         Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
         Route::put('invoices/{invoice}/status', [\App\Http\Controllers\InvoiceController::class, 'updateStatus'])->name('invoices.status');
         Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
@@ -68,6 +67,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Accessible only by Admin
     Route::middleware('role:admin')->group(function () {
         Route::resource('users', \App\Http\Controllers\UserController::class);
+        Route::resource('clients', \App\Http\Controllers\ClientController::class);
         Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');
     });
 });
