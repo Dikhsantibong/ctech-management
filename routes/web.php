@@ -43,25 +43,39 @@ Route::middleware(['auth', 'verified'])->group(function () {
             })(),
         ]);
     })->name('dashboard');
-    Route::resource('users', \App\Http\Controllers\UserController::class);
-    Route::resource('projects', \App\Http\Controllers\ProjectController::class);
+
+    // System Routes (Admin only)
+    Route::middleware(['role:admin,superadmin'])->group(function () {
+        Route::resource('users', \App\Http\Controllers\UserController::class);
+        Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    });
+
+    // Operations, Finance, Admin Routes (Admin & Admin Operasional)
+    Route::middleware(['role:admin_operasional'])->group(function () {
+        Route::resource('projects', \App\Http\Controllers\ProjectController::class);
+        
+        Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
+        Route::put('invoices/{invoice}/status', [\App\Http\Controllers\InvoiceController::class, 'updateStatus'])->name('invoices.status');
+        Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
+        
+        Route::resource('letters', \App\Http\Controllers\LetterController::class);
+        Route::get('letters/{letter}/pdf', [\App\Http\Controllers\LetterController::class, 'downloadPdf'])->name('letters.pdf');
+        
+        Route::resource('documents', \App\Http\Controllers\DocumentController::class);
+        
+        Route::resource('files', \App\Http\Controllers\FileController::class)->except(['create', 'edit', 'update', 'show']);
+        Route::get('files/{file}/download', [\App\Http\Controllers\FileController::class, 'download'])->name('files.download');
+        
+        Route::resource('clients', \App\Http\Controllers\ClientController::class);
+        
+        Route::get('calendar', function () {
+            return inertia('calendar/index');
+        })->name('calendar.index');
+    });
+
+    // Marketing & General Operations (Accessible by Staf)
     Route::resource('tasks', \App\Http\Controllers\TaskController::class);
-    Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
-    Route::put('invoices/{invoice}/status', [\App\Http\Controllers\InvoiceController::class, 'updateStatus'])->name('invoices.status');
-    Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
-    Route::resource('letters', \App\Http\Controllers\LetterController::class);
-    Route::get('letters/{letter}/pdf', [\App\Http\Controllers\LetterController::class, 'downloadPdf'])->name('letters.pdf');
-    Route::resource('documents', \App\Http\Controllers\DocumentController::class);
-    Route::resource('files', \App\Http\Controllers\FileController::class)->except(['create', 'edit', 'update', 'show']);
-    Route::get('files/{file}/download', [\App\Http\Controllers\FileController::class, 'download'])->name('files.download');
-    Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');
     Route::resource('content-plans', \App\Http\Controllers\ContentPlanController::class)->except(['create', 'edit', 'show']);
-    Route::resource('clients', \App\Http\Controllers\ClientController::class);
-    Route::get('calendar', function () {
-        return inertia('calendar/index', [
-            // Dapat diperluas dengan data dari backend nanti
-        ]);
-    })->name('calendar.index');
 });
 
 require __DIR__.'/settings.php';
