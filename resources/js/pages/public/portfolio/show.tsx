@@ -11,22 +11,24 @@ export default function PublicPortfolioShow({ portfolio, relatedPortfolios }: { 
 
             <main className="max-w-6xl mx-auto px-6 py-16 pt-32">
 
-                {/* Hero Image */}
-                {portfolio.image && (
-                    <div className="mb-12 rounded-2xl overflow-hidden shadow-xl border border-slate-100">
-                        <img
-                            src={`/storage/${portfolio.image}`}
-                            alt={portfolio.title}
-                            className="w-full h-auto object-cover"
-                        />
-                    </div>
-                )}
-
                 {/* Content Section */}
-                <div className="grid lg:grid-cols-3 gap-12">
+                <div className="grid lg:grid-cols-2 gap-12 items-start">
+
+                    {/* Image */}
+                    {portfolio.image && (
+                        <div className="lg:sticky lg:top-32">
+                            <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-100">
+                                <img
+                                    src={`/storage/${portfolio.image}`}
+                                    alt={portfolio.title}
+                                    className="w-full h-auto object-cover max-h-[600px]"
+                                />
+                            </div>
+                        </div>
+                    )}
 
                     {/* Description */}
-                    <div className="lg:col-span-2">
+                    <div>
                         <h1 className="text-4xl font-extrabold text-slate-900 mb-8">
                             {portfolio.title}
                         </h1>
@@ -38,6 +40,7 @@ export default function PublicPortfolioShow({ portfolio, relatedPortfolios }: { 
                                 prose-slate 
                                 max-w-none
                                 text-justify
+                                mb-12
                             "
                             dangerouslySetInnerHTML={{
                                 __html:
@@ -45,11 +48,9 @@ export default function PublicPortfolioShow({ portfolio, relatedPortfolios }: { 
                                     'Tidak ada deskripsi.',
                             }}
                         />
-                    </div>
 
-                    {/* Sidebar */}
-                    <div>
-                        <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 sticky top-32">
+                        {/* Project Details */}
+                        <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100">
                             <h3 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-4">
                                 Detail Project
                             </h3>
