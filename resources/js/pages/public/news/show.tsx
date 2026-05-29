@@ -2,7 +2,87 @@ import { Head, Link } from '@inertiajs/react';
 import { User, Calendar, Tag } from 'lucide-react';
 import PublicNavbar from '@/components/public-navbar';
 
+type NewsBlock =
+    | { type: 'html'; html: string }
+    | { type: 'paragraph'; text: string }
+    | { type: 'ordered-list'; items: string[] }
+    | { type: 'unordered-list'; items: string[] };
+
+function normalizeContent(content: string) {
+    return (content || '').replace(/\r\n/g, '\n').trim();
+}
+
+function parseNewsContent(content: string): NewsBlock[] {
+    const normalized = normalizeContent(content);
+
+    if (!normalized) {
+        return [];
+    }
+
+    if (/<[a-z][\s\S]*>/i.test(normalized)) {
+        return [{ type: 'html', html: normalized }];
+    }
+
+    const lines = normalized.split('\n');
+    const blocks: NewsBlock[] = [];
+    let index = 0;
+
+    const isOrderedItem = (line: string) => /^\d+\.\s+/.test(line);
+    const isUnorderedItem = (line: string) => /^(?:[-*]|\u2022)\s+/.test(line);
+
+    while (index < lines.length) {
+        const line = lines[index].trim();
+
+        if (!line) {
+            index += 1;
+            continue;
+        }
+
+        if (isOrderedItem(line)) {
+            const items: string[] = [];
+
+            while (index < lines.length && isOrderedItem(lines[index].trim())) {
+                items.push(lines[index].trim().replace(/^\d+\.\s+/, ''));
+                index += 1;
+            }
+
+            blocks.push({ type: 'ordered-list', items });
+            continue;
+        }
+
+        if (isUnorderedItem(line)) {
+            const items: string[] = [];
+
+            while (index < lines.length && isUnorderedItem(lines[index].trim())) {
+                items.push(lines[index].trim().replace(/^(?:[-*]|\u2022)\s+/, ''));
+                index += 1;
+            }
+
+            blocks.push({ type: 'unordered-list', items });
+            continue;
+        }
+
+        const paragraphLines: string[] = [];
+
+        while (
+            index < lines.length &&
+            lines[index].trim() &&
+            !isOrderedItem(lines[index].trim()) &&
+            !isUnorderedItem(lines[index].trim())
+        ) {
+            paragraphLines.push(lines[index].trim());
+            index += 1;
+        }
+
+        blocks.push({ type: 'paragraph', text: paragraphLines.join(' ') });
+    }
+
+    return blocks;
+}
+
 export default function PublicNewsShow({ news, relatedNews }: { news: any, relatedNews: any[] }) {
+    const contentBlocks = parseNewsContent(news.content || '');
+
     return (
         <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-blue-600 selection:text-white">
             <Head title={news.title} />
@@ -35,7 +115,36 @@ export default function PublicNewsShow({ news, relatedNews }: { news: any, relat
                     </div>
                 )}
 
-                <div className="prose prose-lg prose-slate max-w-none mx-auto" dangerouslySetInnerHTML={{ __html: news.content }} />
+                <article className="prose prose-lg prose-slate max-w-none mx-auto prose-headings:font-bold prose-p:leading-8 prose-li:leading-8 prose-ul:pl-6 prose-ol:pl-6">
+                    {contentBlocks.length > 0 ? (
+                        contentBlocks.map((block, index) => {
+                            if (block.type === 'html') {
+                                return <div key={index} dangerouslySetInnerHTML={{ __html: block.html }} />;
+                            }
+
+                            if (block.type === 'paragraph') {
+                                return <p key={index}>{block.text}</p>;
+                            }
+
+                            const ListTag = block.type === 'ordered-list' ? 'ol' : 'ul';
+
+                            return (
+                                <ListTag
+                                    key={index}
+                                    className={block.type === 'ordered-list' ? 'my-6 list-decimal space-y-2 pl-6' : 'my-6 list-disc space-y-2 pl-6'}
+                                >
+                                    {block.items.map((item, itemIndex) => (
+                                        <li key={itemIndex} className="pl-1">
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ListTag>
+                            );
+                        })
+                    ) : (
+                        <p className="text-slate-500 italic">Tidak ada isi berita.</p>
+                    )}
+                </article>
             </main>
 
             {/* Related News */}
