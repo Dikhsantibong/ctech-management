@@ -334,12 +334,27 @@ export default function Welcome({ news = [], portfolios = [] }: { news?: any[], 
                 <section id="tentang" className="py-24 bg-white relative">
                     <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
                         <div className="relative reveal">
-                            <div className="aspect-square md:aspect-[4/3] rounded-3xl overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800" alt="Team" className="w-full h-full object-cover" />
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-4">
+                                    <div className="rounded-2xl overflow-hidden aspect-[3/4] bg-slate-100 shadow-2xl">
+                                        <img src="/our-story/photo1.jpeg" alt="Tim CTECH" className="w-full h-full object-cover grayscale" onError={(e: any) => { e.target.style.display='none'; e.target.parentElement.innerHTML='<div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"><span class="text-white/80 text-5xl font-black">C</span></div>'; }} />
+                                    </div>
+                                    <div className="rounded-2xl overflow-hidden aspect-square bg-slate-100 shadow-lg">
+                                        <img src="/our-story/photo2.jpeg" alt="Workshop CTECH" className="w-full h-full object-cover grayscale" onError={(e: any) => { e.target.style.display='none'; e.target.parentElement.innerHTML='<div class="w-full h-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center"><span class="text-white/80 text-4xl font-black">T</span></div>'; }} />
+                                    </div>
+                                </div>
+                                <div className="space-y-4 pt-8">
+                                    <div className="rounded-2xl overflow-hidden aspect-square bg-slate-100 shadow-lg">
+                                        <img src="/our-story/photo3.jpeg" alt="Kantor CTECH" className="w-full h-full object-cover grayscale" onError={(e: any) => { e.target.style.display='none'; e.target.parentElement.innerHTML='<div class="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center"><span class="text-white/80 text-4xl font-black">E</span></div>'; }} />
+                                    </div>
+                                    <div className="rounded-2xl overflow-hidden aspect-[3/4] bg-slate-100 shadow-2xl">
+                                        <img src="/our-story/photo4.jpeg" alt="Project CTECH" className="w-full h-full object-cover grayscale" onError={(e: any) => { e.target.style.display='none'; e.target.parentElement.innerHTML='<div class="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center"><span class="text-white/80 text-5xl font-black">H</span></div>'; }} />
+                                    </div>
+                                </div>
                             </div>
-                            <div className="absolute -bottom-8 -right-8 bg-blue-600 text-white p-8 rounded-2xl shadow-xl max-w-xs hidden md:block">
-                                <h4 className="text-4xl font-bold mb-2">10+</h4>
-                                <p className="text-blue-100 font-medium">Tahun Pengalaman Membangun Solusi Digital</p>
+                            <div className="absolute -bottom-6 -left-6 bg-blue-600 text-white p-5 rounded-2xl shadow-xl shadow-blue-600/30">
+                                <div className="text-3xl font-black">5+</div>
+                                <div className="text-blue-100 text-sm font-semibold">Tahun<br/>Berpengalaman</div>
                             </div>
                         </div>
                         <div className="reveal">

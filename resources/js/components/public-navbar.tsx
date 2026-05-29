@@ -37,7 +37,7 @@ export default function PublicNavbar({ isLandingPage = false }: { isLandingPage?
                     <a href={getLink('#home')} className={linkClass}>Home</a>
                     <a href={getLink('#layanan')} className={linkClass}>Layanan</a>
                     <Link href="/tentang" className={linkClass}>Tentang Kami</Link>
-                    <a href={getLink('#produk')} className={linkClass}>Produk</a>
+                    <Link href="/produk" className={linkClass}>Produk</Link>
                     <Link href="/portfolio" className={linkClass}>Portfolio</Link>
                     <Link href="/berita" className={linkClass}>Berita</Link>
                 </div>
@@ -60,6 +60,7 @@ export default function PublicNavbar({ isLandingPage = false }: { isLandingPage?
                     <a href={getLink('#home')} className="text-slate-600 font-medium py-2 border-b">Home</a>
                     <a href={getLink('#layanan')} className="text-slate-600 font-medium py-2 border-b">Layanan</a>
                     <Link href="/tentang" className="text-slate-600 font-medium py-2 border-b">Tentang Kami</Link>
+                    <Link href="/produk" className="text-slate-600 font-medium py-2 border-b">Produk</Link>
                     <Link href="/portfolio" className="text-slate-600 font-medium py-2 border-b">Portfolio</Link>
                     <Link href="/berita" className="text-slate-600 font-medium py-2 border-b">Berita</Link>
                     <a href={getLink('#kontak')} className="bg-blue-600 text-white px-5 py-3 rounded-xl text-center font-semibold mt-2">Konsultasi Gratis</a>
