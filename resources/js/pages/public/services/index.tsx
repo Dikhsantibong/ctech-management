@@ -23,7 +23,8 @@ import {
     Linkedin,
     MapPin,
     Phone,
-    Mail
+    Mail,
+    MessageCircle
 } from 'lucide-react';
 import PublicNavbar from '@/components/public-navbar';
 
@@ -468,6 +469,52 @@ export default function Services() {
                     </div>
                 </div>
             </footer>
+
+            {/* WhatsApp Floating Button */}
+            <div className="fixed bottom-6 right-6 z-50 group">
+                {/* Chat Popup */}
+                <div className="absolute bottom-16 right-0 w-80 bg-white rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                    {/* Chat Header */}
+                    <div className="bg-green-600 text-white p-4 rounded-t-2xl flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
+                            <MessageCircle className="w-6 h-6 text-green-600" />
+                        </div>
+                        <div>
+                            <h4 className="font-bold">CTECH Support</h4>
+                            <p className="text-xs text-green-100">Online</p>
+                        </div>
+                    </div>
+                    {/* Chat Body */}
+                    <div className="p-4 bg-slate-50">
+                        <div className="bg-white rounded-2xl rounded-tl-none p-3 shadow-sm mb-2 max-w-[90%]">
+                            <p className="text-sm text-slate-700">
+                                Halo! 👋 Ada yang bisa kami bantu? Silakan kirim pesan untuk konsultasi gratis.
+                            </p>
+                            <p className="text-xs text-slate-400 mt-1">10:30</p>
+                        </div>
+                    </div>
+                    {/* Chat Input */}
+                    <div className="p-3 border-t border-slate-100">
+                        <a 
+                            href="https://wa.me/6282293118410?text=Halo%20CTECH,%20saya%20ingin%20konsultasi%20tentang%20layanan%20Anda"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-2 rounded-xl text-sm font-semibold transition-colors"
+                        >
+                            Kirim Pesan WhatsApp
+                        </a>
+                    </div>
+                </div>
+                {/* WhatsApp Button */}
+                <a 
+                    href="https://wa.me/6282293118410?text=Halo%20CTECH,%20saya%20ingin%20konsultasi%20tentang%20layanan%20Anda"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center w-14 h-14 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
+                >
+                    <MessageCircle className="w-7 h-7" />
+                </a>
+            </div>
         </div>
     );
 }
