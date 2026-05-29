@@ -12,11 +12,24 @@ use Illuminate\Support\Facades\Auth;
 class LetterController extends Controller
 {
     use LogsActivity;
-    public function index()
+    public function index(Request $request)
     {
-        $letters = Letter::with('creator')->latest()->get();
+        $search = $request->query('search', '');
+        $query = Letter::with('creator');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('reference_number', 'like', "%{$search}%")
+                  ->orWhere('type', 'like', "%{$search}%")
+                  ->orWhere('recipient', 'like', "%{$search}%")
+                  ->orWhere('subject', 'like', "%{$search}%");
+            });
+        }
+
+        $letters = $query->latest()->get();
         return Inertia::render('letters/index', [
-            'letters' => $letters
+            'letters' => $letters,
+            'search' => $search
         ]);
     }
 

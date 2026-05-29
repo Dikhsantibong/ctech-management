@@ -11,11 +11,24 @@ class ClientController extends Controller
 {
     use LogsActivity;
 
-    public function index()
+    public function index(Request $request)
     {
-        $clients = Client::with(['projects', 'invoices'])->latest()->get();
+        $search = $request->query('search', '');
+        $query = Client::with(['projects', 'invoices']);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('pic', 'like', "%{$search}%")
+                  ->orWhere('contact', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $clients = $query->latest()->get();
         return Inertia::render('clients/index', [
-            'clients' => $clients
+            'clients' => $clients,
+            'search' => $search
         ]);
     }
 

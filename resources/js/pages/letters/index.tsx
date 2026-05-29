@@ -1,6 +1,6 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { Plus, MoreVertical, Mail, Trash2, Eye, Edit2 } from 'lucide-react';
+import { Plus, MoreVertical, Mail, Trash2, Eye, Edit2, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -316,13 +316,14 @@ Demikian perjanjian ini dibuat dalam rangkap 2 dan mempunyai kekuatan hukum yang
     },
 };
 
-export default function LettersIndex({ letters }: { letters: any[] }) {
+export default function LettersIndex({ letters, search: initialSearch }: { letters: any[], search?: string }) {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
     const [selectedLetter, setSelectedLetter] = useState<any>(null);
     const [pdfUrl, setPdfUrl] = useState<string>('');
+    const [search, setSearch] = useState(initialSearch || '');
 
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         type: 'Surat Keputusan',
@@ -407,6 +408,17 @@ export default function LettersIndex({ letters }: { letters: any[] }) {
         });
     };
 
+    const handleSearch = (value: string) => {
+        setSearch(value);
+        const page = new URL(window.location.href);
+        if (value) {
+            page.searchParams.set('search', value);
+        } else {
+            page.searchParams.delete('search');
+        }
+        window.location.href = page.toString();
+    };
+
     const submitEdit = (e: React.FormEvent) => {
         e.preventDefault();
         put(`/letters/${selectedLetter?.id}`, {
@@ -453,6 +465,22 @@ export default function LettersIndex({ letters }: { letters: any[] }) {
                     <Button onClick={openCreateModal}>
                         <Plus className="mr-2 h-4 w-4" /> Create Letter
                     </Button>
+                </div>
+
+                <div className="flex flex-col gap-4 rounded-xl border bg-card p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+                    <div className="relative w-full md:max-w-md">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                            placeholder="Search letters by reference, subject, type or recipient..."
+                            value={search}
+                            onChange={(e) => handleSearch(e.target.value)}
+                            className="pl-10"
+                        />
+                    </div>
+
+                    <div className="text-sm text-muted-foreground">
+                        Showing {letters.length} letter{letters.length !== 1 ? 's' : ''}
+                    </div>
                 </div>
 
                 <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
