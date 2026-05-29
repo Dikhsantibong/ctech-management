@@ -17,11 +17,11 @@ export default function PublicPortfolioShow({ portfolio, relatedPortfolios }: { 
                     {/* Image */}
                     {portfolio.image && (
                         <div className="lg:sticky lg:top-32">
-                            <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-100">
+                            <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-100 aspect-[9/16] max-h-[600px]">
                                 <img
                                     src={`/storage/${portfolio.image}`}
                                     alt={portfolio.title}
-                                    className="w-full h-auto object-cover max-h-[600px]"
+                                    className="w-full h-full object-cover"
                                 />
                             </div>
                         </div>
