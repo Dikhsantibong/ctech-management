@@ -9,54 +9,121 @@ export default function PublicPortfolioShow({ portfolio, relatedPortfolios }: { 
             
             <PublicNavbar isLandingPage={false} />
 
-            <main className="max-w-5xl mx-auto px-6 py-16 pt-32">
-                <div className="grid md:grid-cols-3 gap-12">
-                    {/* Main Content */}
-                    <div className="md:col-span-2">
-                        {portfolio.image && (
-                            <div className="mb-10 rounded-2xl overflow-hidden shadow-xl border border-slate-100">
-                                <img src={`/storage/${portfolio.image}`} alt={portfolio.title} className="w-full h-auto object-cover" />
-                            </div>
-                        )}
-                        <h1 className="text-4xl font-extrabold text-slate-900 mb-6 leading-tight">
+            <main className="max-w-6xl mx-auto px-6 py-16 pt-32">
+
+                {/* Hero Image */}
+                {portfolio.image && (
+                    <div className="mb-12 rounded-2xl overflow-hidden shadow-xl border border-slate-100">
+                        <img
+                            src={`/storage/${portfolio.image}`}
+                            alt={portfolio.title}
+                            className="w-full h-auto object-cover"
+                        />
+                    </div>
+                )}
+
+                {/* Content Section */}
+                <div className="grid lg:grid-cols-3 gap-12">
+
+                    {/* Description */}
+                    <div className="lg:col-span-2">
+                        <h1 className="text-4xl font-extrabold text-slate-900 mb-8">
                             {portfolio.title}
                         </h1>
-                        <div className="prose prose-lg prose-slate max-w-none" dangerouslySetInnerHTML={{ __html: portfolio.description || 'Tidak ada deskripsi.' }} />
+
+                        <div
+                            className="
+                                prose 
+                                prose-lg 
+                                prose-slate 
+                                max-w-none
+                                text-justify
+                            "
+                            dangerouslySetInnerHTML={{
+                                __html:
+                                    portfolio.description ||
+                                    'Tidak ada deskripsi.',
+                            }}
+                        />
                     </div>
 
-                    {/* Sidebar Info */}
-                    <div className="md:col-span-1">
+                    {/* Sidebar */}
+                    <div>
                         <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 sticky top-32">
-                            <h3 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-4">Detail Project</h3>
-                            
+                            <h3 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-4">
+                                Detail Project
+                            </h3>
+
                             <div className="space-y-6">
+
                                 <div>
-                                    <p className="text-sm text-slate-500 font-medium mb-1">Klien</p>
-                                    <p className="font-semibold text-slate-900">{portfolio.client_name}</p>
+                                    <p className="text-sm text-slate-500 font-medium mb-1">
+                                        Klien
+                                    </p>
+                                    <p className="font-semibold text-slate-900">
+                                        {portfolio.client_name}
+                                    </p>
                                 </div>
-                                
+
                                 <div>
-                                    <p className="text-sm text-slate-500 font-medium mb-1">Kategori</p>
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold mt-1">
-                                        <Tag className="w-3.5 h-3.5" /> {portfolio.category}
+                                    <p className="text-sm text-slate-500 font-medium mb-1">
+                                        Kategori
+                                    </p>
+
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold">
+                                        <Tag className="w-3.5 h-3.5" />
+                                        {portfolio.category}
                                     </span>
                                 </div>
-                                
+
                                 <div>
-                                    <p className="text-sm text-slate-500 font-medium mb-1">Tanggal Selesai</p>
-                                    <p className="font-semibold text-slate-900">{new Date(portfolio.completion_date || portfolio.created_at).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</p>
+                                    <p className="text-sm text-slate-500 font-medium mb-1">
+                                        Tanggal Selesai
+                                    </p>
+
+                                    <p className="font-semibold text-slate-900">
+                                        {new Date(
+                                            portfolio.completion_date ||
+                                            portfolio.created_at
+                                        ).toLocaleDateString('id-ID', {
+                                            month: 'long',
+                                            year: 'numeric',
+                                        })}
+                                    </p>
                                 </div>
 
                                 {portfolio.link && (
                                     <div className="pt-4 mt-6 border-t border-slate-200">
-                                        <a href={portfolio.link} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-bold transition-colors shadow-lg shadow-blue-600/20">
-                                            Kunjungi Website <ExternalLink className="w-4 h-4" />
+                                        <a
+                                            href={portfolio.link}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="
+                                                flex
+                                                items-center
+                                                justify-center
+                                                gap-2
+                                                w-full
+                                                bg-blue-600
+                                                hover:bg-blue-700
+                                                text-white
+                                                py-3
+                                                px-4
+                                                rounded-xl
+                                                font-bold
+                                                transition-colors
+                                            "
+                                        >
+                                            Kunjungi Website
+                                            <ExternalLink className="w-4 h-4" />
                                         </a>
                                     </div>
                                 )}
+
                             </div>
                         </div>
                     </div>
+
                 </div>
             </main>
 

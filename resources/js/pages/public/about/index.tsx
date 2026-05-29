@@ -13,40 +13,46 @@ import {
 
 const timeline = [
     {
-        year: '2019',
-        title: 'Awal Mula — Ide yang Membara',
-        description: 'Berangkat dari kegelisahan melihat UMKM di Kendari yang belum tersentuh digitalisasi, beberapa anak muda kreatif mulai bereksperimen membangun solusi teknologi di sebuah ruang kerja kecil.',
-        image: '/images/about/timeline-2019.jpg',
-    },
-    {
-        year: '2020',
-        title: 'Komunitas & Workshop Pertama',
-        description: 'Kami menginisiasi workshop digital marketing dan branding untuk pelaku usaha kecil di Kendari. Antusiasme peserta membuktikan bahwa kebutuhan akan transformasi digital sangat besar.',
-        image: '/images/about/timeline-2020.jpg',
-    },
-    {
-        year: '2021',
-        title: 'Resmi Berdiri sebagai PT',
-        description: 'PT Kreatif Teknologi Maju Bersama (CTECH) resmi didirikan. Kami mulai menerima project pertama: membangun sistem kasir, website company profile, dan aplikasi mobile untuk klien lokal.',
-        image: '/images/about/timeline-2021.jpg',
-    },
-    {
-        year: '2022',
-        title: 'Ekspansi Layanan & Tim',
-        description: 'Tim bertumbuh menjadi belasan profesional. Layanan kami meluas ke pengembangan aplikasi enterprise, UI/UX Design, dan produksi video kreatif untuk branding digital.',
-        image: '/images/about/timeline-2022.jpg',
+        year: '2023',
+        title: 'Diskusi di Ruang Kelas Kampus',
+        description: 'Semuanya bermula dari obrolan panjang di sudut kelas — sekelompok mahasiswa yang gerah melihat potensi teknologi yang belum tersentuh di Kendari. Dari sana, tim kecil kami terbentuk, modal utamanya: semangat dan laptop masing-masing.',
+        image: '/images/about/timeline-2023-awal.jpg',
     },
     {
         year: '2023',
-        title: 'Peluncuran CTECH Paylo',
-        description: 'Kami meluncurkan produk unggulan — CTECH Paylo, paket lengkap aplikasi bisnis all-in-one. Mulai dari absensi karyawan, kasir offline-first, inventory, hingga dashboard analisis bisnis.',
-        image: '/images/about/timeline-2023.jpg',
+        title: 'Nama CTECH Mulai Beredar di Kampus',
+        description: 'Karya-karya kecil kami mulai diperhatikan. Dosen dan mahasiswa mengenal CTECH sebagai tim yang serius soal teknologi. Tak lama, undangan datang — kami hadir sebagai pemateri di seminar, workshop kampus, dan beberapa event komunitas teknologi di Kendari.',
+        image: '/images/about/timeline-2023-kampus.jpg',
+    },
+    {
+        year: '2023',
+        title: 'Project Perdana — Sistem Informasi PT PLN Nusantara Power UP Kendari',
+        description: 'Kepercayaan besar datang di tahun pertama: kami dipercaya membangun sistem informasi untuk salah satu divisi di PT PLN Nusantara Power UP Kendari. Ini bukan sekadar project — ini pembuktian bahwa tim kami mampu bermain di level industri nyata.',
+        image: '/images/about/timeline-2023-pln.jpg',
     },
     {
         year: '2024',
-        title: 'Creative Agency Kendari #1',
-        description: 'CTECH dikenal sebagai creative agency terdepan di Sulawesi Tenggara. Klien kami tersebar dari instansi pemerintah, perusahaan swasta, hingga startup yang sedang berkembang pesat.',
-        image: '/images/about/timeline-2024.jpg',
+        title: 'Portofolio Meluas, Kepercayaan Bertumbuh',
+        description: 'Pengalaman dari project PLN membuka pintu lebih lebar. Klien baru datang — dari instansi, bisnis lokal, hingga startup yang butuh tangan teknologi. Tim kami berkembang, kapasitas bertambah, dan nama CTECH mulai lekat di telinga pelaku usaha Sulawesi Tenggara.',
+        image: '/images/about/timeline-2024-ekspansi.jpg',
+    },
+    {
+        year: '2024',
+        title: 'Lahirnya CTECH Paylo & CTECH Booth',
+        description: 'Kami tak hanya mengerjakan pesanan — kami mulai membangun produk sendiri. CTECH Paylo hadir sebagai solusi bisnis all-in-one: kasir offline-first, inventory, absensi karyawan, hingga dashboard analisis bisnis dalam satu paket. Bersamaan, CTECH Booth lahir sebagai platform photobooth modern yang kini dipercaya oleh lebih dari 10 lokasi photobooth di Kendari.',
+        image: '/images/about/timeline-2024-produk.jpg',
+    },
+    {
+        year: '2025',
+        title: 'CTECH Resmi — Studio Teknologi Profesional',
+        description: 'Dari ruang kelas ke ruang kerja sesungguhnya. CTECH bertransformasi menjadi studio teknologi & kreatif profesional dengan tim lintas disiplin: developer, designer, dan creative strategist. Layanan mencakup pengembangan sistem enterprise, UI/UX, hingga produksi konten digital untuk branding.',
+        image: '/images/about/timeline-2025.jpg',
+    },
+    {
+        year: '2026',
+        title: 'Terdepan di Sulawesi Tenggara',
+        description: 'CTECH kini dikenal sebagai creative tech studio terdepan di kawasan Sulawesi Tenggara. Produk kami aktif digunakan, klien kami tersebar dari pemerintahan hingga UMKM berkembang — dan kami masih terus tumbuh, satu baris kode dalam satu waktu.',
+        image: '/images/about/timeline-2026.jpg',
     },
 ];
 
@@ -264,7 +270,7 @@ export default function AboutIndex() {
                             <div className="aspect-video">
                                 <iframe
                                     className="w-full h-full"
-                                    src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                                    src="https://www.youtube.com/embed/HPmPDnmNnf0"
                                     title="CTECH Company Profile"
                                     frameBorder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
