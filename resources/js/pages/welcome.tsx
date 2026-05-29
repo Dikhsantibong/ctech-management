@@ -1,5 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import PublicNavbar from '@/components/public-navbar';
 import { dashboard } from '@/routes';
 import { 
     ChevronRight, ArrowRight, CheckCircle2, 
@@ -153,8 +154,6 @@ const testimonials = [
 
 export default function Welcome({ news = [], portfolios = [] }: { news?: any[], portfolios?: any[] }) {
     const { auth } = usePage<any>().props;
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activePortfolioCategory, setActivePortfolioCategory] = useState('Semua');
 
     const portfolioCategories = ['Semua', ...Array.from(new Set(portfolios.map(p => p.category).filter(Boolean)))];
@@ -163,10 +162,6 @@ export default function Welcome({ news = [], portfolios = [] }: { news?: any[], 
         : portfolios.filter(p => p.category === activePortfolioCategory);
 
     useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 20);
-        };
-        window.addEventListener('scroll', handleScroll);
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -179,7 +174,6 @@ export default function Welcome({ news = [], portfolios = [] }: { news?: any[], 
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
         return () => {
-            window.removeEventListener('scroll', handleScroll);
             observer.disconnect();
         };
     }, []);
@@ -190,49 +184,7 @@ export default function Welcome({ news = [], portfolios = [] }: { news?: any[], 
             <style dangerouslySetInnerHTML={{ __html: ctechStyles }} />
 
             <div className="ctech-landing min-h-screen overflow-x-hidden selection:bg-blue-200 selection:text-blue-900">
-                
-                {/* Navbar Sticky */}
-                <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'glass-nav py-3' : 'bg-transparent py-5'}`}>
-                    <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                            <img src="/logo/logo-web.png" alt="CTECH Logo" className="h-8" />
-                            <span className="font-bold text-xl tracking-tight text-slate-900">CTECH</span>
-                        </div>
-                        
-                        {/* Desktop Menu */}
-                        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-                            <a href="#home" className="nav-link hover:text-blue-600 transition-colors">Home</a>
-                            <a href="#layanan" className="nav-link hover:text-blue-600 transition-colors">Layanan</a>
-                            <a href="#tentang" className="nav-link hover:text-blue-600 transition-colors">Tentang Kami</a>
-                            <a href="#produk" className="nav-link hover:text-blue-600 transition-colors">Produk</a>
-                            <a href="#portfolio" className="nav-link hover:text-blue-600 transition-colors">Portfolio</a>
-                            <a href="#berita" className="nav-link hover:text-blue-600 transition-colors">Berita</a>
-                        </div>
-
-                        <div className="hidden md:flex items-center gap-4">
-
-                            <a href="#kontak" className="bg-slate-900 hover:bg-blue-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md hover:shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5">
-                                Konsultasi Gratis
-                            </a>
-                        </div>
-
-                        {/* Mobile Menu Toggle */}
-                        <button className="md:hidden text-slate-600" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-                            {isMobileMenuOpen ? <X /> : <Menu />}
-                        </button>
-                    </div>
-
-                    {/* Mobile Menu Content */}
-                    {isMobileMenuOpen && (
-                        <div className="md:hidden absolute top-full left-0 w-full bg-white border-b shadow-lg py-4 px-6 flex flex-col gap-4">
-                            <a href="#home" className="text-slate-600 font-medium py-2 border-b">Home</a>
-                            <a href="#layanan" className="text-slate-600 font-medium py-2 border-b">Layanan</a>
-                            <a href="#tentang" className="text-slate-600 font-medium py-2 border-b">Tentang Kami</a>
-                            <a href="#portfolio" className="text-slate-600 font-medium py-2 border-b">Portfolio</a>
-                            <a href="#kontak" className="bg-blue-600 text-white px-5 py-3 rounded-xl text-center font-semibold mt-2">Konsultasi Gratis</a>
-                        </div>
-                    )}
-                </nav>
+                <PublicNavbar isLandingPage={true} />
 
                 {/* Hero Section */}
                 <section id="home" className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden flex items-center min-h-[90vh]">
@@ -593,18 +545,24 @@ export default function Welcome({ news = [], portfolios = [] }: { news?: any[], 
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {filteredPortfolios.map((item, idx) => (
-                                <div key={item.id || idx} className="group relative rounded-3xl overflow-hidden bg-slate-200 aspect-[4/3] reveal active" style={{ animationDelay: `${idx * 100}ms` }}>
+                                <Link href={`/portfolio/${item.id}`} key={item.id || idx} className="group relative rounded-3xl overflow-hidden bg-slate-200 aspect-[4/3] reveal active block" style={{ animationDelay: `${idx * 100}ms` }}>
                                     <img src={item.image ? `/storage/${item.image}` : "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800"} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                                         <span className="inline-block px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full mb-3 w-max translate-y-4 group-hover:translate-y-0 transition-transform duration-300">{item.category || 'Portfolio'}</span>
                                         <h3 className="text-xl font-bold text-white mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">{item.title}</h3>
                                         <p className="text-slate-300 text-sm mb-4 line-clamp-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">{item.description}</p>
-                                        <a href={item.link || '#'} className="text-blue-300 hover:text-white font-medium flex items-center gap-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100" target={item.link ? "_blank" : "_self"} rel="noreferrer">
+                                        <span className="text-blue-300 hover:text-white font-medium flex items-center gap-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">
                                             Lihat Detail <ArrowRight className="w-4 h-4" />
-                                        </a>
+                                        </span>
                                     </div>
-                                </div>
+                                </Link>
                             ))}
+                        </div>
+
+                        <div className="text-center mt-16 reveal">
+                            <Link href="/portfolio" className="inline-flex items-center gap-3 bg-slate-900 hover:bg-blue-600 text-white px-8 py-3.5 rounded-full font-bold transition-colors shadow-xl">
+                                Lihat Semua Karya Kami <ArrowRight className="w-5 h-5" />
+                            </Link>
                         </div>
                     </div>
                 </section>
@@ -620,29 +578,35 @@ export default function Welcome({ news = [], portfolios = [] }: { news?: any[], 
 
                         <div className="grid md:grid-cols-3 gap-8">
                             {news.map((item, idx) => (
-                                <article key={idx} className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover-card reveal" style={{ transitionDelay: `${idx * 100}ms` }}>
-                                    <div className="aspect-[16/9] overflow-hidden relative">
-                                        <img src={item.image ? `/storage/${item.image}` : "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=600"} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
-                                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-slate-900 text-xs font-bold px-3 py-1 rounded-full">
+                                <Link href={`/berita/${item.slug}`} key={idx} className="group bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col reveal" style={{ transitionDelay: `${idx * 100}ms` }}>
+                                    <div className="aspect-[16/9] overflow-hidden relative bg-slate-100">
+                                        <img src={item.image ? `/storage/${item.image}` : "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=600"} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-blue-600 text-xs font-bold px-3 py-1 rounded-full">
                                             {item.category || 'Berita Umum'}
                                         </div>
                                     </div>
-                                    <div className="p-6">
+                                    <div className="p-6 flex flex-col flex-grow">
                                         <div className="text-sm text-slate-400 font-medium mb-3">
                                             {new Date(item.published_at || item.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
                                         </div>
-                                        <h3 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2 hover:text-blue-600 cursor-pointer transition-colors">
+                                        <h3 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
                                             {item.title}
                                         </h3>
-                                        <p className="text-slate-600 mb-5 line-clamp-2 text-sm">
+                                        <p className="text-slate-600 mb-5 line-clamp-3 text-sm flex-grow">
                                             {item.content?.replace(/<[^>]*>?/gm, '').substring(0, 150) || ''}...
                                         </p>
-                                        <a href="#" className="text-blue-600 font-semibold text-sm flex items-center gap-1 hover:gap-2 transition-all">
+                                        <span className="text-blue-600 font-semibold text-sm flex items-center gap-1.5 group-hover:gap-2 transition-all mt-auto">
                                             Baca Selengkapnya <ArrowRight className="w-4 h-4" />
-                                        </a>
+                                        </span>
                                     </div>
-                                </article>
+                                </Link>
                             ))}
+                        </div>
+
+                        <div className="text-center mt-12 reveal">
+                            <Link href="/berita" className="inline-flex items-center gap-2 border-2 border-slate-200 hover:border-blue-600 text-slate-600 hover:text-blue-600 px-8 py-3 rounded-full font-semibold transition-colors">
+                                Lihat Semua Berita <ArrowRight className="w-4 h-4" />
+                            </Link>
                         </div>
                     </div>
                 </section>
@@ -741,11 +705,11 @@ export default function Welcome({ news = [], portfolios = [] }: { news?: any[], 
                         <div>
                             <h4 className="text-white font-bold mb-6 uppercase text-sm tracking-wider">Perusahaan</h4>
                             <ul className="space-y-3">
-                                <li><a href="#" className="hover:text-blue-400 transition-colors">Tentang Kami</a></li>
-                                <li><a href="#" className="hover:text-blue-400 transition-colors">Portfolio</a></li>
+                                <li><Link href="/tentang" className="hover:text-blue-400 transition-colors">Tentang Kami</Link></li>
+                                <li><Link href="/portfolio" className="hover:text-blue-400 transition-colors">Portfolio</Link></li>
                                 <li><a href="#" className="hover:text-blue-400 transition-colors">Karir</a></li>
-                                <li><a href="#" className="hover:text-blue-400 transition-colors">Berita & Insight</a></li>
-                                <li><a href="#" className="hover:text-blue-400 transition-colors">Hubungi Kami</a></li>
+                                <li><Link href="/berita" className="hover:text-blue-400 transition-colors">Berita & Insight</Link></li>
+                                <li><a href="#kontak" className="hover:text-blue-400 transition-colors">Hubungi Kami</a></li>
                             </ul>
                         </div>
 

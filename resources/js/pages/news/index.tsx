@@ -1,5 +1,5 @@
-import { Head, Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
 import { Plus, MoreVertical, Newspaper, Trash2, Edit2, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,11 +22,21 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 
-export default function NewsIndex({ news }: { news: any[] }) {
+export default function NewsIndex({ news, filters }: { news: any, filters?: any }) {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedNews, setSelectedNews] = useState<any>(null);
+    const [searchQuery, setSearchQuery] = useState(filters?.search || '');
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (searchQuery !== (filters?.search || '')) {
+                router.get('/news', { search: searchQuery }, { preserveState: true, replace: true, preserveScroll: true });
+            }
+        }, 500);
+        return () => clearTimeout(timeoutId);
+    }, [searchQuery]);
 
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         title: '',
@@ -115,9 +125,17 @@ export default function NewsIndex({ news }: { news: any[] }) {
                         <h2 className="text-2xl font-bold tracking-tight">Berita & Informasi</h2>
                         <p className="text-muted-foreground">Kelola artikel, berita, dan pengumuman perusahaan.</p>
                     </div>
-                    <Button onClick={openCreateModal}>
-                        <Plus className="mr-2 h-4 w-4" /> Buat Berita
-                    </Button>
+                    <div className="flex items-center gap-4">
+                        <Input 
+                            placeholder="Cari berita..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-[250px]"
+                        />
+                        <Button onClick={openCreateModal}>
+                            <Plus className="mr-2 h-4 w-4" /> Buat Berita
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
@@ -135,7 +153,7 @@ export default function NewsIndex({ news }: { news: any[] }) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {news.map((item) => (
+                                    {(news.data || news).map((item: any) => (
                                         <tr key={item.id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                                             <td className="p-4 align-middle">
                                                 {item.image ? (
@@ -178,7 +196,7 @@ export default function NewsIndex({ news }: { news: any[] }) {
                                             </td>
                                         </tr>
                                     ))}
-                                    {news.length === 0 && (
+                                    {(news.data || news).length === 0 && (
                                         <tr>
                                             <td colSpan={6} className="p-4 text-center text-muted-foreground">
                                                 Belum ada berita.

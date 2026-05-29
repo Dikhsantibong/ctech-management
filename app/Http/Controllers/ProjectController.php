@@ -11,14 +11,26 @@ use Inertia\Inertia;
 class ProjectController extends Controller
 {
     use LogsActivity;
-    public function index()
+    public function index(Request $request)
     {
-        $projects = Project::with('members')->latest()->get();
+        $search = $request->input('search');
+
+        $projects = Project::with('members')
+            ->when($search, function ($query, $search) {
+                $query->where('project_name', 'like', "%{$search}%")
+                      ->orWhere('client_name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
         $users = User::all();
         
         return Inertia::render('projects/index', [
             'projects' => $projects,
-            'users' => $users
+            'users' => $users,
+            'filters' => ['search' => $search]
         ]);
     }
 

@@ -11,11 +11,22 @@ use Illuminate\Support\Facades\Auth;
 class DocumentController extends Controller
 {
     use LogsActivity;
-    public function index()
+    public function index(Request $request)
     {
-        $documents = Document::with('creator')->latest()->get();
+        $search = $request->input('search');
+        
+        $documents = Document::with('creator')
+            ->when($search, function ($query, $search) {
+                $query->where('title', 'like', "%{$search}%")
+                      ->orWhere('content', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
         return Inertia::render('documents/index', [
-            'documents' => $documents
+            'documents' => $documents,
+            'filters' => ['search' => $search]
         ]);
     }
 

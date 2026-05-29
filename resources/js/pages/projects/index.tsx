@@ -1,4 +1,4 @@
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { Plus, MoreVertical, Edit2, Trash2, Eye, LayoutTemplate, MonitorPlay, PenTool, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,11 +24,21 @@ import { Textarea } from '@/components/ui/textarea';
 
 const projectTypes = ['Aplikasi', 'Video/Animasi', 'Desain', 'Lainnya'];
 
-export default function ProjectsIndex({ projects, users }: { projects: any[], users: any[] }) {
+export default function ProjectsIndex({ projects, users, filters }: { projects: any, users: any[], filters?: any }) {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedProject, setSelectedProject] = useState<any>(null);
+    const [searchQuery, setSearchQuery] = useState(filters?.search || '');
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (searchQuery !== (filters?.search || '')) {
+                router.get('/projects', { search: searchQuery }, { preserveState: true, replace: true, preserveScroll: true });
+            }
+        }, 500);
+        return () => clearTimeout(timeoutId);
+    }, [searchQuery]);
 
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         project_name: '',
@@ -354,9 +364,17 @@ export default function ProjectsIndex({ projects, users }: { projects: any[], us
                         <h2 className="text-2xl font-bold tracking-tight">Projects</h2>
                         <p className="text-muted-foreground">Manage your startup projects and clients.</p>
                     </div>
-                    <Button onClick={openCreateModal}>
-                        <Plus className="mr-2 h-4 w-4" /> New Project
-                    </Button>
+                    <div className="flex items-center gap-4">
+                        <Input 
+                            placeholder="Cari project..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-[250px]"
+                        />
+                        <Button onClick={openCreateModal}>
+                            <Plus className="mr-2 h-4 w-4" /> New Project
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
@@ -375,7 +393,7 @@ export default function ProjectsIndex({ projects, users }: { projects: any[], us
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {projects.map((project) => (
+                                    {(projects.data || projects).map((project: any) => (
                                         <tr key={project.id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                                             <td className="p-4 align-middle">
                                                 <div className="flex items-center text-muted-foreground text-xs font-medium">
@@ -400,7 +418,7 @@ export default function ProjectsIndex({ projects, users }: { projects: any[], us
                                             <td className="p-4 align-middle">
                                                 <div className="flex -space-x-2 overflow-hidden">
                                                     {project.members?.map((member: any) => (
-                                                        <div key={member.id} title={member.name} className="inline-block h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs border-2 border-background">
+                                                        <div key={member.id} title={member.name} className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs border-2 border-background">
                                                             {member.name.charAt(0)}
                                                         </div>
                                                     ))}
@@ -431,7 +449,7 @@ export default function ProjectsIndex({ projects, users }: { projects: any[], us
                                             </td>
                                         </tr>
                                     ))}
-                                    {projects.length === 0 && (
+                                    {(projects.data || projects).length === 0 && (
                                         <tr>
                                             <td colSpan={7} className="p-4 text-center text-muted-foreground">
                                                 No projects found.

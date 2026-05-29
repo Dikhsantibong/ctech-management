@@ -11,11 +11,23 @@ use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $news = News::with('author')->latest()->get();
+        $search = $request->input('search');
+
+        $news = News::with('author')
+            ->when($search, function ($query, $search) {
+                $query->where('title', 'like', "%{$search}%")
+                      ->orWhere('content', 'like', "%{$search}%")
+                      ->orWhere('category', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
         return Inertia::render('news/index', [
-            'news' => $news
+            'news' => $news,
+            'filters' => ['search' => $search]
         ]);
     }
 

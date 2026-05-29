@@ -9,6 +9,14 @@ Route::get('/', function () {
     return inertia('welcome', ['news' => $news, 'portfolios' => $portfolios]);
 })->name('home');
 
+Route::get('/berita', [\App\Http\Controllers\PublicController::class, 'newsIndex'])->name('public.news.index');
+Route::get('/berita/{slug}', [\App\Http\Controllers\PublicController::class, 'newsShow'])->name('public.news.show');
+
+Route::get('/tentang', function () { return inertia('public/about/index'); })->name('public.about');
+
+Route::get('/portfolio', [\App\Http\Controllers\PublicController::class, 'portfolioIndex'])->name('public.portfolio.index');
+Route::get('/portfolio/{id}', [\App\Http\Controllers\PublicController::class, 'portfolioShow'])->name('public.portfolio.show');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     // Accessible by all authenticated users (Staff, Admin Operasional, Direktur Utama)
     Route::middleware('role:direktur_utama,admin_operasional,staff')->group(function () {

@@ -1,5 +1,5 @@
-import { Head, Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
 import { Plus, MoreVertical, FileText, Trash2, Eye, Edit2, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,11 +20,21 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 
-export default function DocumentsIndex({ documents }: { documents: any[] }) {
+export default function DocumentsIndex({ documents, filters }: { documents: any, filters?: any }) {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedDocument, setSelectedDocument] = useState<any>(null);
+    const [searchQuery, setSearchQuery] = useState(filters?.search || '');
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (searchQuery !== (filters?.search || '')) {
+                router.get('/documents', { search: searchQuery }, { preserveState: true, replace: true, preserveScroll: true });
+            }
+        }, 500);
+        return () => clearTimeout(timeoutId);
+    }, [searchQuery]);
 
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         title: '',
@@ -88,13 +98,21 @@ export default function DocumentsIndex({ documents }: { documents: any[] }) {
                         <h2 className="text-2xl font-bold tracking-tight">Documents</h2>
                         <p className="text-muted-foreground">Internal company wiki and documentation.</p>
                     </div>
-                    <Button onClick={openCreateModal}>
-                        <Plus className="mr-2 h-4 w-4" /> New Document
-                    </Button>
+                    <div className="flex items-center gap-4">
+                        <Input 
+                            placeholder="Cari dokumen..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-[250px]"
+                        />
+                        <Button onClick={openCreateModal}>
+                            <Plus className="mr-2 h-4 w-4" /> New Document
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {documents.map((document) => (
+                    {(documents.data || documents).map((document: any) => (
                         <div key={document.id} className="group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-card p-5 text-card-foreground shadow-sm transition-all hover:shadow-md">
                             <div className="absolute top-4 right-4">
                                 <DropdownMenu>
@@ -138,7 +156,7 @@ export default function DocumentsIndex({ documents }: { documents: any[] }) {
                             </div>
                         </div>
                     ))}
-                    {documents.length === 0 && (
+                    {(documents.data || documents).length === 0 && (
                         <div className="col-span-full py-12 text-center text-muted-foreground border-2 border-dashed rounded-xl">
                             <BookOpen className="mx-auto h-12 w-12 opacity-20 mb-3" />
                             <h3 className="font-semibold text-lg mb-1">No documents found</h3>
