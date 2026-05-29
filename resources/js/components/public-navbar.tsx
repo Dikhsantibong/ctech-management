@@ -35,7 +35,7 @@ export default function PublicNavbar({ isLandingPage = false }: { isLandingPage?
                 {/* Desktop Menu */}
                 <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
                     <a href={getLink('#home')} className={linkClass}>Home</a>
-                    <a href={getLink('#layanan')} className={linkClass}>Layanan</a>
+                    <Link href="/layanan" className={linkClass}>Layanan</Link>
                     <Link href="/tentang" className={linkClass}>Tentang Kami</Link>
                     <Link href="/produk" className={linkClass}>Produk</Link>
                     <Link href="/portfolio" className={linkClass}>Portfolio</Link>
@@ -58,7 +58,7 @@ export default function PublicNavbar({ isLandingPage = false }: { isLandingPage?
             {isMobileMenuOpen && (
                 <div className="md:hidden absolute top-full left-0 w-full bg-white border-b shadow-lg py-4 px-6 flex flex-col gap-4">
                     <a href={getLink('#home')} className="text-slate-600 font-medium py-2 border-b">Home</a>
-                    <a href={getLink('#layanan')} className="text-slate-600 font-medium py-2 border-b">Layanan</a>
+                    <Link href="/layanan" className="text-slate-600 font-medium py-2 border-b">Layanan</Link>
                     <Link href="/tentang" className="text-slate-600 font-medium py-2 border-b">Tentang Kami</Link>
                     <Link href="/produk" className="text-slate-600 font-medium py-2 border-b">Produk</Link>
                     <Link href="/portfolio" className="text-slate-600 font-medium py-2 border-b">Portfolio</Link>

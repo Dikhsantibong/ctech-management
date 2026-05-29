@@ -20,7 +20,13 @@ import {
     Upload,
     Bell,
     Settings,
-    Globe
+    Globe,
+    Facebook,
+    Twitter,
+    Instagram,
+    Linkedin,
+    Phone,
+    Mail
 } from 'lucide-react';
 import PublicNavbar from '@/components/public-navbar';
 
@@ -514,18 +520,82 @@ export default function Booth() {
             </section>
 
             {/* Footer */}
-            <footer className="bg-slate-900 text-white py-12 px-6">
-                <div className="max-w-7xl mx-auto text-center">
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                        <img src="/logo/logo-web.png" alt="CTECH Logo" className="h-8" />
-                        <span className="font-bold text-xl">CTECH</span>
+            <footer className="bg-slate-950 text-slate-400 py-20 border-t border-slate-900">
+                <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-2">
+                            <img src="/logo/logo-web.png" alt="CTECH Logo" className="h-8 grayscale brightness-0 invert" />
+                            <span className="font-bold text-2xl tracking-tight text-white">CTECH</span>
+                        </div>
+                        <p className="text-sm leading-relaxed pr-4">
+                            PT KREATIF TEKNOLOGI MAJU BERSAMA. Mewujudkan transformasi digital perusahaan Anda melalui teknologi canggih dan desain elegan.
+                        </p>
+                        <div className="flex gap-4">
+                            <a href="#" className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors">
+                                <Facebook className="w-4 h-4" />
+                            </a>
+                            <a href="#" className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors">
+                                <Twitter className="w-4 h-4" />
+                            </a>
+                            <a href="#" className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors">
+                                <Instagram className="w-4 h-4" />
+                            </a>
+                            <a href="#" className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors">
+                                <Linkedin className="w-4 h-4" />
+                            </a>
+                        </div>
                     </div>
-                    <p className="text-slate-400 mb-6">
-                        CTECH Booth - Platform Photobooth Modern
+
+                    <div>
+                        <h4 className="text-white font-bold mb-6 uppercase text-sm tracking-wider">Layanan Utama</h4>
+                        <ul className="space-y-3">
+                            <li><a href="#" className="hover:text-blue-400 transition-colors">Web Development</a></li>
+                            <li><a href="#" className="hover:text-blue-400 transition-colors">Mobile App Development</a></li>
+                            <li><a href="#" className="hover:text-blue-400 transition-colors">AI & Automation</a></li>
+                            <li><a href="#" className="hover:text-blue-400 transition-colors">Cloud Infrastructure</a></li>
+                            <li><a href="#" className="hover:text-blue-400 transition-colors">Cyber Security</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 className="text-white font-bold mb-6 uppercase text-sm tracking-wider">Perusahaan</h4>
+                        <ul className="space-y-3">
+                            <li><Link href="/tentang" className="hover:text-blue-400 transition-colors">Tentang Kami</Link></li>
+                            <li><Link href="/portfolio" className="hover:text-blue-400 transition-colors">Portfolio</Link></li>
+                            <li><a href="#" className="hover:text-blue-400 transition-colors">Karir</a></li>
+                            <li><Link href="/berita" className="hover:text-blue-400 transition-colors">Berita & Insight</Link></li>
+                            <li><a href="#kontak" className="hover:text-blue-400 transition-colors">Hubungi Kami</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 className="text-white font-bold mb-6 uppercase text-sm tracking-wider">Kontak</h4>
+                        <ul className="space-y-4">
+                            <li className="flex gap-3">
+                                <MapPin className="w-5 h-5 text-blue-500 shrink-0" />
+                                <span className="text-sm">BTN UNHALU BLOK L NO 10</span>
+                            </li>
+                            <li className="flex gap-3">
+                                <Phone className="w-5 h-5 text-blue-500 shrink-0" />
+                                <span className="text-sm">+62 22 9311 8410</span>
+                            </li>
+                            <li className="flex gap-3">
+                                <Mail className="w-5 h-5 text-blue-500 shrink-0" />
+                                <span className="text-sm">ptkreatifteknologimajubersama@gmail.com</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p className="text-sm">
+                        &copy; {new Date().getFullYear()} PT Kreatif Teknologi Maju Bersama (CTECH). All rights reserved.
                     </p>
-                    <p className="text-slate-500 text-sm">
-                        © 2024 CTECH. All rights reserved.
-                    </p>
+                    <div className="flex gap-6 text-sm">
+                        <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+                        <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
+                    </div>
                 </div>
             </footer>
         </div>

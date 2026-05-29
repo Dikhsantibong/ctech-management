@@ -14,6 +14,8 @@ Route::get('/berita/{slug}', [\App\Http\Controllers\PublicController::class, 'ne
 
 Route::get('/tentang', function () { return inertia('public/about/index'); })->name('public.about');
 
+Route::get('/layanan', function () { return inertia('public/services/index'); })->name('public.services');
+
 Route::get('/produk', function () { return inertia('public/products/index'); })->name('public.products');
 
 Route::get('/produk/{product}', function ($product) {

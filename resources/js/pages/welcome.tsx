@@ -8,7 +8,8 @@ import {
     Cpu, Cloud, Menu, X, Star, Quote, Mail, Phone, MapPin, 
     Facebook, Twitter, Instagram, Linkedin,
     Briefcase, Activity, Clock, Users, Building2, PlayCircle, BarChart3, LineChart,
-    Package, Fingerprint, ShoppingCart, Calculator, PieChart, Wifi, WifiOff, Layers
+    Package, Fingerprint, ShoppingCart, Calculator, PieChart, Wifi, WifiOff, Layers,
+    TrendingUp, Palette
 } from 'lucide-react';
 
 const ctechStyles = `
@@ -112,12 +113,12 @@ const ctechStyles = `
 `;
 
 const services = [
-    { icon: <Monitor className="w-6 h-6 text-blue-600" />, title: 'Web Development', desc: 'Pembuatan website modern, responsif, dan scalable untuk kebutuhan enterprise.' },
+    { icon: <Code2 className="w-6 h-6 text-blue-600" />, title: 'Software Development', desc: 'Pengembangan software kustom untuk kebutuhan bisnis dengan teknologi modern dan scalable.' },
     { icon: <Smartphone className="w-6 h-6 text-blue-600" />, title: 'Mobile App Development', desc: 'Aplikasi iOS & Android native/hybrid dengan performa tinggi dan UX premium.' },
-    { icon: <Database className="w-6 h-6 text-blue-600" />, title: 'Sistem Internal', desc: 'Solusi dashboard admin, ERP, CRM, dan sistem manajemen kustom.' },
-    { icon: <Cpu className="w-6 h-6 text-blue-600" />, title: 'AI Automation', desc: 'Integrasi kecerdasan buatan untuk mengotomatisasi dan mempercepat proses bisnis.' },
-    { icon: <Cloud className="w-6 h-6 text-blue-600" />, title: 'Cloud Infrastructure', desc: 'Arsitektur cloud yang aman, andal, dan siap mendukung skalabilitas tinggi.' },
-    { icon: <Shield className="w-6 h-6 text-blue-600" />, title: 'Cyber Security', desc: 'Sistem keamanan data terenkripsi untuk melindungi aset digital perusahaan Anda.' }
+    { icon: <PlayCircle className="w-6 h-6 text-blue-600" />, title: 'Video Animasi', desc: 'Produksi video animasi 2D/3D untuk kebutuhan promosi, edukasi, dan branding.' },
+    { icon: <TrendingUp className="w-6 h-6 text-blue-600" />, title: 'Digital Marketing', desc: 'Strategi pemasaran digital terpadu untuk meningkatkan visibilitas dan konversi bisnis.' },
+    { icon: <Palette className="w-6 h-6 text-blue-600" />, title: 'Desain', desc: 'Desain grafis, UI/UX, dan branding visual untuk identitas bisnis yang kuat.' },
+    { icon: <Monitor className="w-6 h-6 text-blue-600" />, title: 'Video Production', desc: 'Produksi video profesional untuk company profile, dokumentasi, dan konten kreatif.' }
 ];
 
 const features = [
