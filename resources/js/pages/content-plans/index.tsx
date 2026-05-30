@@ -529,9 +529,12 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
                                                             </span>
                                                         )}
                                                     </div>
-                                                    {plan.creator && (
-                                                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-[10px] font-medium" title={plan.creator.name}>
-                                                            {plan.creator.name.charAt(0)}
+                                                    {plan.assigned_to && (
+                                                        <div className="flex items-center gap-1">
+                                                            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-[10px] font-medium" title={plan.assigned_to.name}>
+                                                                {plan.assigned_to.name.charAt(0)}
+                                                            </div>
+                                                            <span className="text-[10px] text-muted-foreground truncate max-w-[60px]">{plan.assigned_to.name}</span>
                                                         </div>
                                                     )}
                                                 </div>
