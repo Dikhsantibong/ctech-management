@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Clock, CheckSquare, Users, DollarSign, Calendar as CalendarIcon, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, CheckSquare, Users, DollarSign, Calendar as CalendarIcon, ArrowRight, Megaphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -22,71 +22,15 @@ interface Event {
     id: string;
     title: string;
     date: Date;
-    type: 'project' | 'task' | 'meeting' | 'invoice';
+    type: 'project' | 'task' | 'meeting' | 'invoice' | 'content_plan';
     description?: string;
     time?: string;
     location?: string;
     priority?: 'high' | 'medium' | 'low';
     daysUntil?: number;
+    platform?: string;
+    content_type?: string;
 }
-
-// Mock data - dalam implementasi nyata, ini akan datang dari backend
-const mockEvents: Event[] = [
-    {
-        id: '1',
-        title: 'Project ABC - Deadline',
-        date: new Date(2026, 4, 28),
-        type: 'project',
-        description: 'Final submission for Project ABC',
-        time: '17:00',
-        location: 'Office - Meeting Room A',
-        priority: 'high',
-    },
-    {
-        id: '2',
-        title: 'Task: Design Dashboard',
-        date: new Date(2026, 4, 29),
-        type: 'task',
-        description: 'Complete dashboard design mockups',
-        priority: 'medium',
-    },
-    {
-        id: '3',
-        title: 'Team Meeting',
-        date: new Date(2026, 4, 30),
-        type: 'meeting',
-        description: 'Weekly sync with development team',
-        time: '10:00',
-        location: 'Zoom - Meeting Link in Channel',
-        priority: 'medium',
-    },
-    {
-        id: '4',
-        title: 'Invoice Payment Due',
-        date: new Date(2026, 5, 5),
-        type: 'invoice',
-        description: 'Client ABC - Invoice #12345',
-        priority: 'high',
-    },
-    {
-        id: '5',
-        title: 'Project XYZ - Deadline',
-        date: new Date(2026, 5, 15),
-        type: 'project',
-        description: 'Phase 2 completion',
-        time: '18:00',
-        location: 'Office',
-        priority: 'high',
-    },
-    {
-        id: '6',
-        title: 'Task: Code Review',
-        date: new Date(2026, 5, 10),
-        type: 'task',
-        description: 'Review pull requests for feature X',
-        priority: 'low',
-    },
-];
 
 const getEventIcon = (type: string) => {
     switch (type) {
@@ -98,6 +42,8 @@ const getEventIcon = (type: string) => {
             return <Users className="h-4 w-4" />;
         case 'invoice':
             return <DollarSign className="h-4 w-4" />;
+        case 'content_plan':
+            return <Megaphone className="h-4 w-4" />;
         default:
             return <CalendarIcon className="h-4 w-4" />;
     }
@@ -113,6 +59,8 @@ const getEventColor = (type: string) => {
             return 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800';
         case 'invoice':
             return 'bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
+        case 'content_plan':
+            return 'bg-pink-100 text-pink-800 border-pink-300 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800';
         default:
             return 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700';
     }
@@ -128,17 +76,25 @@ const getEventBadgeColor = (type: string) => {
             return 'bg-purple-500';
         case 'invoice':
             return 'bg-orange-500';
+        case 'content_plan':
+            return 'bg-pink-500';
         default:
             return 'bg-gray-500';
     }
 };
 
-export default function CalendarIndex() {
+export default function CalendarIndex({ events: initialEvents }: { events: any[] }) {
     const [viewMode, setViewMode] = useState<'monthly' | 'weekly' | 'agenda'>('monthly');
-    const [currentDate, setCurrentDate] = useState(new Date(2026, 4, 1)); // May 2026
+    const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [selectedEvents, setSelectedEvents] = useState<Event[]>([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    // Convert backend events to frontend format
+    const events: Event[] = initialEvents.map((event) => ({
+        ...event,
+        date: new Date(event.date),
+    }));
 
     const getDaysInMonth = (date: Date) => {
         return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -149,7 +105,7 @@ export default function CalendarIndex() {
     };
 
     const getEventsForDate = (date: Date) => {
-        return mockEvents.filter(
+        return events.filter(
             (event) =>
                 event.date.getDate() === date.getDate() &&
                 event.date.getMonth() === date.getMonth() &&
@@ -158,10 +114,10 @@ export default function CalendarIndex() {
     };
 
     const handleDateClick = (date: Date) => {
-        const events = getEventsForDate(date);
-        if (events.length > 0) {
+        const dateEvents = getEventsForDate(date);
+        if (dateEvents.length > 0) {
             setSelectedDate(date);
-            setSelectedEvents(events);
+            setSelectedEvents(dateEvents);
             setIsDialogOpen(true);
         }
     };
@@ -183,7 +139,7 @@ export default function CalendarIndex() {
     };
 
     const getUpcomingEvents = () => {
-        return mockEvents.sort((a, b) => a.date.getTime() - b.date.getTime());
+        return events.sort((a, b) => a.date.getTime() - b.date.getTime());
     };
 
     const monthNames = [
@@ -412,7 +368,7 @@ export default function CalendarIndex() {
                                 <div>
                                     <div>{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</div>
                                     <div className="text-xs text-muted-foreground mt-1">
-                                        {mockEvents.filter(e => e.date.getMonth() === currentDate.getMonth() && e.date.getFullYear() === currentDate.getFullYear()).length} events this month
+                                        {events.filter(e => e.date.getMonth() === currentDate.getMonth() && e.date.getFullYear() === currentDate.getFullYear()).length} events this month
                                     </div>
                                 </div>
                             )}
@@ -420,7 +376,7 @@ export default function CalendarIndex() {
                                 <div>
                                     <div>Week of {getWeekStart(currentDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(getWeekStart(currentDate).getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
                                     <div className="text-xs text-muted-foreground mt-1">
-                                        {mockEvents.filter(e => {
+                                        {events.filter(e => {
                                             const eDate = e.date.getTime();
                                             const weekStart = getWeekStart(currentDate).getTime();
                                             const weekEnd = weekStart + 7 * 24 * 60 * 60 * 1000;
@@ -433,7 +389,7 @@ export default function CalendarIndex() {
                                 <div>
                                     <div>Upcoming Events</div>
                                     <div className="text-xs text-muted-foreground mt-1">
-                                        {mockEvents.length} total events scheduled
+                                        {events.length} total events scheduled
                                     </div>
                                 </div>
                             )}
@@ -491,6 +447,10 @@ export default function CalendarIndex() {
                     <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded bg-orange-500"></div>
                         <span className="text-sm">Invoice Due</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded bg-pink-500"></div>
+                        <span className="text-sm">Content Plan</span>
                     </div>
                 </div>
 
@@ -558,9 +518,13 @@ export default function CalendarIndex() {
                                 </div>
                             ))}
                         </div>
-                        <div className="mt-6 pt-4 border-t">
+                        <div className="mt-6 pt-4 border-t flex gap-4">
                             <Link href="/tasks" className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
                                 Lihat Semua Tasks
+                                <ArrowRight className="h-4 w-4" />
+                            </Link>
+                            <Link href="/content-plans" className="inline-flex items-center gap-2 text-sm font-semibold text-pink-600 hover:text-pink-700 transition-colors">
+                                Lihat Semua Content Plans
                                 <ArrowRight className="h-4 w-4" />
                             </Link>
                         </div>
