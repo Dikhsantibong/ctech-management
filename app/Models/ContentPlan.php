@@ -24,6 +24,8 @@ class ContentPlan extends Model
         'visual_assets_url',
         'target_audience',
         'keywords',
+        'tujuan_konten',
+        'assigned_to',
     ];
 
     protected function casts(): array
@@ -37,5 +39,10 @@ class ContentPlan extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function assignedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
     }
 }

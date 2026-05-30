@@ -25,6 +25,7 @@ import { Textarea } from '@/components/ui/textarea';
 const platforms = ['Instagram', 'Facebook', 'Twitter/X', 'TikTok', 'LinkedIn', 'YouTube', 'Website/Blog'];
 const contentTypes = ['Post', 'Story', 'Reel', 'Video', 'Article', 'Carousel', 'Thread'];
 const statusList = ['Draft', 'Scheduled', 'Published', 'Cancelled'];
+const tujuanKontenOptions = ['ctechagency', 'officialperusahaan', 'ctechpaylo', 'ctechbooth'];
 
 const platformColors: Record<string, string> = {
     'Instagram': 'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
@@ -43,7 +44,7 @@ const statusColumnColors: Record<string, string> = {
     'Cancelled': 'border-t-red-500',
 };
 
-export default function ContentPlansIndex({ contentPlans }: { contentPlans: any[] }) {
+export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }: { contentPlans: any[], staffUsers: any[], userRole: string }) {
     const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -67,6 +68,8 @@ export default function ContentPlansIndex({ contentPlans }: { contentPlans: any[
         visual_assets_url: '',
         target_audience: '',
         keywords: '',
+        tujuan_konten: '',
+        assigned_to: '',
     });
 
     const openCreateModal = () => {
@@ -91,6 +94,8 @@ export default function ContentPlansIndex({ contentPlans }: { contentPlans: any[
             visual_assets_url: plan.visual_assets_url || '',
             target_audience: plan.target_audience || '',
             keywords: plan.keywords || '',
+            tujuan_konten: plan.tujuan_konten || '',
+            assigned_to: plan.assigned_to || '',
         });
         setIsEditModalOpen(true);
     };
@@ -174,6 +179,8 @@ export default function ContentPlansIndex({ contentPlans }: { contentPlans: any[
                 visual_assets_url: draggedPlan.visual_assets_url || '',
                 target_audience: draggedPlan.target_audience || '',
                 keywords: draggedPlan.keywords || '',
+                tujuan_konten: draggedPlan.tujuan_konten || '',
+                assigned_to: draggedPlan.assigned_to || '',
             }, {
                 preserveScroll: true,
             });
@@ -252,6 +259,28 @@ export default function ContentPlansIndex({ contentPlans }: { contentPlans: any[
                         <Label>Catatan Tambahan</Label>
                         <Textarea value={data.notes} onChange={e => setData('notes', e.target.value)} placeholder="Catatan internal..." className="h-[40px] resize-none" />
                     </div>
+                    <div className="space-y-2 col-span-2 md:col-span-1">
+                        <Label>Tujuan Konten</Label>
+                        <Select value={data.tujuan_konten} onValueChange={value => setData('tujuan_konten', value)}>
+                            <SelectTrigger><SelectValue placeholder="Pilih tujuan" /></SelectTrigger>
+                            <SelectContent>
+                                {tujuanKontenOptions.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    {(userRole === 'direktur_utama' || userRole === 'direktur_operasional') && (
+                        <div className="space-y-2 col-span-2 md:col-span-1">
+                            <Label>Assigned To</Label>
+                            <Select value={data.assigned_to} onValueChange={value => setData('assigned_to', value)}>
+                                <SelectTrigger><SelectValue placeholder="Pilih staff" /></SelectTrigger>
+                                <SelectContent>
+                                    {staffUsers.map(user => (
+                                        <SelectItem key={user.id} value={user.id.toString()}>{user.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -332,8 +361,9 @@ export default function ContentPlansIndex({ contentPlans }: { contentPlans: any[
                                             <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Platform</th>
                                             <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tipe</th>
                                             <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
+                                            <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tujuan</th>
                                             <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Jadwal</th>
-                                            <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Pembuat</th>
+                                            <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Assigned To</th>
                                             <th className="h-12 px-4 align-middle font-medium text-muted-foreground text-right">Aksi</th>
                                         </tr>
                                     </thead>
@@ -352,10 +382,17 @@ export default function ContentPlansIndex({ contentPlans }: { contentPlans: any[
                                                         {plan.status}
                                                     </Badge>
                                                 </td>
+                                                <td className="p-4 align-middle">
+                                                    {plan.tujuan_konten ? (
+                                                        <Badge variant="outline" className="bg-primary/5 text-primary">
+                                                            {plan.tujuan_konten}
+                                                        </Badge>
+                                                    ) : '-'}
+                                                </td>
                                                 <td className="p-4 align-middle text-muted-foreground">
                                                     {plan.scheduled_date ? new Date(plan.scheduled_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                                                 </td>
-                                                <td className="p-4 align-middle">{plan.creator?.name || '-'}</td>
+                                                <td className="p-4 align-middle">{plan.assigned_to?.name || '-'}</td>
                                                 <td className="p-4 align-middle text-right">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
@@ -377,7 +414,7 @@ export default function ContentPlansIndex({ contentPlans }: { contentPlans: any[
                                         ))}
                                         {contentPlans.length === 0 && (
                                             <tr>
-                                                <td colSpan={7} className="p-4 text-center text-muted-foreground">
+                                                <td colSpan={8} className="p-4 text-center text-muted-foreground">
                                                     Belum ada content plan. Klik "Buat Konten" untuk memulai.
                                                 </td>
                                             </tr>
@@ -434,13 +471,18 @@ export default function ContentPlansIndex({ contentPlans }: { contentPlans: any[
                                                 onDragEnd={handleDragEnd}
                                                 className={`group rounded-lg border bg-card p-3 shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing active:shadow-lg active:scale-[1.02] ${draggedPlan?.id === plan.id ? 'opacity-50' : ''}`}
                                             >
-                                                {/* Drag handle + Platform */}
+                                                {/* Drag handle + Platform + Tujuan */}
                                                 <div className="flex items-center justify-between mb-2">
                                                     <div className="flex items-center gap-1.5">
                                                         <GripVertical className="h-3.5 w-3.5 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${platformColors[plan.platform] || 'bg-muted text-foreground'}`}>
                                                             {plan.platform}
                                                         </span>
+                                                        {plan.tujuan_konten && (
+                                                            <Badge variant="outline" className="text-[10px] bg-secondary">
+                                                                {plan.tujuan_konten}
+                                                            </Badge>
+                                                        )}
                                                     </div>
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
