@@ -33,19 +33,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Accessible by all authenticated users (Staff, Admin Operasional, Direktur Operasional, Direktur Utama)
     Route::middleware('role:direktur_utama,direktur_operasional,admin_operasional,staff')->group(function () {
         Route::get('/dashboard', function () {
-            return inertia('dashboard', [
-                'stats' => [
+            $user = auth()->user();
+            $role = $user->role;
+
+            // Base data for all roles
+            $data = [
+                'user_role' => $role,
+                'announcements' => \App\Models\Announcement::active()->forRole($role)->latest()->take(3)->get(),
+            ];
+
+            // Direktur Utama and Direktur Operasional see all information
+            if (in_array($role, ['direktur_utama', 'direktur_operasional'])) {
+                $data['stats'] = [
                     'active_projects' => \App\Models\Project::where('status', '!=', 'Completed')->count(),
                     'pending_tasks' => \App\Models\Task::where('status', '!=', 'Done')->count(),
                     'unpaid_invoices' => \App\Models\Invoice::where('status', '!=', 'Paid')->count(),
                     'team_members' => \App\Models\User::count(),
-                ],
-                'upcoming_tasks' => \App\Models\Task::with('project')->where('status', '!=', 'Done')->whereNotNull('deadline')->orderBy('deadline')->take(5)->get(),
-                'task_status_counts' => DB::table('tasks')
+                ];
+                $data['upcoming_tasks'] = \App\Models\Task::with('project')->where('status', '!=', 'Done')->whereNotNull('deadline')->orderBy('deadline')->take(5)->get();
+                $data['task_status_counts'] = DB::table('tasks')
                     ->select('status', DB::raw('count(*) as count'))
                     ->groupBy('status')
-                    ->pluck('count', 'status'),
-                'tasks_last_7_days' => (function () {
+                    ->pluck('count', 'status');
+                $data['tasks_last_7_days'] = (function () {
                     $rows = DB::table('tasks')
                         ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
                         ->where('created_at', '>=', now()->subDays(6))
@@ -56,16 +66,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
                         ->toArray();
 
                     $labels = [];
-                    $data = [];
+                    $data_points = [];
                     for ($i = 6; $i >= 0; $i--) {
                         $d = now()->subDays($i)->format('Y-m-d');
                         $labels[] = now()->subDays($i)->format('M j');
-                        $data[] = isset($rows[$d]) ? (int) $rows[$d] : 0;
+                        $data_points[] = isset($rows[$d]) ? (int) $rows[$d] : 0;
                     }
 
-                    return ['labels' => $labels, 'data' => $data];
-                })(),
-            ]);
+                    return ['labels' => $labels, 'data' => $data_points];
+                })();
+            }
+
+            // Staff sees limited information
+            if ($role === 'staff' || $role === 'admin_operasional') {
+                $data['stats'] = [
+                    'pending_tasks' => \App\Models\Task::where('status', '!=', 'Done')->count(),
+                    'active_projects' => \App\Models\Project::where('status', '!=', 'Completed')->count(),
+                ];
+                $data['upcoming_tasks'] = \App\Models\Task::with('project')->where('status', '!=', 'Done')->whereNotNull('deadline')->orderBy('deadline')->take(5)->get();
+            }
+
+            return inertia('dashboard', $data);
         })->name('dashboard');
 
         Route::resource('projects', \App\Http\Controllers\ProjectController::class);
@@ -98,6 +119,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('clients', \App\Http\Controllers\ClientController::class);
         Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');
     });
+
+    // Announcements - CRUD for direktur utama, read-only for others
+    Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->except(['index', 'show']);
+    Route::get('announcements', [\App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
+    Route::get('announcements/{announcement}', [\App\Http\Controllers\AnnouncementController::class, 'show'])->name('announcements.show');
 });
 
 require __DIR__.'/settings.php';

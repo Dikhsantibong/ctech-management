@@ -1,12 +1,12 @@
 import { Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PublicNavbar from '@/components/public-navbar';
 import {
     ArrowRight, CheckCircle2, ChevronDown, ChevronUp,
     Lightbulb, Target, Rocket, Users, Award, Heart,
     Play, ExternalLink, MapPin, Phone, Mail,
     Facebook, Instagram, Linkedin, Star,
-    Code2, Palette, TrendingUp, Zap
+    Code2, Palette, TrendingUp, Zap, ChevronLeft, ChevronRight
 } from 'lucide-react';
 
 /* ─────────── DATA ─────────── */
@@ -103,6 +103,37 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 /* ─────────── PAGE ─────────── */
 
 export default function AboutIndex() {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    const storyImages = [
+        { src: '/our-story/photo1.jpeg', alt: 'Tim CTECH', gradient: 'from-blue-500 to-indigo-600', letter: 'C' },
+        { src: '/our-story/photo2.jpeg', alt: 'Workshop CTECH', gradient: 'from-cyan-500 to-blue-600', letter: 'T' },
+        { src: '/our-story/photo3.jpeg', alt: 'Kantor CTECH', gradient: 'from-indigo-500 to-purple-600', letter: 'E' },
+        { src: '/our-story/photo4.jpeg', alt: 'Project CTECH', gradient: 'from-slate-700 to-slate-900', letter: 'H' },
+        { src: '/our-story/photo5.jpeg', alt: 'Project CTECH', gradient: 'from-slate-700 to-slate-900', letter: 'H' },
+        { src: '/our-story/photo6.jpeg', alt: 'Project CTECH', gradient: 'from-slate-700 to-slate-900', letter: 'H' },
+        { src: '/our-story/photo7.jpeg', alt: 'Project CTECH', gradient: 'from-slate-700 to-slate-900', letter: 'H' },
+        { src: '/our-story/photo8.jpeg', alt: 'Project CTECH', gradient: 'from-slate-700 to-slate-900', letter: 'H' },
+        { src: '/our-story/photo9.jpeg', alt: 'Project CTECH', gradient: 'from-slate-700 to-slate-900', letter: 'H' },
+        { src: '/our-story/photo10.jpeg', alt: 'Project CTECH', gradient: 'from-slate-700 to-slate-900', letter: 'H' },
+        { src: '/our-story/photo11.jpeg', alt: 'Project CTECH', gradient: 'from-slate-700 to-slate-900', letter: 'H' },
+    ];
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentImageIndex((prev) => (prev + 1) % storyImages.length);
+        }, 4000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const nextImage = () => {
+        setCurrentImageIndex((prev) => (prev + 1) % storyImages.length);
+    };
+
+    const prevImage = () => {
+        setCurrentImageIndex((prev) => (prev - 1 + storyImages.length) % storyImages.length);
+    };
     return (
         <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-blue-600 selection:text-white">
             <Head title="Tentang Kami — CTECH Creative Agency Kendari" />
@@ -203,22 +234,51 @@ export default function AboutIndex() {
                             </div>
 
                             <div className="relative">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-4">
-                                        <div className="rounded-2xl overflow-hidden aspect-[3/4] bg-slate-100 shadow-2xl">
-                                            <img src="/our-story/photo1.jpeg" alt="Tim CTECH" className="w-full h-full object-cover grayscale" onError={(e: any) => { e.target.style.display='none'; e.target.parentElement.innerHTML='<div class=&quot;w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center&quot;><span class=&quot;text-white/80 text-5xl font-black&quot;>C</span></div>'; }} />
+                                <div className="relative rounded-2xl overflow-hidden aspect-[3/4] bg-slate-100 shadow-2xl">
+                                    {storyImages.map((image, index) => (
+                                        <div
+                                            key={index}
+                                            className={`absolute inset-0 transition-opacity duration-500 ${
+                                                index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                                            }`}
+                                        >
+                                            <img
+                                                src={image.src}
+                                                alt={image.alt}
+                                                className="w-full h-full object-cover grayscale"
+                                                onError={(e: any) => {
+                                                    e.target.style.display='none';
+                                                    e.target.parentElement.innerHTML=`<div class="w-full h-full bg-gradient-to-br ${image.gradient} flex items-center justify-center"><span class="text-white/80 text-5xl font-black">${image.letter}</span></div>`;
+                                                }}
+                                            />
                                         </div>
-                                        <div className="rounded-2xl overflow-hidden aspect-square bg-slate-100 shadow-lg">
-                                            <img src="/our-story/photo2.jpeg" alt="Workshop CTECH" className="w-full h-full object-cover grayscale" onError={(e: any) => { e.target.style.display='none'; e.target.parentElement.innerHTML='<div class=&quot;w-full h-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center&quot;><span class=&quot;text-white/80 text-4xl font-black&quot;>T</span></div>'; }} />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-4 pt-8">
-                                        <div className="rounded-2xl overflow-hidden aspect-square bg-slate-100 shadow-lg">
-                                            <img src="/our-story/photo3.jpeg" alt="Kantor CTECH" className="w-full h-full object-cover grayscale" onError={(e: any) => { e.target.style.display='none'; e.target.parentElement.innerHTML='<div class=&quot;w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center&quot;><span class=&quot;text-white/80 text-4xl font-black&quot;>E</span></div>'; }} />
-                                        </div>
-                                        <div className="rounded-2xl overflow-hidden aspect-[3/4] bg-slate-100 shadow-2xl">
-                                            <img src="/our-story/photo4.jpeg" alt="Project CTECH" className="w-full h-full object-cover grayscale" onError={(e: any) => { e.target.style.display='none'; e.target.parentElement.innerHTML='<div class=&quot;w-full h-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center&quot;><span class=&quot;text-white/80 text-5xl font-black&quot;>H</span></div>'; }} />
-                                        </div>
+                                    ))}
+
+                                    {/* Navigation buttons */}
+                                    <button
+                                        onClick={prevImage}
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/90 hover:bg-white text-slate-900 flex items-center justify-center shadow-lg transition-all hover:scale-110"
+                                    >
+                                        <ChevronLeft className="w-6 h-6" />
+                                    </button>
+                                    <button
+                                        onClick={nextImage}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/90 hover:bg-white text-slate-900 flex items-center justify-center shadow-lg transition-all hover:scale-110"
+                                    >
+                                        <ChevronRight className="w-6 h-6" />
+                                    </button>
+
+                                    {/* Dots indicator */}
+                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                                        {storyImages.map((_, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => setCurrentImageIndex(index)}
+                                                className={`w-3 h-3 rounded-full transition-all ${
+                                                    index === currentImageIndex ? 'bg-white w-8' : 'bg-white/50'
+                                                }`}
+                                            />
+                                        ))}
                                     </div>
                                 </div>
                                 {/* Floating badge */}
