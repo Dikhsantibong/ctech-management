@@ -8,11 +8,6 @@ use Illuminate\Support\Facades\Auth;
 
 class AnnouncementController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('role:direktur_utama')->except(['index', 'show']);
-    }
-
     public function index(Request $request)
     {
         $user = Auth::user();

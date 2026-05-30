@@ -3,12 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Announcement extends Model
 {
-    #[Fillable(['title', 'content', 'visible_to_roles', 'type', 'is_active', 'published_at', 'expires_at', 'created_by'])]
+    protected $fillable = ['title', 'content', 'visible_to_roles', 'type', 'is_active', 'published_at', 'expires_at', 'created_by'];
 
     protected $casts = [
         'visible_to_roles' => 'array',

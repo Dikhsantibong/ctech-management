@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
-import { Plus, MoreVertical, Edit2, Trash2, Bell, Info, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { Plus, MoreVertical, Edit2, Trash2, Bell, Info, AlertTriangle, CheckCircle, XCircle, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -136,33 +136,35 @@ export default function AnnouncementsIndex({ announcements, canManage }: Props) 
                                             <td className="p-4 align-middle text-muted-foreground">
                                                 {new Date(announcement.created_at).toLocaleDateString('id-ID')}
                                             </td>
-                                            {canManage && (
-                                                <td className="p-4 align-middle text-right">
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                                                <span className="sr-only">Open menu</span>
-                                                                <MoreVertical className="h-4 w-4" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem asChild>
-                                                                <Link href={`/announcements/${announcement.id}`}>
-                                                                    <Edit2 className="mr-2 h-4 w-4" /> Lihat Detail
-                                                                </Link>
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem asChild>
-                                                                <Link href={`/announcements/${announcement.id}/edit`}>
-                                                                    <Edit2 className="mr-2 h-4 w-4" /> Edit
-                                                                </Link>
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => openDeleteModal(announcement)} className="text-destructive">
-                                                                <Trash2 className="mr-2 h-4 w-4" /> Hapus
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </td>
-                                            )}
+                                            <td className="p-4 align-middle text-right">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                            <span className="sr-only">Open menu</span>
+                                                            <MoreVertical className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/announcements/${announcement.id}`}>
+                                                                <Eye className="mr-2 h-4 w-4" /> Lihat Detail
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                        {canManage && (
+                                                            <>
+                                                                <DropdownMenuItem asChild>
+                                                                    <Link href={`/announcements/${announcement.id}/edit`}>
+                                                                        <Edit2 className="mr-2 h-4 w-4" /> Edit
+                                                                    </Link>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => openDeleteModal(announcement)} className="text-destructive">
+                                                                    <Trash2 className="mr-2 h-4 w-4" /> Hapus
+                                                                </DropdownMenuItem>
+                                                            </>
+                                                        )}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </td>
                                         </tr>
                                     ))}
                                     {announcements.length === 0 && (

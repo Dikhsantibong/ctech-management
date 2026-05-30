@@ -121,7 +121,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Announcements - CRUD for direktur utama, read-only for others
-    Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->except(['index', 'show']);
+    Route::middleware('role:direktur_utama')->group(function () {
+        Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->except(['index', 'show']);
+    });
     Route::get('announcements', [\App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
     Route::get('announcements/{announcement}', [\App\Http\Controllers\AnnouncementController::class, 'show'])->name('announcements.show');
 });
