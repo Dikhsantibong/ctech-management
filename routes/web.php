@@ -30,8 +30,8 @@ Route::get('/portfolio', [\App\Http\Controllers\PublicController::class, 'portfo
 Route::get('/portfolio/{id}', [\App\Http\Controllers\PublicController::class, 'portfolioShow'])->name('public.portfolio.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Accessible by all authenticated users (Staff, Admin Operasional, Direktur Utama)
-    Route::middleware('role:direktur_utama,admin_operasional,staff')->group(function () {
+    // Accessible by all authenticated users (Staff, Admin Operasional, Direktur Operasional, Direktur Utama)
+    Route::middleware('role:direktur_utama,direktur_operasional,admin_operasional,staff')->group(function () {
         Route::get('/dashboard', function () {
             return inertia('dashboard', [
                 'stats' => [
@@ -78,8 +78,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('calendar.index');
     });
 
-    // Accessible by Admin Operasional and Direktur Utama
-    Route::middleware('role:direktur_utama,admin_operasional')->group(function () {
+    // Accessible by Admin Operasional, Direktur Operasional, and Direktur Utama
+    Route::middleware('role:direktur_utama,direktur_operasional,admin_operasional')->group(function () {
         Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
         Route::put('invoices/{invoice}/status', [\App\Http\Controllers\InvoiceController::class, 'updateStatus'])->name('invoices.status');
         Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');

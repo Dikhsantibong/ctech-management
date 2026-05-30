@@ -2,13 +2,6 @@ import { Head, Link, router } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import PublicNavbar from '@/components/public-navbar';
 
-function stripHtml(content: string) {
-    return (content || '')
-        .replace(/<[^>]*>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-}
-
 export default function PublicNewsIndex({ news }: { news: any }) {
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-600 selection:text-white">
@@ -45,7 +38,7 @@ export default function PublicNewsIndex({ news }: { news: any }) {
                                     {item.title}
                                 </h3>
                                 <p className="text-slate-600 text-sm leading-relaxed line-clamp-3 mb-4 flex-grow">
-                                    {stripHtml(item.content).slice(0, 180)}
+                                    {item.content.replace(/<[^>]+>/g, '')}
                                 </p>
                                 <span className="inline-flex items-center gap-1.5 text-blue-600 font-semibold text-sm mt-auto group-hover:gap-2 transition-all">
                                     Baca Selengkapnya &rarr;

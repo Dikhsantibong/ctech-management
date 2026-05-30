@@ -247,7 +247,7 @@ export default function Services() {
                                 href="#kontak" 
                                 className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-semibold transition-all shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 transform hover:-translate-y-0.5"
                             >
-                                Konsultasi Gratis
+                                Dapatkan Penawaran
                                 <ArrowRight className="w-5 h-5" />
                             </a>
                             <Link 

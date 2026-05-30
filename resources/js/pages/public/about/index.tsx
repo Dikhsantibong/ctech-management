@@ -191,7 +191,7 @@ export default function AboutIndex() {
                                         CTECH lahir dari keyakinan sederhana: bahwa <strong className="text-slate-900">Kendari layak memiliki agency teknologi berkualitas global.</strong> Kami melihat potensi besar UMKM dan perusahaan lokal yang belum tersentuh digitalisasi, dan memutuskan untuk menjadi jembatannya.
                                     </p>
                                     <p>
-                                        Bermula dari sebuah ruang kerja kecil di tahun 2019, kini CTECH telah berkembang menjadi creative agency & software house terdepan di Sulawesi Tenggara. Kami menggabungkan <strong className="text-slate-900">kekuatan teknologi</strong>, <strong className="text-slate-900">kreativitas visual</strong>, dan <strong className="text-slate-900">strategi bisnis</strong> untuk membantu klien kami bertransformasi secara digital.
+                                        Bermula dari sebuah ruang kelas kecil di tahun 2023, kini CTECH telah berkembang menjadi creative agency & software house terdepan di Sulawesi Tenggara. Kami menggabungkan <strong className="text-slate-900">kekuatan teknologi</strong>, <strong className="text-slate-900">kreativitas visual</strong>, dan <strong className="text-slate-900">strategi bisnis</strong> untuk membantu klien kami bertransformasi secara digital.
                                     </p>
                                 </div>
 

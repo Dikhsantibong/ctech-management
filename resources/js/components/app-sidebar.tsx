@@ -53,6 +53,7 @@ export function AppSidebar() {
 
     const isStaff = userRole === 'staff';
     const isAdminOp = userRole === 'admin_operasional';
+    const isDirekturOp = userRole === 'direktur_operasional';
     const isAdmin = userRole === 'direktur_utama';
 
     const currentOperationsNav = [...operationsNav];
@@ -78,13 +79,13 @@ export function AppSidebar() {
                 <NavMain items={dashboardNav} label="Overview" />
                 <NavMain items={currentOperationsNav} label="Operations" />
                 
-                {(isAdmin || isAdminOp) && (
+                {(isAdmin || isDirekturOp || isAdminOp) && (
                     <NavMain items={financeNav} label="Finance" />
                 )}
                 
                 <NavMain items={marketingNav} label="Marketing" />
                 
-                {(isAdmin || isAdminOp) && (
+                {(isAdmin || isDirekturOp || isAdminOp) && (
                     <NavMain items={administrationNav} label="Administration" />
                 )}
                 

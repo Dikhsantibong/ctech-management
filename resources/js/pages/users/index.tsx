@@ -87,8 +87,9 @@ export default function UsersIndex({ users }: { users: any[] }) {
     const roleBadgeColor = (role: string) => {
         switch (role) {
             case 'direktur_utama': return 'destructive';
-            case 'admin_operasional': return 'default';
-            default: return 'secondary';
+            case 'direktur_operasional': return 'default';
+            case 'admin_operasional': return 'secondary';
+            default: return 'outline';
         }
     };
 
@@ -203,6 +204,7 @@ export default function UsersIndex({ users }: { users: any[] }) {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="direktur_utama">Direktur Utama</SelectItem>
+                                    <SelectItem value="direktur_operasional">Direktur Operasional</SelectItem>
                                     <SelectItem value="admin_operasional">Admin Operasional</SelectItem>
                                     <SelectItem value="staff">Staff</SelectItem>
                                 </SelectContent>
@@ -248,6 +250,7 @@ export default function UsersIndex({ users }: { users: any[] }) {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="direktur_utama">Direktur Utama</SelectItem>
+                                    <SelectItem value="direktur_operasional">Direktur Operasional</SelectItem>
                                     <SelectItem value="admin_operasional">Admin Operasional</SelectItem>
                                     <SelectItem value="staff">Staff</SelectItem>
                                 </SelectContent>
