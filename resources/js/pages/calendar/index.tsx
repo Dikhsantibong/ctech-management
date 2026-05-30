@@ -1,6 +1,6 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Clock, CheckSquare, Users, DollarSign, Calendar as CalendarIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, CheckSquare, Users, DollarSign, Calendar as CalendarIcon, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -10,6 +10,13 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 interface Event {
     id: string;
@@ -129,6 +136,9 @@ const getEventBadgeColor = (type: string) => {
 export default function CalendarIndex() {
     const [viewMode, setViewMode] = useState<'monthly' | 'weekly' | 'agenda'>('monthly');
     const [currentDate, setCurrentDate] = useState(new Date(2026, 4, 1)); // May 2026
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const [selectedEvents, setSelectedEvents] = useState<Event[]>([]);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const getDaysInMonth = (date: Date) => {
         return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -145,6 +155,15 @@ export default function CalendarIndex() {
                 event.date.getMonth() === date.getMonth() &&
                 event.date.getFullYear() === date.getFullYear()
         );
+    };
+
+    const handleDateClick = (date: Date) => {
+        const events = getEventsForDate(date);
+        if (events.length > 0) {
+            setSelectedDate(date);
+            setSelectedEvents(events);
+            setIsDialogOpen(true);
+        }
     };
 
     const getWeekStart = (date: Date) => {
@@ -199,6 +218,7 @@ export default function CalendarIndex() {
                     className={`aspect-square border rounded-lg p-2 overflow-hidden cursor-pointer hover:shadow-md transition-shadow group relative ${
                         isToday ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-border'
                     }`}
+                    onClick={() => handleDateClick(date)}
                 >
                     <div className={`text-sm font-semibold mb-1 ${isToday ? 'text-blue-600 dark:text-blue-400' : 'text-foreground'}`}>
                         {day}
@@ -480,6 +500,72 @@ export default function CalendarIndex() {
                     {viewMode === 'weekly' && renderWeeklyView()}
                     {viewMode === 'agenda' && renderAgendaView()}
                 </div>
+
+                {/* Event Details Dialog */}
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>
+                                {selectedDate?.toLocaleDateString('en-US', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                })}
+                            </DialogTitle>
+                            <DialogDescription>
+                                {selectedEvents.length} event{selectedEvents.length > 1 ? 's' : ''} scheduled
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-3 mt-4">
+                            {selectedEvents.map((event) => (
+                                <div
+                                    key={event.id}
+                                    className={`p-4 rounded-lg border-l-4 ${getEventColor(event.type)}`}
+                                >
+                                    <div className="flex items-start gap-3">
+                                        <div className="flex-shrink-0 mt-1">
+                                            {getEventIcon(event.type)}
+                                        </div>
+                                        <div className="flex-grow">
+                                            <div className="font-semibold text-foreground mb-1">
+                                                {event.title}
+                                            </div>
+                                            {event.description && (
+                                                <div className="text-sm text-muted-foreground mb-2">
+                                                    {event.description}
+                                                </div>
+                                            )}
+                                            <div className="space-y-1 text-sm text-muted-foreground">
+                                                {event.time && (
+                                                    <div className="flex items-center gap-2">
+                                                        <Clock className="h-3 w-3" />
+                                                        <span>{event.time}</span>
+                                                    </div>
+                                                )}
+                                                {event.location && (
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs font-semibold">LOCATION:</span>
+                                                        <span className="text-xs">{event.location}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="flex-shrink-0">
+                                            <Badge variant="outline">{event.type}</Badge>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-6 pt-4 border-t">
+                            <Link href="/tasks" className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                                Lihat Semua Tasks
+                                <ArrowRight className="h-4 w-4" />
+                            </Link>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
         </>
     );
