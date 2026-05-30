@@ -82,8 +82,59 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 $data['stats'] = [
                     'pending_tasks' => \App\Models\Task::where('status', '!=', 'Done')->count(),
                     'active_projects' => \App\Models\Project::where('status', '!=', 'Completed')->count(),
+                    'content_plans' => \App\Models\ContentPlan::count(),
+                    'scheduled_content' => \App\Models\ContentPlan::whereNotNull('scheduled_date')->where('scheduled_date', '>=', now())->count(),
+                    'news' => \App\Models\News::where('status', 'published')->count(),
+                    'portfolios' => \App\Models\Portfolio::count(),
                 ];
                 $data['upcoming_tasks'] = \App\Models\Task::with('project')->where('status', '!=', 'Done')->whereNotNull('deadline')->orderBy('deadline')->take(5)->get();
+
+                // Content plans by status
+                $data['content_plan_status_counts'] = DB::table('content_plans')
+                    ->select('status', DB::raw('count(*) as count'))
+                    ->groupBy('status')
+                    ->pluck('count', 'status');
+
+                // Content plans by platform
+                $data['content_plan_platform_counts'] = DB::table('content_plans')
+                    ->select('platform', DB::raw('count(*) as count'))
+                    ->groupBy('platform')
+                    ->pluck('count', 'platform');
+
+                // News by category
+                $data['news_category_counts'] = DB::table('news')
+                    ->select('category', DB::raw('count(*) as count'))
+                    ->where('status', 'published')
+                    ->groupBy('category')
+                    ->pluck('count', 'category');
+
+                // Portfolios by category
+                $data['portfolio_category_counts'] = DB::table('portfolios')
+                    ->select('category', DB::raw('count(*) as count'))
+                    ->groupBy('category')
+                    ->pluck('count', 'category');
+
+                // Content plans last 7 days
+                $data['content_plans_last_7_days'] = (function () {
+                    $rows = DB::table('content_plans')
+                        ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
+                        ->where('created_at', '>=', now()->subDays(6))
+                        ->groupBy(DB::raw('DATE(created_at)'))
+                        ->orderBy(DB::raw('DATE(created_at)'))
+                        ->get()
+                        ->pluck('count', 'date')
+                        ->toArray();
+
+                    $labels = [];
+                    $data_points = [];
+                    for ($i = 6; $i >= 0; $i--) {
+                        $d = now()->subDays($i)->format('Y-m-d');
+                        $labels[] = now()->subDays($i)->format('M j');
+                        $data_points[] = isset($rows[$d]) ? (int) $rows[$d] : 0;
+                    }
+
+                    return ['labels' => $labels, 'data' => $data_points];
+                })();
             }
 
             return inertia('dashboard', $data);

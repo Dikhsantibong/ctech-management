@@ -1,11 +1,12 @@
 import { Head } from '@inertiajs/react';
-import { Line, Pie } from 'react-chartjs-2';
+import { Line, Pie, Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
     CategoryScale,
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
     Title,
     Tooltip,
     Legend,
@@ -13,10 +14,10 @@ import {
 } from 'chart.js';
 import { dashboard } from '@/routes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Activity, Briefcase, FileText, ListTodo, Users, Bell, Info, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { Activity, Briefcase, FileText, ListTodo, Users, Bell, Info, AlertTriangle, CheckCircle, XCircle, Megaphone, FolderOpen } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
 
 interface Announcement {
     id: number;
@@ -26,7 +27,7 @@ interface Announcement {
     created_at: string;
 }
 
-export default function Dashboard({ user_role, stats, upcoming_tasks, task_status_counts, tasks_last_7_days, announcements }: { user_role: string, stats?: any, upcoming_tasks?: any[], task_status_counts?: Record<string, number>, tasks_last_7_days?: { labels: string[], data: number[] }, announcements?: Announcement[] }) {
+export default function Dashboard({ user_role, stats, upcoming_tasks, task_status_counts, tasks_last_7_days, announcements, content_plan_status_counts, content_plan_platform_counts, news_category_counts, portfolio_category_counts, content_plans_last_7_days }: { user_role: string, stats?: any, upcoming_tasks?: any[], task_status_counts?: Record<string, number>, tasks_last_7_days?: { labels: string[], data: number[] }, announcements?: Announcement[], content_plan_status_counts?: Record<string, number>, content_plan_platform_counts?: Record<string, number>, news_category_counts?: Record<string, number>, portfolio_category_counts?: Record<string, number>, content_plans_last_7_days?: { labels: string[], data: number[] } }) {
     return (
         <>
             <Head title="Dashboard" />
@@ -84,7 +85,7 @@ export default function Dashboard({ user_role, stats, upcoming_tasks, task_statu
 
                 {/* Limited stats for staff */}
                 {stats && (user_role === 'staff' || user_role === 'admin_operasional') && (
-                    <div className="grid gap-4 md:grid-cols-2">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Pending Tasks</CardTitle>
@@ -103,6 +104,46 @@ export default function Dashboard({ user_role, stats, upcoming_tasks, task_statu
                             <CardContent>
                                 <div className="text-2xl font-bold">{stats.active_projects}</div>
                                 <p className="text-xs text-muted-foreground">Projects currently in progress</p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Content Plans</CardTitle>
+                                <Megaphone className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats.content_plans}</div>
+                                <p className="text-xs text-muted-foreground">Total content plans created</p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Scheduled Content</CardTitle>
+                                <Activity className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats.scheduled_content}</div>
+                                <p className="text-xs text-muted-foreground">Content scheduled for future</p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Published News</CardTitle>
+                                <FileText className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats.news}</div>
+                                <p className="text-xs text-muted-foreground">News articles published</p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Portfolios</CardTitle>
+                                <FolderOpen className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats.portfolios}</div>
+                                <p className="text-xs text-muted-foreground">Portfolio items</p>
                             </CardContent>
                         </Card>
                     </div>
@@ -166,6 +207,159 @@ export default function Dashboard({ user_role, stats, upcoming_tasks, task_statu
                             </div>
                         </CardContent>
                     </Card>
+                )}
+
+                {/* Charts for staff - Content Plans, News, and Portfolios */}
+                {(user_role === 'staff' || user_role === 'admin_operasional') && (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Content Plans by Status</CardTitle>
+                                <CardDescription>Distribution of content plan statuses</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="w-full h-64 flex items-center justify-center">
+                                    <div className="w-full h-full">
+                                        <Pie
+                                            options={{
+                                                responsive: true,
+                                                maintainAspectRatio: false,
+                                                plugins: { legend: { position: 'bottom' } },
+                                            }}
+                                            data={{
+                                                labels: Object.keys(content_plan_status_counts || {}),
+                                                datasets: [
+                                                    {
+                                                        data: Object.values(content_plan_status_counts || {}).map(v => Number(v)),
+                                                        backgroundColor: ['#f97316', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6'],
+                                                    },
+                                                ],
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Content Plans by Platform</CardTitle>
+                                <CardDescription>Content distribution across platforms</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="w-full h-64">
+                                    <Bar
+                                        options={{
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: { legend: { display: false } },
+                                            scales: { y: { beginAtZero: true } },
+                                        }}
+                                        data={{
+                                            labels: Object.keys(content_plan_platform_counts || {}),
+                                            datasets: [
+                                                {
+                                                    label: 'Content Plans',
+                                                    data: Object.values(content_plan_platform_counts || {}).map(v => Number(v)),
+                                                    backgroundColor: 'rgba(59,130,246,0.8)',
+                                                },
+                                            ],
+                                        }}
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>News by Category</CardTitle>
+                                <CardDescription>Published news distribution</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="w-full h-64">
+                                    <Bar
+                                        options={{
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: { legend: { display: false } },
+                                            scales: { y: { beginAtZero: true } },
+                                        }}
+                                        data={{
+                                            labels: Object.keys(news_category_counts || {}),
+                                            datasets: [
+                                                {
+                                                    label: 'News',
+                                                    data: Object.values(news_category_counts || {}).map(v => Number(v)),
+                                                    backgroundColor: 'rgba(16,185,129,0.8)',
+                                                },
+                                            ],
+                                        }}
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Portfolios by Category</CardTitle>
+                                <CardDescription>Portfolio items distribution</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="w-full h-64">
+                                    <Bar
+                                        options={{
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: { legend: { display: false } },
+                                            scales: { y: { beginAtZero: true } },
+                                        }}
+                                        data={{
+                                            labels: Object.keys(portfolio_category_counts || {}),
+                                            datasets: [
+                                                {
+                                                    label: 'Portfolios',
+                                                    data: Object.values(portfolio_category_counts || {}).map(v => Number(v)),
+                                                    backgroundColor: 'rgba(139,92,246,0.8)',
+                                                },
+                                            ],
+                                        }}
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="col-span-2">
+                            <CardHeader>
+                                <CardTitle>Content Plans Last 7 Days</CardTitle>
+                                <CardDescription>New content plans created per day</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                {content_plans_last_7_days ? (
+                                    <Line
+                                        options={{
+                                            responsive: true,
+                                            plugins: { legend: { display: false } },
+                                            scales: { y: { beginAtZero: true } },
+                                        }}
+                                        data={{
+                                            labels: content_plans_last_7_days.labels,
+                                            datasets: [
+                                                {
+                                                    label: 'Content Plans',
+                                                    data: content_plans_last_7_days.data,
+                                                    borderColor: 'rgba(236,72,153,1)',
+                                                    backgroundColor: 'rgba(236,72,153,0.2)',
+                                                    tension: 0.4,
+                                                },
+                                            ],
+                                        }}
+                                    />
+                                ) : (
+                                    <p className="text-sm text-muted-foreground">No data available.</p>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
                 )}
 
                 {/* Tasks and activity sections - only for direktur_utama and direktur_operasional */}
