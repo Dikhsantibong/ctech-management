@@ -15,7 +15,21 @@ class ContentPlanController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $contentPlans = ContentPlan::with(['creator', 'assignedTo'])->latest()->get();
+
+        // Staff can see content plans assigned to them AND unassigned content plans
+        if (in_array($user->role, ['staff', 'admin_operasional'])) {
+            $contentPlans = ContentPlan::with(['creator', 'assignedTo'])
+                ->where(function($query) use ($user) {
+                    $query->where('assigned_to', $user->id)
+                          ->orWhereNull('assigned_to');
+                })
+                ->latest()
+                ->get();
+        } else {
+            // Directors can see all content plans
+            $contentPlans = ContentPlan::with(['creator', 'assignedTo'])->latest()->get();
+        }
+
         $staffUsers = \App\Models\User::whereNotIn('role', ['direktur_utama', 'direktur_operasional'])->get();
 
         return Inertia::render('content-plans/index', [
@@ -66,6 +80,15 @@ class ContentPlanController extends Controller
 
     public function update(Request $request, ContentPlan $contentPlan)
     {
+        $user = Auth::user();
+
+        // Staff can only update content plans assigned to them or unassigned content plans
+        if (in_array($user->role, ['staff', 'admin_operasional'])) {
+            if ($contentPlan->assigned_to !== null && $contentPlan->assigned_to !== $user->id) {
+                return redirect()->back()->with('error', 'You can only update content plans assigned to you.');
+            }
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -85,12 +108,18 @@ class ContentPlanController extends Controller
             'assigned_to' => 'nullable|exists:users,id',
         ]);
 
-        $user = Auth::user();
         $data = $validated;
 
-        // Auto-fill assigned_to for non-director users
+        // Convert empty string to null for assigned_to
+        if (isset($data['assigned_to']) && $data['assigned_to'] === '') {
+            $data['assigned_to'] = null;
+        }
+
+        // Auto-fill assigned_to for non-director users if content plan is unassigned
         if (!in_array($user->role, ['direktur_utama', 'direktur_operasional'])) {
-            $data['assigned_to'] = $user->id;
+            if ($contentPlan->assigned_to === null) {
+                $data['assigned_to'] = $user->id;
+            }
         }
 
         $contentPlan->update($data);
