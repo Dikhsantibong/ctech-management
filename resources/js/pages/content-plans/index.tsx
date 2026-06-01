@@ -95,7 +95,7 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
             target_audience: plan.target_audience || '',
             keywords: plan.keywords || '',
             tujuan_konten: plan.tujuan_konten || '',
-            assigned_to: plan.assigned_to || '',
+            assigned_to: plan.assigned_to?.id ? plan.assigned_to.id.toString() : '',
         });
         setIsEditModalOpen(true);
     };
@@ -180,7 +180,7 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
                 target_audience: draggedPlan.target_audience || '',
                 keywords: draggedPlan.keywords || '',
                 tujuan_konten: draggedPlan.tujuan_konten || '',
-                assigned_to: draggedPlan.assigned_to || '',
+                assigned_to: draggedPlan.assigned_to?.id ? draggedPlan.assigned_to.id.toString() : '',
             }, {
                 preserveScroll: true,
             });
