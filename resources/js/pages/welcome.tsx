@@ -346,10 +346,24 @@ export default function Welcome({ news = [], portfolios = [] }: { news?: any[], 
                 {/* Client Logos */}
                 <section className="py-10 border-y border-slate-200/60 bg-white/50 backdrop-blur-sm reveal">
                     <div className="max-w-7xl mx-auto px-6">
-                        <p className="text-center text-sm font-semibold text-slate-400 tracking-wider uppercase mb-8">Dipercaya Oleh Perusahaan Inovatif</p>
+                        <p className="text-center text-sm font-semibold text-slate-400 tracking-wider uppercase mb-8">Dipercaya Oleh Perusahaan dan Pemerintahan</p>
                         <div className="flex flex-wrap justify-center items-center gap-12 lg:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-                            {['Google', 'Microsoft', 'Amazon', 'Spotify', 'Stripe'].map((brand) => (
-                                <h3 key={brand} className="text-2xl font-bold text-slate-800">{brand}</h3>
+                            {[
+                                { name: 'Company 1', logo: '/logos/company1.png' },
+                                { name: 'Company 2', logo: '/logos/company2.png' },
+                                { name: 'Company 3', logo: '/logos/company3.png' },
+                                { name: 'Company 4', logo: '/logos/company4.png' },
+                                { name: 'Company 5', logo: '/logos/company5.png' },
+                            ].map((partner) => (
+                                <img
+                                    key={partner.name}
+                                    src={partner.logo}
+                                    alt={partner.name}
+                                    className="h-12 w-auto object-contain"
+                                    onError={(e: any) => {
+                                        e.target.style.display = 'none';
+                                    }}
+                                />
                             ))}
                         </div>
                     </div>
