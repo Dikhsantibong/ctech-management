@@ -114,23 +114,15 @@ export default function DocumentsIndex({ documents, filters }: { documents: any,
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {(documents.data || documents).map((document: any) => (
                         <div key={document.id} className="group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-card p-5 text-card-foreground shadow-sm transition-all hover:shadow-md">
-                            <div className="absolute top-4 right-4">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <span className="sr-only">Open menu</span>
-                                            <MoreVertical className="h-4 w-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onClick={() => openEditModal(document)}>
-                                            <Edit2 className="mr-2 h-4 w-4" /> Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => openDeleteModal(document)} className="text-destructive">
-                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                            <div className="absolute top-4 right-4 flex items-center gap-1 bg-card shadow-sm border rounded-md p-0.5">
+                                <Button variant="ghost" size="icon" onClick={(e) => { e.preventDefault(); openEditModal(document); }} className="h-7 w-7 text-muted-foreground hover:text-primary">
+                                    <Edit2 className="h-3.5 w-3.5" />
+                                    <span className="sr-only">Edit</span>
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={(e) => { e.preventDefault(); openDeleteModal(document); }} className="h-7 w-7 text-muted-foreground hover:text-destructive">
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                    <span className="sr-only">Delete</span>
+                                </Button>
                             </div>
                             
                             <Link href={`/documents/${document.id}`} className="block mb-4 pt-2">
