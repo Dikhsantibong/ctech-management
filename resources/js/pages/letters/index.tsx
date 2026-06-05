@@ -25,294 +25,353 @@ import {
 const LETTER_TEMPLATES = {
     'Surat Keputusan': {
         subject: 'Keputusan tentang [isi perihal]',
-        content: `DENGAN RAHMAT TUHAN YANG MAHA ESA
+        content: `KEPUTUSAN MANAJEMEN / MANAGEMENT DECREE
 
-DIREKTUR UTAMA
+Tentang: [Perihal/Topik Keputusan]
 
-Telah mempertimbangkan:
-Bahwa dalam rangka [alasan/tujuan], perlu ditetapkan Surat Keputusan ini.
+Mempertimbangkan:
+Bahwa dalam rangka [alasan/tujuan/project], manajemen perlu menetapkan keputusan ini.
 
 MEMUTUSKAN:
 
-Kesatu  : [Keputusan utama yang diambil]
-Kedua   : [Ketentuan tambahan jika ada]
-Ketiga  : [Ketentuan lainnya]
+1. [Keputusan utama yang diambil]
+2. [Ketentuan operasional tambahan]
+3. [Hal-hal lain yang terkait]
 
-Keputusan ini berlaku sejak tanggal ditetapkan.
+Keputusan ini mulai berlaku secara efektif sejak tanggal ditetapkan.
 
 [Tempat], [Tanggal]
 
-[Nama Direktur]
-[Jabatan]`,
+[Nama Direktur/Manager]
+[Posisi/Role]`,
     },
     'Surat Tugas': {
-        subject: 'Surat Tugas untuk [nama/tujuan]',
-        content: `Dasar:
-1. [Peraturan/Perundangan yang menjadi dasar]
-2. [Ketentuan atau keputusan terkait]
+        subject: 'Assignment Letter untuk [nama/tujuan]',
+        content: `SURAT TUGAS / ASSIGNMENT LETTER
 
-Kami perintahkan kepada:
-Nama            : [Nama Pegawai]
-Jabatan         : [Jabatan]
-Tanggal Lahir   : [Tanggal Lahir]
-NIP             : [NIP]
+Project / Klien: [Nama Project atau Klien]
+Referensi      : [Kontrak/Brief/Dokumen pendukung]
 
-Untuk melaksanakan tugas sebagai berikut:
-[Uraian tugas yang harus dilaksanakan]
+Kami menugaskan kepada tim berikut:
+Nama         : [Nama Anggota Tim]
+Posisi/Role  : [Posisi]
 
-Waktu pelaksanaan: [Mulai tanggal] s.d. [Tanggal selesai]
-Tempat pelaksanaan: [Lokasi]
+Untuk menangani ruang lingkup pekerjaan (Scope of Work):
+[Uraian tugas / deliverables yang harus diselesaikan]
 
-Biaya operasional ditanggung oleh [Sumber pembiayaan]
+Timeline Pelaksanaan:
+Mulai        : [Tanggal Mulai]
+Selesai      : [Tanggal Selesai]
+Lokasi       : [Studio/On-site/Remote]
 
-Demikian Surat Tugas ini diberikan untuk dijalankan dengan sebaik-baiknya.
+Semua pengeluaran operasional terkait project ini ditanggung oleh [Sumber Anggaran].
+
+Demikian assignment ini diberikan untuk dijalankan secara profesional.
 
 [Tempat], [Tanggal]
 
-[Nama Pemberi Tugas]
-[Jabatan]`,
+[Nama Penugas]
+[Posisi Penugas]`,
     },
     'Surat Keterangan': {
         subject: 'Keterangan tentang [isi perihal]',
-        content: `Yang bertanda tangan di bawah ini:
+        content: `SURAT KETERANGAN / TO WHOM IT MAY CONCERN
 
-Nama            : [Nama Pemberi Keterangan]
-Jabatan         : [Jabatan]
-Instansi/Perusahaan : [Nama Instansi/Perusahaan]
+Yang bertanda tangan di bawah ini:
+Nama         : [Nama Pemberi Keterangan]
+Posisi       : [Posisi/Role]
+Perusahaan   : [Nama Creative Agency]
 
 Dengan ini menerangkan bahwa:
+Nama         : [Nama Pihak/Tim]
+[Identitas/Info Lain]: [Data]
 
-Nama            : [Nama Penerima Keterangan]
-[Identitas lainnya]: [Data]
+Adalah benar [uraian keterangan/status saat ini, misalnya: bagian dari tim kami untuk project X].
 
-Telah [uraian keadaan/keterangan yang diberikan]
+Keterangan ini diberikan sebagai dukungan untuk keperluan [tujuan penggunaan, misalnya administrasi/izin lokasi].
 
-Keterangan ini diberikan untuk keperluan [tujuan penggunaan].
-
-Demikian surat keterangan ini dibuat dengan sebenarnya dan dapat dipertanggungjawabkan.
+Demikian surat ini dibuat dengan sebenarnya.
 
 [Tempat], [Tanggal]
 
 [Nama Pemberi Keterangan]
-[Jabatan]`,
+[Posisi]`,
     },
     'Surat Penawaran': {
-        subject: 'Penawaran Produk/Layanan [nama produk/layanan]',
-        content: `Kepada Yth.
-[Nama Penerima]
-[Perusahaan/Institusi]
-[Alamat]
+        subject: 'Commercial Proposal untuk [Nama Klien]',
+        content: `PROPOSAL PENAWARAN KERJA SAMA / COMMERCIAL PROPOSAL
 
-Assalamu'alaikum Wr. Wb.
+Kepada Yth.
+[Nama Klien/Penerima]
+[Posisi Penerima]
+[Perusahaan Klien]
 
-Dengan hormat,
+Halo [Nama Klien],
 
-Kami dengan ini menawarkan produk/layanan kami sebagai berikut:
+Terima kasih atas ketertarikan Anda terhadap layanan kami. Bersama ini kami lampirkan penawaran kerja sama (Commercial Proposal) untuk kebutuhan [Nama Project/Campaign]:
 
-1. Deskripsi Produk/Layanan:
-   [Jelaskan produk/layanan secara detail]
+1. Scope of Work (Ruang Lingkup):
+   - [Deliverable 1]
+   - [Deliverable 2]
 
-2. Spesifikasi/Fitur:
-   [Sebutkan spesifikasi dan fitur utama]
+2. Timeline / Jadwal Pelaksanaan:
+   [Estimasi timeline pengerjaan]
 
-3. Harga:
-   [Rincian harga]
+3. Investment / Estimasi Biaya:
+   [Rincian harga / paket penawaran]
 
-4. Syarat Pembayaran:
-   [Metode dan syarat pembayaran]
+4. Term of Payment (Syarat Pembayaran):
+   [Metode dan termin pembayaran, misal DP 50%]
 
-5. Waktu Pengiriman:
-   [Estimasi pengiriman]
+Proposal ini valid hingga [Tanggal Berlaku].
 
-Penawaran ini berlaku hingga [tanggal berlaku].
+Jika ada penyesuaian terkait scope atau budget, mari kita jadwalkan sesi diskusi (brainstorming) lebih lanjut.
 
-Kami siap memberikan demonstrasi dan informasi lebih lanjut sesuai kebutuhan Anda.
+Terima kasih atas kepercayaan Anda. 
 
-Demikian penawaran ini kami sampaikan. Atas perhatian dan pertimbangan Anda, kami ucapkan terima kasih.
-
-Wassalamu'alaikum Wr. Wb.
+Warm regards,
 
 [Tempat], [Tanggal]
 
 [Nama Penanda Tangan]
-[Jabatan]`,
+[Posisi]`,
     },
     'Surat Peringatan': {
-        subject: 'Surat Peringatan kepada [nama penerima]',
-        content: `Kepada Yth.
-[Nama Penerima]
-[Jabatan]
-[Perusahaan/Institusi]
+        subject: 'Surat Peringatan / Warning Letter untuk [Nama Penerima]',
+        content: `SURAT PERINGATAN (WARNING LETTER)
 
-Dengan hormat,
+Kepada:
+Nama      : [Nama Penerima]
+Posisi    : [Posisi/Role]
 
-Berdasarkan laporan dan pengamatan yang telah kami lakukan, kami melihat adanya pelanggaran/ketidaksesuaian dalam hal:
+Berdasarkan evaluasi kinerja dan operasional terbaru, kami menemukan adanya hal yang tidak sejalan dengan standar profesional perusahaan (SOP), yaitu:
 
-[Jelaskan pelanggaran atau ketidaksesuaian yang dilakukan]
+[Jelaskan ketidaksesuaian/pelanggaran, misal: keterlambatan deliverable project X, dsb.]
 
-Hal ini bertentangan dengan:
-- [Peraturan/Kebijakan yang dilanggar]
-- [Kontrak/Perjanjian yang berlaku]
+Hal ini sangat memengaruhi kelancaran alur kerja tim dan klien. Oleh karena itu, surat ini diterbitkan sebagai:
+[ ] Peringatan Pertama (SP1)
+[ ] Peringatan Kedua (SP2)
+[ ] Peringatan Ketiga (SP3)
 
-Oleh karena itu, kami memberikan peringatan ini sebagai:
-☐ Peringatan Pertama
-☐ Peringatan Kedua
-☐ Peringatan Ketiga
+Kami sangat menghargai kontribusi Anda selama ini, namun perbaikan yang signifikan diharapkan dalam waktu [jumlah hari] hari ke depan. 
 
-Kami mengharapkan perbaikan dalam waktu [jumlah hari] hari sejak surat ini diterima.
-
-Apabila dalam waktu yang ditetapkan tidak ada perbaikan, kami akan mengambil tindakan selanjutnya sesuai dengan ketentuan yang berlaku.
-
-Demikian surat peringatan ini kami sampaikan. Atas perhatian Anda, kami ucapkan terima kasih.
+Jika memerlukan dukungan atau sesi 1-on-1, pintu manajemen selalu terbuka. Apabila tidak ada perbaikan, manajemen akan mengambil langkah sesuai kebijakan perusahaan.
 
 [Tempat], [Tanggal]
 
-[Nama Penanda Tangan]
-[Jabatan]`,
+[Nama HR/Manajemen]
+[Posisi]`,
     },
     'Surat Undangan': {
-        subject: 'Undangan [Acara] kepada [Nama Penerima]',
-        content: `Kepada Yth.
-[Nama Penerima]
-[Jabatan]
-[Organisasi]
+        subject: 'Invitation: Meeting/Event [Acara]',
+        content: `UNDANGAN / INVITATION
 
-Dengan hormat,
+Kepada Yth.
+[Nama Klien/Penerima]
+[Posisi/Perusahaan]
 
-Sehubungan dengan akan diselenggarakannya [Acara] pada:
+Halo [Nama Penerima],
+
+Kami ingin mengundang Bapak/Ibu/Rekan-rekan untuk berdiskusi lebih lanjut mengenai [Topik Meeting / Project Kick-off / Pitching] yang akan diselenggarakan pada:
+
 Hari/Tanggal : [Hari, Tanggal]
-Waktu         : [Jam]
-Tempat        : [Lokasi]
+Waktu        : [Jam]
+Platform     : [Zoom / Google Meet / Offline Location]
+Link/Alamat  : [Tautan atau Alamat]
 
-Kami mengundang Saudara/i untuk hadir dan berpartisipasi dalam acara tersebut.
+Agenda utama yang akan kita bahas:
+- [Agenda 1]
+- [Agenda 2]
 
-Demikian undangan ini kami sampaikan. Atas perhatian dan kehadiran Saudara/i, kami ucapkan terima kasih.
+Mohon konfirmasi kehadirannya. Jika ada pertanyaan lebih lanjut, silakan balas pesan ini.
+
+Terima kasih dan sampai jumpa!
 
 [Tempat], [Tanggal]
 
-[Nama]
-[Jabatan]`,
+[Nama Pengundang]
+[Posisi]`,
     },
     'Surat Izin': {
-        subject: 'Permohonan Izin [keperluan] kepada [penerima]',
-        content: `Yang bertanda tangan di bawah ini:
+        subject: 'Permohonan Izin / Leave Request: [Nama Karyawan]',
+        content: `FORM PERMOHONAN IZIN (LEAVE REQUEST)
 
-Nama    : [Nama Pemohon]
-Jabatan : [Jabatan]
-Instansi: [Instansi]
+Yang bertanda tangan di bawah ini:
+Nama      : [Nama Karyawan]
+Posisi    : [Posisi/Role]
+Divisi    : [Nama Divisi/Departemen]
 
-Dengan ini mengajukan permohonan izin untuk [uraian izin] pada:
-Hari/Tanggal: [Tanggal]
-Waktu       : [Jam]
-Alasan      : [Alasan izin]
+Dengan ini mengajukan permohonan izin / cuti untuk keperluan [alasan izin, misal: urusan keluarga, sakit, dsb.] pada:
 
-Demikian permohonan ini kami sampaikan. Atas perhatian dan izin yang diberikan, kami ucapkan terima kasih.
+Mulai Tanggal   : [Tanggal Mulai]
+Selesai Tanggal : [Tanggal Selesai]
+Total Hari      : [Jumlah Hari]
+
+Pekerjaan / project yang sedang berjalan ([Nama Project]) telah dikoordinasikan dengan [Nama Rekan/Back-up] selama masa izin ini.
+
+Demikian permohonan ini saya ajukan untuk dapat disetujui.
 
 [Tempat], [Tanggal]
 
-[Nama Pemohon]
-[Jabatan]`,
+[Nama Karyawan]
+[Posisi]`,
     },
     'Surat Keterangan Kerja': {
-        subject: 'Keterangan Kerja untuk [nama karyawan]',
-        content: `Yang bertanda tangan di bawah ini menerangkan bahwa:
+        subject: 'Certificate of Employment untuk [Nama Karyawan]',
+        content: `CERTIFICATE OF EMPLOYMENT (SURAT KETERANGAN KERJA)
 
-Nama    : [Nama Karyawan]
-Jabatan : [Jabatan]
-NIP     : [NIP]
-Perusahaan/Instansi: [Nama Perusahaan]
+Hal: Surat Keterangan Pengalaman Kerja
 
-Adalah benar-benar bekerja pada perusahaan kami sejak [tanggal masuk] sampai dengan [tanggal selesai/present]. Surat keterangan ini dibuat untuk keperluan [tujuan].
+Kami yang bertanda tangan di bawah ini, mewakili manajemen [Nama Agency/Perusahaan], menerangkan bahwa:
 
-Demikian surat keterangan ini dibuat agar dapat dipergunakan sebagaimana mestinya.
+Nama      : [Nama Karyawan]
+Posisi    : [Posisi Terakhir]
+Periode   : [Tanggal Masuk] s.d. [Tanggal Keluar/Saat Ini]
+
+Selama bergabung bersama agensi kami, yang bersangkutan telah menunjukkan kinerja dan kreativitas yang baik dalam menangani berbagai project dan campaign klien.
+
+Surat keterangan ini diberikan atas permintaan yang bersangkutan untuk dipergunakan semestinya (misalnya keperluan administratif atau melamar pekerjaan baru).
+
+Kami mengucapkan terima kasih atas dedikasi yang diberikan dan mendoakan kesuksesan di masa depan.
 
 [Tempat], [Tanggal]
 
-[Nama Pemberi Keterangan]
-[Jabatan]`,
+[Nama HR/Manajemen]
+[Posisi]`,
     },
     'Surat Pengantar': {
-        subject: 'Surat Pengantar [perihal] kepada [penerima]',
-        content: `Dengan hormat,
+        subject: 'Transmittal / Pengantar [Perihal]',
+        content: `SURAT PENGANTAR (COVER LETTER / TRANSMITTAL)
 
-Bersama surat ini kami sampaikan [dokumen/barang] kepada:
+Kepada Yth.
+[Nama Klien/Penerima]
+[Posisi/Perusahaan]
 
-Nama Penerima : [Nama]
-Alamat         : [Alamat]
+Halo [Nama Penerima],
 
-Mohon untuk diterima dan diproses sesuai dengan ketentuan yang berlaku.
+Bersama surat ini, kami mengirimkan beberapa dokumen/deliverables terkait [Nama Project/Campaign] untuk dapat direview/diproses lebih lanjut:
 
-Demikian surat pengantar ini kami buat. Terima kasih.
+1. [Nama Dokumen/File 1] (Jumlah: [Qty])
+2. [Nama Dokumen/File 2] (Jumlah: [Qty])
+
+Mohon bantuan Anda untuk memeriksa kelengkapan materi tersebut. Jika ada revisi atau feedback, silakan hubungi tim kami.
+
+Terima kasih atas kerja samanya!
 
 [Tempat], [Tanggal]
 
 [Nama Pengirim]
-[Jabatan]`,
+[Posisi]`,
     },
     'Surat Pemberitahuan': {
-        subject: 'Pemberitahuan tentang [isi pemberitahuan]',
-        content: `Kepada Yth.
-[Pihak Terkait]
+        subject: 'Announcement: [Topik Pemberitahuan]',
+        content: `PEMBERITAHUAN / ANNOUNCEMENT
 
-Dengan hormat,
+Kepada:
+[Seluruh Tim / Klien / Vendor]
 
-Sehubungan dengan [uraian singkat], kami memberitahukan bahwa [isi pemberitahuan].
+Halo semuanya,
 
-Demikian pemberitahuan ini kami sampaikan untuk diketahui.
+Melalui memo ini, manajemen bermaksud menginformasikan mengenai [Topik Pemberitahuan, misal: Libur Nasional / Perubahan Jam Operasional Studio / dsb.]:
+
+[Detail Informasi secara jelas dan ringkas]
+
+Ketentuan ini akan mulai diberlakukan pada tanggal [Tanggal Efektif]. 
+
+Jika ada pertanyaan atau butuh penyesuaian jadwal project, mohon hubungi Project Manager masing-masing.
+
+Terima kasih atas perhatiannya.
 
 [Tempat], [Tanggal]
 
-[Nama]
-[Jabatan]`,
+[Nama Manajemen/Pengirim]
+[Posisi]`,
     },
     'Surat Rekomendasi': {
-        subject: 'Surat Rekomendasi untuk [nama]',
-        content: `Yang bertanda tangan di bawah ini memberikan rekomendasi kepada:
+        subject: 'Letter of Recommendation untuk [Nama]',
+        content: `SURAT REKOMENDASI (LETTER OF RECOMMENDATION)
 
-Nama    : [Nama]
-Keterangan singkat mengenai kemampuan/kelayakan yang direkomendasikan.
+To Whom It May Concern,
 
-Rekomendasi ini diberikan untuk keperluan [tujuan].
+Surat ini ditulis untuk merekomendasikan:
+
+Nama      : [Nama Karyawan/Freelancer]
+Posisi    : [Posisi/Role saat di agensi]
+
+Selama masa kerjanya, yang bersangkutan telah berpartisipasi dalam banyak project kreatif dan menunjukkan kemampuan analisis, eksekusi, serta kolaborasi tim yang luar biasa. 
+
+Skill utama yang kami highlight dari yang bersangkutan:
+- [Skill 1, misal: Art Direction yang kuat]
+- [Skill 2, misal: Mampu bekerja dalam tight deadline]
+
+Kami sangat merekomendasikan yang bersangkutan untuk peluang karier selanjutnya.
 
 [Tempat], [Tanggal]
 
 [Nama Pemberi Rekomendasi]
-[Jabatan]`,
+[Posisi / Hubungan dengan kandidat]`,
     },
     'Surat Permohonan': {
-        subject: 'Permohonan [jenis permohonan] kepada [penerima]',
-        content: `Dengan hormat,
+        subject: 'Request Letter: [Tujuan Permohonan]',
+        content: `SURAT PERMOHONAN (REQUEST LETTER)
 
-Kami bermaksud mengajukan permohonan [uraian permohonan] kepada [penerima] dengan rincian sebagai berikut:
+Kepada Yth.
+[Nama Penerima/Instansi/Klien]
+[Alamat/Lokasi]
 
-[Rincian permohonan]
+Dengan hormat,
 
-Demikian permohonan ini kami sampaikan. Atas perhatian dan kebijaksanaan Saudara, kami ucapkan terima kasih.
+Kami dari [Nama Agency] bermaksud mengajukan permohonan [Tujuan Permohonan, misal: Izin Lokasi Syuting / Penggunaan Footage] untuk keperluan project campaign [Nama Project].
+
+Rincian kebutuhan/kegiatan adalah sebagai berikut:
+Hari/Tanggal : [Tanggal]
+Waktu        : [Jam]
+Kebutuhan    : [Detail kebutuhan/aktivitas]
+Jumlah Tim   : [Jumlah orang yang akan hadir]
+
+Kami berkomitmen untuk menjaga ketertiban dan mematuhi seluruh peraturan yang berlaku selama proses tersebut. 
+
+Atas perhatian dan kerja sama yang baik, kami ucapkan terima kasih.
 
 [Tempat], [Tanggal]
 
 [Nama Pemohon]
-[Jabatan]`,
+[Posisi]`,
     },
     'Surat Kontrak': {
-        subject: 'Surat Perjanjian / Kontrak antara [pihak A] dan [pihak B]',
-        content: `Pada hari ini [Hari, Tanggal], yang bertanda tangan di bawah ini:
+        subject: 'Agreement / Kontrak Kerja Sama: [Nama Project]',
+        content: `AGREEMENT / KONTRAK KERJA SAMA
 
-Pihak Pertama  : [Nama / Perusahaan A]
-Pihak Kedua    : [Nama / Perusahaan B]
+Pada hari ini [Hari, Tanggal], kami yang bertanda tangan di bawah ini sepakat untuk menjalin kerja sama:
 
-Kedua belah pihak sepakat untuk mengadakan perjanjian dengan ketentuan sebagai berikut:
-1. [Ruang lingkup kerja]
-2. [Harga dan pembayaran]
-3. [Jangka waktu]
-4. [Ketentuan lain]
+Pihak Pertama (Agency) : [Nama Agency / Perwakilan]
+Pihak Kedua (Klien/Vendor) : [Nama Klien / Vendor]
 
-Demikian perjanjian ini dibuat dalam rangkap 2 dan mempunyai kekuatan hukum yang sama.
+Kedua belah pihak menyetujui ketentuan kerja sama (SOW/SLA) sebagai berikut:
+
+1. Ruang Lingkup (Scope of Work):
+   [Detail pekerjaan/deliverables yang disepakati]
+
+2. Nilai Kontrak & Termin Pembayaran:
+   [Nominal Total]
+   [Termin Pembayaran, misal: DP 50%, Pelunasan 50% setelah final handover]
+
+3. Timeline Pekerjaan:
+   [Jadwal mulai hingga selesai]
+
+4. Revisi & Feedback:
+   [Batas maksimal revisi, misal: Max 2 kali revisi minor]
+
+5. Hak Cipta (Intellectual Property):
+   [Kepemilikan aset akhir setelah pelunasan]
+
+Demikian perjanjian ini dibuat secara sadar dan mengikat kedua belah pihak.
 
 [Tempat], [Tanggal]
 
-[Nama Pihak Pertama]
-[Nama Pihak Kedua]`,
+Pihak Pertama (Agency)                   Pihak Kedua (Klien/Vendor)
+
+(____________________)                   (____________________)`,
     },
 };
 
@@ -584,19 +643,9 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                                         <SelectValue placeholder="Pilih jenis surat" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Surat Keputusan">Surat Keputusan</SelectItem>
-                                        <SelectItem value="Surat Tugas">Surat Tugas</SelectItem>
-                                        <SelectItem value="Surat Keterangan">Surat Keterangan</SelectItem>
-                                        <SelectItem value="Surat Penawaran">Surat Penawaran</SelectItem>
-                                        <SelectItem value="Surat Peringatan">Surat Peringatan</SelectItem>
-                                        <SelectItem value="Surat Undangan">Surat Undangan</SelectItem>
-                                        <SelectItem value="Surat Izin">Surat Izin</SelectItem>
-                                        <SelectItem value="Surat Keterangan Kerja">Surat Keterangan Kerja</SelectItem>
-                                        <SelectItem value="Surat Pengantar">Surat Pengantar</SelectItem>
-                                        <SelectItem value="Surat Pemberitahuan">Surat Pemberitahuan</SelectItem>
-                                        <SelectItem value="Surat Rekomendasi">Surat Rekomendasi</SelectItem>
-                                        <SelectItem value="Surat Permohonan">Surat Permohonan</SelectItem>
-                                        <SelectItem value="Surat Kontrak">Surat Kontrak</SelectItem>
+                                        {Object.keys(LETTER_TEMPLATES).map((type) => (
+                                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                                 {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
@@ -663,11 +712,9 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                                         <SelectValue placeholder="Pilih jenis surat" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Surat Keputusan">Surat Keputusan</SelectItem>
-                                        <SelectItem value="Surat Tugas">Surat Tugas</SelectItem>
-                                        <SelectItem value="Surat Keterangan">Surat Keterangan</SelectItem>
-                                        <SelectItem value="Surat Penawaran">Surat Penawaran</SelectItem>
-                                        <SelectItem value="Surat Peringatan">Surat Peringatan</SelectItem>
+                                        {Object.keys(LETTER_TEMPLATES).map((type) => (
+                                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                                 {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}

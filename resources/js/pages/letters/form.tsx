@@ -10,18 +10,11 @@ import { Textarea } from '@/components/ui/textarea';
 const LETTER_TEMPLATES: Record<string, { subject: string; content: string }> = {
     'Surat Keputusan': {
         subject: 'Keputusan tentang [isi perihal]',
-        content: `DENGAN RAHMAT TUHAN YANG MAHA ESA
-
-DIREKTUR UTAMA
-
-Telah mempertimbangkan:
-Bahwa dalam rangka [alasan/tujuan], perlu ditetapkan Surat Keputusan ini.
-
-MEMUTUSKAN:\n\nKesatu  : [Keputusan utama yang diambil]\nKedua   : [Ketentuan tambahan jika ada]\nKetiga  : [Ketentuan lainnya]\n\nKeputusan ini berlaku sejak tanggal ditetapkan.\n\n[Tempat], [Tanggal]\n\n[Nama Direktur]\n[Jabatan]`,
+        content: `KEPUTUSAN MANAJEMEN / MANAGEMENT DECREE\n\nTentang: [Perihal/Topik Keputusan]\n\nMempertimbangkan:\nBahwa dalam rangka [alasan/tujuan/project], manajemen perlu menetapkan keputusan ini.\n\nMEMUTUSKAN:\n\n1. [Keputusan utama yang diambil]\n2. [Ketentuan operasional tambahan]\n3. [Hal-hal lain yang terkait]\n\nKeputusan ini mulai berlaku secara efektif sejak tanggal ditetapkan.\n\n[Tempat], [Tanggal]\n\n[Nama Direktur/Manager]\n[Posisi/Role]`,
     },
     'Surat Tugas': {
-        subject: 'Surat Tugas untuk [nama/tujuan]',
-        content: `Dasar:\n1. [Peraturan/Perundangan yang menjadi dasar]\n2. [Ketentuan atau keputusan terkait]\n\nKami perintahkan kepada:\nNama            : [Nama Pegawai]\nJabatan         : [Jabatan]\nTanggal Lahir   : [Tanggal Lahir]\nNIP             : [NIP]\n\nUntuk melaksanakan tugas sebagai berikut:\n[Uraian tugas yang harus dilaksanakan]\n\nWaktu pelaksanaan: [Mulai tanggal] s.d. [Tanggal selesai]\nTempat pelaksanaan: [Lokasi]\n\nBiaya operasional ditanggung oleh [Sumber pembiayaan]\n\nDemikian Surat Tugas ini diberikan untuk dijalankan dengan sebaik-baiknya.\n\n[Tempat], [Tanggal]\n\n[Nama Pemberi Tugas]\n[Jabatan]`,
+        subject: 'Assignment Letter untuk [nama/tujuan]',
+        content: `SURAT TUGAS / ASSIGNMENT LETTER\n\nProject / Klien: [Nama Project atau Klien]\nReferensi      : [Kontrak/Brief/Dokumen pendukung]\n\nKami menugaskan kepada tim berikut:\nNama         : [Nama Anggota Tim]\nPosisi/Role  : [Posisi]\n\nUntuk menangani ruang lingkup pekerjaan (Scope of Work):\n[Uraian tugas / deliverables yang harus diselesaikan]\n\nTimeline Pelaksanaan:\nMulai        : [Tanggal Mulai]\nSelesai      : [Tanggal Selesai]\nLokasi       : [Studio/On-site/Remote]\n\nSemua pengeluaran operasional terkait project ini ditanggung oleh [Sumber Anggaran].\n\nDemikian assignment ini diberikan untuk dijalankan secara profesional.\n\n[Tempat], [Tanggal]\n\n[Nama Penugas]\n[Posisi Penugas]`,
     },
     // keep basic templates; additional templates available in index page
 };
@@ -102,10 +95,9 @@ export default function LetterForm({ letter }: { letter: any }) {
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Surat Keputusan">Surat Keputusan</SelectItem>
-                                        <SelectItem value="Surat Tugas">Surat Tugas</SelectItem>
-                                        <SelectItem value="Surat Keterangan">Surat Keterangan</SelectItem>
-                                        <SelectItem value="Surat Penawaran">Surat Penawaran</SelectItem>
+                                        {Object.keys(LETTER_TEMPLATES).map((type) => (
+                                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>

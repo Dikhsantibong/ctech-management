@@ -44,9 +44,30 @@ class LetterController extends Controller
             'content' => 'required|string',
         ]);
 
-        // Generate reference number e.g. 001/CT/ST/2026
-        $count = Letter::whereYear('created_at', date('Y'))->count() + 1;
-        $typeCode = strtoupper(substr($validated['type'], 0, 2));
+        // Generate proper type code based on the letter type
+        $codeMap = [
+            'Surat Keputusan' => 'SK',
+            'Surat Tugas' => 'ST',
+            'Surat Keterangan' => 'SKET',
+            'Surat Penawaran' => 'SPNW',
+            'Surat Peringatan' => 'SP',
+            'Surat Undangan' => 'SUND',
+            'Surat Izin' => 'SI',
+            'Surat Keterangan Kerja' => 'SKK',
+            'Surat Pengantar' => 'SPG',
+            'Surat Pemberitahuan' => 'SPMB',
+            'Surat Rekomendasi' => 'SREK',
+            'Surat Permohonan' => 'SPRM',
+            'Surat Kontrak' => 'SKTR',
+        ];
+
+        $typeCode = $codeMap[$validated['type']] ?? 'SRT';
+        
+        // Count specific to the letter type and year for a cleaner sequence
+        $count = Letter::where('type', $validated['type'])
+                       ->whereYear('created_at', date('Y'))
+                       ->count() + 1;
+                       
         $refNumber = str_pad($count, 3, '0', STR_PAD_LEFT) . '/CT/' . $typeCode . '/' . date('Y');
 
         $letter = Letter::create([
