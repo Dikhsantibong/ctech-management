@@ -52,6 +52,9 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
     const [selectedPlan, setSelectedPlan] = useState<any>(null);
     const [draggedPlan, setDraggedPlan] = useState<any>(null);
     const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+    const [expandedColumns, setExpandedColumns] = useState<Record<string, boolean>>({});
 
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         title: '',
@@ -205,6 +208,31 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
         Cancelled: contentPlans.filter(p => p.status === 'Cancelled').length,
     };
 
+    // Pagination logic for table mode
+    const totalPages = Math.ceil(contentPlans.length / itemsPerPage);
+    const paginatedPlans = contentPlans.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    const handleViewModeChange = (mode: 'kanban' | 'table') => {
+        setViewMode(mode);
+        setCurrentPage(1); // Reset to first page when switching modes
+    };
+
+    const toggleColumnExpansion = (status: string) => {
+        setExpandedColumns(prev => ({
+            ...prev,
+            [status]: !prev[status]
+        }));
+    };
+
+    const ITEMS_PER_COLUMN = 10;
+
     const formFields = (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
             {/* Left Column: General Info */}
@@ -331,14 +359,14 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
                             <Button
                                 variant={viewMode === 'kanban' ? 'default' : 'outline'}
                                 className="rounded-r-none px-3"
-                                onClick={() => setViewMode('kanban')}
+                                onClick={() => handleViewModeChange('kanban')}
                             >
                                 <Kanban className="h-4 w-4" />
                             </Button>
                             <Button
                                 variant={viewMode === 'table' ? 'default' : 'outline'}
                                 className="rounded-l-none px-3"
-                                onClick={() => setViewMode('table')}
+                                onClick={() => handleViewModeChange('table')}
                             >
                                 <List className="h-4 w-4" />
                             </Button>
@@ -368,7 +396,7 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {contentPlans.map((plan) => (
+                                        {paginatedPlans.map((plan) => (
                                             <tr key={plan.id} className="border-b transition-colors hover:bg-muted/50">
                                                 <td className="p-4 align-middle font-medium">{plan.title}</td>
                                                 <td className="p-4 align-middle">
@@ -423,12 +451,52 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
                                 </table>
                             </div>
                         </div>
+                        {/* Pagination Controls */}
+                        {contentPlans.length > 0 && (
+                            <div className="flex items-center justify-between px-4 py-3 border-t">
+                                <div className="text-sm text-muted-foreground">
+                                    Menampilkan {((currentPage - 1) * itemsPerPage) + 1} sampai {Math.min(currentPage * itemsPerPage, contentPlans.length)} dari {contentPlans.length} item
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                    >
+                                        Previous
+                                    </Button>
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                        <Button
+                                            key={page}
+                                            variant={currentPage === page ? 'default' : 'outline'}
+                                            size="sm"
+                                            onClick={() => handlePageChange(page)}
+                                            className="w-8 h-8 p-0"
+                                        >
+                                            {page}
+                                        </Button>
+                                    ))}
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                    >
+                                        Next
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     /* Kanban Board View */
                     <div className="flex gap-4 overflow-x-auto pb-4">
                         {statusList.map(status => {
                             const columnPlans = contentPlans.filter(p => p.status === status);
+                            const isExpanded = expandedColumns[status];
+                            const displayedPlans = isExpanded ? columnPlans : columnPlans.slice(0, ITEMS_PER_COLUMN);
+                            const hasMoreItems = columnPlans.length > ITEMS_PER_COLUMN;
                             const isOver = dragOverColumn === status;
 
                             return (
@@ -463,7 +531,7 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
 
                                     {/* Cards */}
                                     <div className="flex flex-col gap-2 p-3 pt-1 min-h-[200px]">
-                                        {columnPlans.map(plan => (
+                                        {displayedPlans.map(plan => (
                                             <div
                                                 key={plan.id}
                                                 draggable
@@ -540,6 +608,18 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
                                                 </div>
                                             </div>
                                         ))}
+
+                                        {/* Load More Button */}
+                                        {hasMoreItems && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => toggleColumnExpansion(status)}
+                                                className="w-full mt-2 text-xs"
+                                            >
+                                                {isExpanded ? 'Show Less' : `Load More (${columnPlans.length - ITEMS_PER_COLUMN} more)`}
+                                            </Button>
+                                        )}
 
                                         {/* Empty state */}
                                         {columnPlans.length === 0 && (
