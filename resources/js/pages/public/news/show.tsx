@@ -168,7 +168,7 @@ export default function PublicNewsShow({ news, relatedNews }: { news: any; relat
                             }
 
                             if (block.type === 'paragraph') {
-                                return <p key={i}>{block.text}</p>;
+                                return <p key={i} className="text-justify mb-4">{block.text}</p>;
                             }
 
                             const ListTag = block.type === 'ordered-list' ? 'ol' : 'ul';
