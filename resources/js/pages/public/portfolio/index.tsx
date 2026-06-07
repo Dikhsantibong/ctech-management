@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { ExternalLink, Code2, Paintbrush, MonitorPlay, FolderOpen } from 'lucide-react';
 import PublicNavbar from '@/components/public-navbar';
+import PublicFooter from '@/components/public-footer';
 import { useState, useEffect } from 'react';
 
 const categoryIcons: Record<string, any> = {
@@ -30,8 +31,11 @@ export default function PublicPortfolioIndex({ portfolios, categories, filters }
 
             <main className="max-w-7xl mx-auto px-6 py-16 pt-32">
                 <div className="text-center max-w-2xl mx-auto mb-12">
-                    <h1 className="text-4xl font-extrabold text-slate-900 mb-4">Karya Terbaik Kami</h1>
-                    <p className="text-slate-600 text-lg">Eksplorasi berbagai solusi digital dan kreatif yang telah kami bangun untuk berbagai klien.</p>
+                    <span className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold mb-4">
+                        Success Stories
+                    </span>
+                    <h1 className="text-4xl font-extrabold text-slate-900 mb-4">Case Study & Portfolio</h1>
+                    <p className="text-slate-600 text-lg">Eksplorasi berbagai solusi digital dan hasil nyata yang telah kami capai untuk klien kami.</p>
                 </div>
 
                 {/* Categories Tabs */}
@@ -116,6 +120,7 @@ export default function PublicPortfolioIndex({ portfolios, categories, filters }
                     </div>
                 )}
             </main>
+            <PublicFooter />
         </div>
     );
 }

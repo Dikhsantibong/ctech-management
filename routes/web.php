@@ -16,6 +16,16 @@ Route::get('/tentang', function () { return inertia('public/about/index'); })->n
 
 Route::get('/layanan', function () { return inertia('public/services/index'); })->name('public.services');
 
+Route::get('/kontak', function () { return inertia('public/contact/index'); })->name('public.contact');
+
+Route::prefix('solusi')->group(function () {
+    Route::get('/photobooth', function () { return inertia('public/solutions/photobooth'); })->name('public.solutions.photobooth');
+});
+
+Route::get('/industri', function () { return inertia('public/industries/index'); })->name('public.industries');
+Route::get('/proses', function () { return inertia('public/process/index'); })->name('public.process');
+Route::get('/case-studi', function () { return inertia('public/case-studies/index'); })->name('public.case-studies');
+
 Route::get('/produk', function () { return inertia('public/products/index'); })->name('public.products');
 
 Route::get('/produk/{product}', function ($product) {

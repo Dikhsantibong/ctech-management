@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { User, Calendar, ExternalLink, Tag } from 'lucide-react';
 import PublicNavbar from '@/components/public-navbar';
-
+import PublicFooter from '@/components/public-footer';
 export default function PublicPortfolioShow({ portfolio, relatedPortfolios }: { portfolio: any, relatedPortfolios: any[] }) {
     return (
         <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-blue-600 selection:text-white">
@@ -56,16 +56,6 @@ export default function PublicPortfolioShow({ portfolio, relatedPortfolios }: { 
                             </h3>
 
                             <div className="space-y-6">
-
-                                <div>
-                                    <p className="text-sm text-slate-500 font-medium mb-1">
-                                        Klien
-                                    </p>
-                                    <p className="font-semibold text-slate-900">
-                                        {portfolio.client_name}
-                                    </p>
-                                </div>
-
                                 <div>
                                     <p className="text-sm text-slate-500 font-medium mb-1">
                                         Kategori
@@ -75,22 +65,6 @@ export default function PublicPortfolioShow({ portfolio, relatedPortfolios }: { 
                                         <Tag className="w-3.5 h-3.5" />
                                         {portfolio.category}
                                     </span>
-                                </div>
-
-                                <div>
-                                    <p className="text-sm text-slate-500 font-medium mb-1">
-                                        Tanggal Selesai
-                                    </p>
-
-                                    <p className="font-semibold text-slate-900">
-                                        {new Date(
-                                            portfolio.completion_date ||
-                                            portfolio.created_at
-                                        ).toLocaleDateString('id-ID', {
-                                            month: 'long',
-                                            year: 'numeric',
-                                        })}
-                                    </p>
                                 </div>
 
                                 {portfolio.link && (
@@ -120,7 +94,6 @@ export default function PublicPortfolioShow({ portfolio, relatedPortfolios }: { 
                                         </a>
                                     </div>
                                 )}
-
                             </div>
                         </div>
                     </div>
@@ -146,7 +119,7 @@ export default function PublicPortfolioShow({ portfolio, relatedPortfolios }: { 
                                         
                                         <div className="absolute bottom-4 left-4 right-4">
                                             <h3 className="text-lg font-bold text-white mb-1 group-hover:text-blue-300 transition-colors line-clamp-1">{item.title}</h3>
-                                            <p className="text-slate-300 text-sm line-clamp-1">{item.client_name}</p>
+                                            <p className="text-slate-300 text-sm line-clamp-1">{item.category}</p>
                                         </div>
                                     </div>
                                 </Link>
@@ -155,6 +128,8 @@ export default function PublicPortfolioShow({ portfolio, relatedPortfolios }: { 
                     </div>
                 </section>
             )}
+
+            <PublicFooter />
         </div>
     );
 }

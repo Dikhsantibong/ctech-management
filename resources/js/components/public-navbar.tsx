@@ -1,8 +1,9 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 
-export default function PublicNavbar({ isLandingPage = false }: { isLandingPage?: boolean }) {
+export default function PublicNavbar() {
+    const { url } = usePage();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -15,55 +16,65 @@ export default function PublicNavbar({ isLandingPage = false }: { isLandingPage?
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const getLink = (hash: string) => isLandingPage ? hash : `/${hash}`;
-    
-    // Using purely Tailwind for the glass effect and underline animation
     const navClass = isScrolled 
-        ? 'bg-white/80 backdrop-blur-md border-b border-slate-200/60 py-3 shadow-sm' 
-        : 'bg-transparent py-5';
+        ? 'bg-surface/95 backdrop-blur-md border-b border-outline-variant shadow-sm' 
+        : 'bg-surface/95 backdrop-blur-md border-b border-outline-variant';
 
-    const linkClass = "relative hover:text-blue-600 transition-colors after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-blue-600 after:transition-all after:duration-300 hover:after:w-full";
+    const getLinkClass = (path: string) => {
+        // Handle exact match for home, or prefix match for others
+        const isActive = (path === '/' && url === '/') || (path !== '/' && url.startsWith(path));
+        
+        return isActive
+            ? "font-button text-button text-primary font-bold border-b-2 border-primary flex items-center h-20"
+            : "font-button text-button text-on-surface-variant hover:text-primary transition-colors duration-200 flex items-center h-20";
+    };
 
     return (
         <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${navClass}`}>
-            <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-                <Link href="/" className="flex items-center gap-2">
-                    <img src="/logo/logo-web.png" alt="CTECH Logo" className="h-8" />
-                    <span className="font-bold text-xl tracking-tight text-slate-900">CTECH</span>
-                </Link>
-                
-                {/* Desktop Menu */}
-                <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-                    <a href={getLink('#home')} className={linkClass}>Home</a>
-                    <Link href="/layanan" className={linkClass}>Layanan</Link>
-                    <Link href="/tentang" className={linkClass}>Tentang Kami</Link>
-                    <Link href="/produk" className={linkClass}>Produk</Link>
-                    <Link href="/portfolio" className={linkClass}>Portfolio</Link>
-                    <Link href="/berita" className={linkClass}>Berita</Link>
+            <div className="max-w-container-max mx-auto px-margin-desktop flex items-center h-20">
+                {/* Logo - Left aligned */}
+                <div className="flex-1 flex justify-start h-full items-center">
+                    <Link href="/" className="flex items-center gap-2">
+                        <img src="/logo/logo-web.png" alt="CTECH Logo" className="h-8" />
+                        <span className="font-headline-sm text-headline-sm font-bold text-on-surface tracking-tight">CTECH</span>
+                    </Link>
                 </div>
 
-                <div className="hidden md:flex items-center gap-4">
-                    <a href={getLink('#kontak')} className="bg-slate-900 hover:bg-blue-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md hover:shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5">
+                {/* Desktop Menu - Centered */}
+                <div className="hidden lg:flex justify-center items-center gap-stack-lg h-full">
+                    <Link href="/layanan" className={getLinkClass('/layanan')}>Solusi</Link>
+                    <Link href="/industri" className={getLinkClass('/industri')}>Industri</Link>
+                    <Link href="/case-studi" className={getLinkClass('/case-studi')}>Case Studi</Link>
+                    <Link href="/proses" className={getLinkClass('/proses')}>Proses</Link>
+                    <Link href="/tentang" className={getLinkClass('/tentang')}>About</Link>
+                </div>
+
+                {/* Actions - Right aligned */}
+                <div className="flex-1 flex justify-end items-center gap-stack-md">
+                    <button className="hidden xl:flex items-center gap-stack-sm font-button text-button px-stack-lg py-stack-sm border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition-all">
+                        <span className="material-symbols-outlined text-[20px]">search</span>
+                        <span>Cari Informasi</span>
+                    </button>
+                    <Link href="/kontak" className="hidden md:inline-block bg-primary text-on-primary font-button text-button px-stack-lg py-stack-md rounded-lg cursor-pointer active:opacity-80 transition-all text-center">
                         Konsultasi Gratis
-                    </a>
+                    </Link>
+                    
+                    {/* Mobile Menu Toggle */}
+                    <button className="lg:hidden text-on-surface-variant ml-2" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                        {isMobileMenuOpen ? <X /> : <Menu />}
+                    </button>
                 </div>
-
-                {/* Mobile Menu Toggle */}
-                <button className="md:hidden text-slate-600" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-                    {isMobileMenuOpen ? <X /> : <Menu />}
-                </button>
             </div>
 
             {/* Mobile Menu Content */}
             {isMobileMenuOpen && (
-                <div className="md:hidden absolute top-full left-0 w-full bg-white border-b shadow-lg py-4 px-6 flex flex-col gap-4">
-                    <a href={getLink('#home')} className="text-slate-600 font-medium py-2 border-b">Home</a>
-                    <Link href="/layanan" className="text-slate-600 font-medium py-2 border-b">Layanan</Link>
-                    <Link href="/tentang" className="text-slate-600 font-medium py-2 border-b">Tentang Kami</Link>
-                    <Link href="/produk" className="text-slate-600 font-medium py-2 border-b">Produk</Link>
-                    <Link href="/portfolio" className="text-slate-600 font-medium py-2 border-b">Portfolio</Link>
-                    <Link href="/berita" className="text-slate-600 font-medium py-2 border-b">Berita</Link>
-                    <a href={getLink('#kontak')} className="bg-blue-600 text-white px-5 py-3 rounded-xl text-center font-semibold mt-2">Konsultasi Gratis</a>
+                <div className="md:hidden absolute top-full left-0 w-full bg-surface border-b border-outline-variant shadow-lg py-4 px-margin-desktop flex flex-col gap-4">
+                    <Link href="/layanan" className="text-on-surface font-button text-button py-2 border-b border-outline-variant/50">Solusi</Link>
+                    <Link href="/industri" className="text-on-surface font-button text-button py-2 border-b border-outline-variant/50">Industri</Link>
+                    <Link href="/case-studi" className="text-on-surface font-button text-button py-2 border-b border-outline-variant/50">Case Studi</Link>
+                    <Link href="/proses" className="text-on-surface font-button text-button py-2 border-b border-outline-variant/50">Proses</Link>
+                    <Link href="/tentang" className="text-on-surface font-button text-button py-2 border-b border-outline-variant/50">About</Link>
+                    <Link href="/kontak" className="bg-primary text-on-primary px-5 py-3 rounded-xl text-center font-button text-button mt-2">Konsultasi Gratis</Link>
                 </div>
             )}
         </nav>
