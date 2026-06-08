@@ -101,7 +101,7 @@ export default function About() {
                                     </div>
                                 </div>
                                 <div className="relative h-[500px] rounded-xl overflow-hidden shadow-sm">
-                                    <img alt="CTECH Workspace" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLt63fRy-SfB0mApMVBt44u5Rzijumtv-yjhsmW2YTxTvq3ycIwFwsyf09BrhRt-XU7N2TOTpR1rFuiNn9IBfu-gHuB88UUG6pqqnJUrkiErPpj_5xCVgzmiKUMf7_be7SxxnVzFbolN8AQhm4ULIRL54c13MfWlJk0KeYtk7EDlQdPFMXuvBPWgZFDaxke5Z44Wl5SsIE50EqQgU-SK9c9njIZO64Vx1nhIUuI2-CwtYq5OtAqToco0VKFq" />
+                                    <img alt="CTECH Workspace" className="w-full h-full object-cover" src="/our-story/photo1.jpeg" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
                                 </div>
                             </div>

@@ -22,9 +22,25 @@ Route::prefix('solusi')->group(function () {
     Route::get('/photobooth', function () { return inertia('public/solutions/photobooth'); })->name('public.solutions.photobooth');
 });
 
-Route::get('/industri', function () { return inertia('public/industries/index'); })->name('public.industries');
+Route::get('/industri', function () {
+    $portfolios = \App\Models\Portfolio::latest()->take(6)->get();
+    return inertia('public/industries/index', ['portfolios' => $portfolios]);
+})->name('public.industries');
 Route::get('/proses', function () { return inertia('public/process/index'); })->name('public.process');
-Route::get('/case-studi', function () { return inertia('public/case-studies/index'); })->name('public.case-studies');
+Route::get('/case-studi', function (Request $request) {
+    $category = $request->input('category');
+    $portfolios = \App\Models\Portfolio::when($category, function($query, $category) {
+            return $query->where('category', $category);
+        })
+        ->latest()
+        ->get();
+    $categories = \App\Models\Portfolio::select('category')->distinct()->pluck('category');
+    return inertia('public/case-studies/index', [
+        'portfolios' => $portfolios,
+        'categories' => $categories,
+        'filters' => ['category' => $category]
+    ]);
+})->name('public.case-studies');
 
 Route::get('/produk', function () { return inertia('public/products/index'); })->name('public.products');
 

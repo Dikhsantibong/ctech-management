@@ -2,7 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { useEffect } from 'react';
 import PublicNavbar from '@/components/public-navbar';
 
-export default function CaseStudies() {
+export default function CaseStudies({ portfolios, categories, filters }: { portfolios: any[], categories: string[], filters: any }) {
     useEffect(() => {
         // Simple intersection observer for reveal animations
         const observer = new IntersectionObserver((entries) => {
@@ -69,14 +69,24 @@ export default function CaseStudies() {
                     <section className="max-w-container-max mx-auto px-margin-desktop mb-stack-lg">
                         <div className="flex flex-wrap items-center justify-between gap-stack-md py-4 border-y border-outline-variant">
                             <div className="flex gap-stack-md overflow-x-auto no-scrollbar pb-2 md:pb-0">
-                                <button className="px-4 py-1.5 bg-primary text-on-primary text-label-md font-label-md rounded-full whitespace-nowrap">Semua Industri</button>
-                                <button className="px-4 py-1.5 text-on-surface-variant hover:bg-surface-container-high text-label-md font-label-md rounded-full transition-colors whitespace-nowrap">FinTech</button>
-                                <button className="px-4 py-1.5 text-on-surface-variant hover:bg-surface-container-high text-label-md font-label-md rounded-full transition-colors whitespace-nowrap">Rantai Pasok</button>
-                                <button className="px-4 py-1.5 text-on-surface-variant hover:bg-surface-container-high text-label-md font-label-md rounded-full transition-colors whitespace-nowrap">Kesehatan</button>
-                                <button className="px-4 py-1.5 text-on-surface-variant hover:bg-surface-container-high text-label-md font-label-md rounded-full transition-colors whitespace-nowrap">Manufaktur</button>
+                                <Link
+                                    href="/case-studi"
+                                    className={`px-4 py-1.5 text-label-md font-label-md rounded-full whitespace-nowrap transition-colors ${!filters.category ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+                                >
+                                    Semua Industri
+                                </Link>
+                                {(categories || []).map((category) => (
+                                    <Link
+                                        key={category}
+                                        href={`/case-studi?category=${category}`}
+                                        className={`px-4 py-1.5 text-label-md font-label-md rounded-full whitespace-nowrap transition-colors ${filters.category === category ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+                                    >
+                                        {category}
+                                    </Link>
+                                ))}
                             </div>
                             <div className="flex items-center text-on-surface-variant text-label-md font-label-md whitespace-nowrap">
-                                <span className="mr-2">Menampilkan 12 hasil</span>
+                                <span className="mr-2">Menampilkan {portfolios?.length || 0} hasil</span>
                                 <span className="material-symbols-outlined">filter_list</span>
                             </div>
                         </div>
@@ -85,94 +95,75 @@ export default function CaseStudies() {
                     {/* Case Studies Grid */}
                     <section className="max-w-container-max mx-auto px-margin-desktop">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
-                            {/* Card 1: Main Feature */}
-                            <div className="case-study-card bg-surface-container-lowest border border-outline-variant p-stack-lg flex flex-col group md:col-span-2 rounded-lg">
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-stack-xl h-full">
-                                    <div className="order-2 lg:order-1 flex flex-col justify-center">
-                                        <div className="flex items-center gap-stack-sm mb-stack-md">
-                                            <span className="bg-secondary-container text-on-secondary-container px-3 py-1 text-label-md font-label-md rounded">Featured</span>
-                                            <span className="text-on-surface-variant text-label-md font-label-md">Solusi FinTech</span>
-                                        </div>
-                                        <h2 className="font-headline-md text-headline-md mb-stack-md">Meningkatkan Likuiditas Global untuk NeoBank International</h2>
-                                        <p className="text-on-surface-variant mb-stack-lg leading-relaxed">Migrasi mesin transaksi monolitik lama ke arsitektur layanan mikro ketersediaan tinggi untuk mendukung lebih dari 15 juta pengguna aktif harian di berbagai pasar.</p>
-                                        <div className="grid grid-cols-2 gap-stack-md mb-stack-lg">
-                                            <div className="bg-surface-container p-stack-md rounded">
-                                                <div className="text-secondary font-headline-sm text-headline-sm">99.99%</div>
-                                                <div className="text-on-surface-variant text-label-md font-label-md uppercase">Keandalan Uptime</div>
+                            {(portfolios || []).map((portfolio, index) => {
+                                const isFirst = index === 0;
+
+                                return isFirst ? (
+                                    <div key={portfolio.id} className="case-study-card bg-surface-container-lowest border border-outline-variant p-stack-lg flex flex-col group md:col-span-2 rounded-lg">
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-stack-xl h-full">
+                                            <div className="order-2 lg:order-1 flex flex-col justify-center">
+                                                <div className="flex items-center gap-stack-sm mb-stack-md">
+                                                    <span className="bg-secondary-container text-on-secondary-container px-3 py-1 text-label-md font-label-md rounded">Featured</span>
+                                                    <span className="text-on-surface-variant text-label-md font-label-md">{portfolio.category}</span>
+                                                </div>
+                                                <h2 className="font-headline-md text-headline-md mb-stack-md">{portfolio.title}</h2>
+                                                <p className="text-on-surface-variant mb-stack-lg leading-relaxed">{portfolio.description}</p>
+                                                <Link
+                                                    className="flex items-center text-secondary font-button text-button group/btn w-fit"
+                                                    href={portfolio.link || `/portfolio/${portfolio.id}`}
+                                                    target={portfolio.link ? '_blank' : undefined}
+                                                    rel={portfolio.link ? 'noreferrer' : undefined}
+                                                >
+                                                    Lihat Detail Studi Kasus
+                                                    <span className="material-symbols-outlined ml-2 transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+                                                </Link>
                                             </div>
-                                            <div className="bg-surface-container p-stack-md rounded">
-                                                <div className="text-secondary font-headline-sm text-headline-sm">40%</div>
-                                                <div className="text-on-surface-variant text-label-md font-label-md uppercase">Pengurangan Latensi</div>
+                                            {portfolio.image && (
+                                                <div className="order-1 lg:order-2 h-full min-h-[300px]">
+                                                    <div className="relative overflow-hidden rounded-lg bg-primary-container border border-outline-variant h-full">
+                                                        <img
+                                                            alt={portfolio.title}
+                                                            className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700"
+                                                            src={`/storage/${portfolio.image}`}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div key={portfolio.id} className="case-study-card bg-surface-container-lowest border border-outline-variant p-stack-lg flex flex-col rounded-lg group">
+                                        {portfolio.image && (
+                                            <div className="mb-stack-lg h-48 overflow-hidden rounded bg-surface-container relative">
+                                                <img
+                                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                                    alt={portfolio.title}
+                                                    src={`/storage/${portfolio.image}`}
+                                                />
                                             </div>
+                                        )}
+                                        <span className="text-on-surface-variant text-label-md font-label-md mb-stack-xs uppercase">{portfolio.category}</span>
+                                        <h3 className="font-headline-sm text-headline-sm mb-stack-sm">{portfolio.title}</h3>
+                                        <p className="text-on-surface-variant text-body-sm mb-stack-lg grow">{portfolio.description}</p>
+                                        <div className="flex items-center justify-between pt-stack-md border-t border-outline-variant">
+                                            <Link
+                                                className="text-secondary font-button text-button group/btn"
+                                                href={portfolio.link || `/portfolio/${portfolio.id}`}
+                                                target={portfolio.link ? '_blank' : undefined}
+                                                rel={portfolio.link ? 'noreferrer' : undefined}
+                                            >
+                                                Lihat Detail
+                                                <span className="material-symbols-outlined ml-1 text-sm transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+                                            </Link>
                                         </div>
-                                        <Link className="flex items-center text-secondary font-button text-button group/btn w-fit" href="#">
-                                            Lihat Detail Studi Kasus 
-                                            <span className="material-symbols-outlined ml-2 transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
-                                        </Link>
                                     </div>
-                                    <div className="order-1 lg:order-2 h-full min-h-[300px]">
-                                        <div className="relative overflow-hidden rounded-lg bg-primary-container border border-outline-variant h-full">
-                                            <img alt="Dashboard Mockup" className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida/AP1WRLvVRb3EL0X_e8Hmgaj5SMWD2uZjnrpvqOINVmVq1dEIWguIFNbBSSM4_5tCbTprXylJtgfSE2-RTFWypUPln0xtG03i5nz1_ySC5qJpmMNgfr-FwSzjRbosnBBakiJ83vnw-8NT1lqENTlpt7m9EJnIgI6mTxIhG1VraJ-n6TVBS_4bYo4mDA6VhmtiTqbc4KB-HNkfS7lukI8kUOHLuxdVmM4E7t4_MuYvuH3-K5jE4LnYBzko1c23E9E" />
-                                        </div>
-                                    </div>
+                                );
+                            })}
+                            {(!portfolios || portfolios.length === 0) && (
+                                <div className="md:col-span-2 text-center py-12">
+                                    <p className="text-on-surface-variant">Belum ada case study yang ditampilkan.</p>
                                 </div>
-                            </div>
-
-                            {/* Card 2 */}
-                            <div className="case-study-card bg-surface-container-lowest border border-outline-variant p-stack-lg flex flex-col rounded-lg group">
-                                <div className="mb-stack-lg h-48 overflow-hidden rounded bg-surface-container relative">
-                                    <img className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="Logistics Infrastructure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5KnHILKNmCILTrmbi6EA4IpxyfKB2UzsIsVYJlNCpcUgs5B_F5MRvJBhnCKoJp6JpP6Hp7q4wsTs3-DLRqZ21xLrAFwkdl5eHl8Ant978Z3ttHb_a7sLd0ICTGLu3eJWVdSy8E7hhNfBktZMk9CVb0yc4VlWt_uxjOvQRht2tPc7j_PxuqnEXkJoXfSJTTE0hNeWlBOiN0XA89YhurGleLtgTvc6D7swDMepk-5MjdYtPEFFDTnboT-jMDK2khu_Y8o4i7l8MBe2l" />
-                                </div>
-                                <span className="text-on-surface-variant text-label-md font-label-md mb-stack-xs uppercase">Logistik & Rantai Pasok</span>
-                                <h3 className="font-headline-sm text-headline-sm mb-stack-sm">Sistem Kecerdasan Armada Real-Time</h3>
-                                <p className="text-on-surface-variant text-body-sm mb-stack-lg grow">Perutean terintegrasi berbasis AI untuk konglomerat pengiriman global, mengoptimalkan konsumsi bahan bakar dan kepadatan rute.</p>
-                                <div className="flex items-center justify-between pt-stack-md border-t border-outline-variant">
-                                    <div className="text-secondary font-bold text-headline-sm">22%</div>
-                                    <div className="text-on-surface-variant text-label-md font-label-md">Penghematan Biaya</div>
-                                </div>
-                            </div>
-
-                            {/* Card 3 */}
-                            <div className="case-study-card bg-surface-container-lowest border border-outline-variant p-stack-lg flex flex-col rounded-lg group">
-                                <div className="mb-stack-lg h-48 overflow-hidden rounded bg-surface-container relative">
-                                    <img className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="Healthcare Systems" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDd1ZNN-mJloa8orZNDAbhGlDjHqwjhu8rna2nEc7dsOSae6Ez8oio_q4d3gXTvg7oJ4SqVzzkoPvAjAQnHDw3_icoJU9YTJqw-fo6kmrBloUETsqTENgzYpf3BGYKs_iSrLeIGrGAWQWO2CJlrqiPnPyoR0yDnPy6FFhD9789zZswi7yUo1KuHRIzBA3AFpspU17onVgKmC4cTlJ7LfDILVcdF5tUFANeL8B9lIzFjztB3OvESd3JfGEjZgJpIjlaFz4svcXVdhikp" />
-                                </div>
-                                <span className="text-on-surface-variant text-label-md font-label-md mb-stack-xs uppercase">Sistem Kesehatan</span>
-                                <h3 className="font-headline-sm text-headline-sm mb-stack-sm">Manajemen Siklus Hidup Pasien</h3>
-                                <p className="text-on-surface-variant text-body-sm mb-stack-lg grow">Pusat data yang aman untuk jaringan rumah sakit, memungkinkan pemodelan hasil pasien prediktif.</p>
-                                <div className="flex items-center justify-between pt-stack-md border-t border-outline-variant">
-                                    <div className="text-secondary font-bold text-headline-sm">80%</div>
-                                    <div className="text-on-surface-variant text-label-md font-label-md">Peningkatan Efisiensi</div>
-                                </div>
-                            </div>
-
-                            {/* Card 4 */}
-                            <div className="case-study-card bg-surface-container-lowest border border-outline-variant p-stack-lg flex flex-col rounded-lg group">
-                                <div className="mb-stack-lg h-48 overflow-hidden rounded bg-surface-container relative">
-                                    <img className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="Urban Infrastructure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBJpc-KWRnNtdl_6meb1GnMD_g8eS6xkq1B_Gr0D26HRu20uLKlXr8aZ82eKcgX1X0ZxmJ7L_VqYFO-BPw5GoLCthroTnfPRulSVRmxZYLD6aXcU5yNHGhpz3jaJAoCbQ5Nr1ZwXUJhwZ4g78PMOvZu5HTQ8bvTDFVPLhXA84zqEkJEieVFvjp8BCiTLenXt1qyvisZsDzemTfoYVlzwAyPwzgONrGnFNsqHMf-7G8cD-KzWWhutskVDiAJsgdUXRP46O6k5G2Faa9" />
-                                </div>
-                                <span className="text-on-surface-variant text-label-md font-label-md mb-stack-xs uppercase">Infrastruktur Perkotaan</span>
-                                <h3 className="font-headline-sm text-headline-sm mb-stack-sm">Pusat Data IoT Kota Pintar</h3>
-                                <p className="text-on-surface-variant text-body-sm mb-stack-lg grow">Platform orkestrasi data terpusat untuk sensor kota, meningkatkan waktu tanggap darurat di seluruh area.</p>
-                                <div className="flex items-center justify-between pt-stack-md border-t border-outline-variant">
-                                    <div className="text-secondary font-bold text-headline-sm">15min</div>
-                                    <div className="text-on-surface-variant text-label-md font-label-md">Pemotongan Waktu Respon</div>
-                                </div>
-                            </div>
-
-                            {/* Card 5 */}
-                            <div className="case-study-card bg-surface-container-lowest border border-outline-variant p-stack-lg flex flex-col rounded-lg group">
-                                <div className="mb-stack-lg h-48 overflow-hidden rounded bg-surface-container relative">
-                                    <img className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="Enterprise SaaS" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsBWp84gCY8McZPoW2G6_Qz4C5iTDJYL43NKtmchz7sOLQsz_fDWd_9_Mlv7hADZDHmt6himLV4D5BroHF9J_MZokDfxot05TWjhJbODEIDbIr66sxqKfvKv0vchW8nhzchS2uoGpf3-DeWKFmJ_4yxPeLUiut0PS2F7u63s6_KMkeMBLMDrwSbKtIzPmBdpNWDpO0fDfUy_VkYBHEzyVl8YqN1TPDj_0Mul7RtDCtGaCkirsvR9ftCqcpeIjaQJcMuyACzywpRp5E" />
-                                </div>
-                                <span className="text-on-surface-variant text-label-md font-label-md mb-stack-xs uppercase">Enterprise SaaS</span>
-                                <h3 className="font-headline-sm text-headline-sm mb-stack-sm">Skalabilitas Infrastruktur Cloud</h3>
-                                <p className="text-on-surface-variant text-body-sm mb-stack-lg grow">Pipeline DevOps otomatis dan implementasi logika auto-scaling untuk platform SDM global selama fase pertumbuhan 300%.</p>
-                                <div className="flex items-center justify-between pt-stack-md border-t border-outline-variant">
-                                    <div className="text-secondary font-bold text-headline-sm">3x</div>
-                                    <div className="text-on-surface-variant text-label-md font-label-md">Dukungan Pertumbuhan</div>
-                                </div>
-                            </div>
+                            )}
                         </div>
                     </section>
 
