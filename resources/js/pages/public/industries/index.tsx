@@ -106,7 +106,7 @@ export default function Industries({ portfolios }: { portfolios: any[] }) {
                                                     <span className="font-label-md text-label-md uppercase tracking-wider">{portfolio.category}</span>
                                                 </div>
                                                 <h3 className={`${isFirst || isThirdOrFourth ? 'font-headline-md text-headline-md' : 'font-headline-sm text-headline-sm'} mb-4`}>{portfolio.title}</h3>
-                                                <p className={`${isSecond ? 'font-body-sm text-body-sm' : 'font-body-md text-body-md'} mb-6 text-white/80 max-w-lg`}>{portfolio.description}</p>
+                                                <p className={`${isSecond ? 'font-body-sm text-body-sm' : 'font-body-md text-body-md'} mb-6 text-white/80 max-w-lg line-clamp-3`}>{portfolio.description}</p>
                                                 {portfolio.link ? (
                                                     <a
                                                         href={portfolio.link}
