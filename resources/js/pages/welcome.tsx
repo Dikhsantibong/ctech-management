@@ -104,10 +104,10 @@ export default function Welcome() {
                     <div className="max-w-container-max mx-auto px-margin-desktop">
                         <div className="flex flex-col md:flex-row items-center justify-between gap-stack-xl">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-stack-xl flex-grow opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
-                                <div className="flex items-center gap-2"><span className="material-symbols-outlined text-4xl">corporate_fare</span> <span className="font-bold">GLOBAL_CORP</span></div>
-                                <div className="flex items-center gap-2"><span className="material-symbols-outlined text-4xl">factory</span> <span className="font-bold">INDUS_TECH</span></div>
-                                <div className="flex items-center gap-2"><span className="material-symbols-outlined text-4xl">account_balance</span> <span className="font-bold">FIN_SYSTEM</span></div>
-                                <div className="flex items-center gap-2"><span className="material-symbols-outlined text-4xl">health_metrics</span> <span className="font-bold">MED_CLOUD</span></div>
+                                <img src="/logos/company1.png" alt="Company 1" className="h-12 object-contain" />
+                                <img src="/logos/company2.png" alt="Company 2" className="h-12 object-contain" />
+                                <img src="/logos/company3.png" alt="Company 3" className="h-12 object-contain" />
+                                <img src="/logos/company4.png" alt="Company 4" className="h-12 object-contain" />
                             </div>
                             <div className="flex gap-stack-xl border-l border-outline-variant pl-stack-xl max-md:border-l-0 max-md:pl-0">
                                 <div className="text-center">
