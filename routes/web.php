@@ -27,8 +27,8 @@ Route::get('/industri', function () {
     return inertia('public/industries/index', ['portfolios' => $portfolios]);
 })->name('public.industries');
 Route::get('/proses', function () { return inertia('public/process/index'); })->name('public.process');
-Route::get('/case-studi', function (Request $request) {
-    $category = $request->input('category');
+Route::get('/case-studi', function () {
+    $category = request()->input('category');
     $portfolios = \App\Models\Portfolio::when($category, function($query, $category) {
             return $query->where('category', $category);
         })
