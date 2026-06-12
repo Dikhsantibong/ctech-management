@@ -176,7 +176,7 @@ export default function Industries({ portfolios }: { portfolios: any[] }) {
                             <h2 className="font-display-lg text-display-lg mb-stack-lg">Siap mendefinisikan ulang standar industri Anda?</h2>
                             <p className="font-body-lg text-body-lg text-on-primary/70 mb-stack-xl max-w-2xl mx-auto">Konsultasikan dengan spesialis sektor kami untuk merancang peta jalan software yang mendorong pertumbuhan terukur.</p>
                             <div className="flex flex-col md:flex-row gap-gutter justify-center">
-                                <Link href="/kontak" className="bg-secondary text-on-secondary px-8 py-4 font-button text-button rounded-full hover:opacity-90 transition-opacity">
+                                <Link href="/kontak" className="bg-secondary text-white px-8 py-4 font-button text-button rounded-full hover:opacity-90 transition-opacity">
                                     Jadwalkan Konsultasi
                                 </Link>
                                 <button className="border border-on-primary text-on-primary px-8 py-4 font-button text-button rounded-full hover:bg-on-primary hover:text-primary transition-all">

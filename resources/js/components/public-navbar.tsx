@@ -13,7 +13,31 @@ export default function PublicNavbar() {
         };
         window.addEventListener('scroll', handleScroll);
         handleScroll();
-        return () => window.removeEventListener('scroll', handleScroll);
+
+        // Force light mode for public pages
+        const root = document.documentElement;
+        root.dataset.publicPage = 'true';
+        const wasDark = root.classList.contains('dark');
+        const originalColorScheme = root.style.colorScheme;
+        
+        if (wasDark) {
+            root.classList.remove('dark');
+            root.style.colorScheme = 'light';
+        }
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            
+            // Allow next component to mount and retain light mode if it's a public page
+            setTimeout(() => {
+                const stillPublic = root.dataset.publicPage === 'true';
+                if (!stillPublic && wasDark) {
+                    root.classList.add('dark');
+                    root.style.colorScheme = originalColorScheme;
+                }
+            }, 0);
+            delete root.dataset.publicPage;
+        };
     }, []);
 
     const navClass = isScrolled 

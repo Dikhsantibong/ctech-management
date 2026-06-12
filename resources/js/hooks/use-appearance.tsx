@@ -47,9 +47,10 @@ const applyTheme = (appearance: Appearance): void => {
     }
 
     const isDark = isDarkMode(appearance);
+    const isPublicPage = document.documentElement.dataset.publicPage === 'true';
 
-    document.documentElement.classList.toggle('dark', isDark);
-    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+    document.documentElement.classList.toggle('dark', isDark && !isPublicPage);
+    document.documentElement.style.colorScheme = (isDark && !isPublicPage) ? 'dark' : 'light';
 };
 
 const subscribe = (callback: () => void) => {
