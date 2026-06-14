@@ -209,208 +209,223 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
     };
 
     const renderFormContent = () => (
-        <div className="grid grid-cols-3 gap-x-6 gap-y-4 py-2">
-            {/* ── COLUMN 1: Basic Info + Relation ── */}
-            <div className="space-y-4">
-                <h3 className="font-semibold text-sm border-b pb-1.5">Basic Information</h3>
-                <div className="space-y-1.5">
-                    <Label htmlFor="title">Work Title <span className="text-destructive">*</span></Label>
-                    <Input id="title" value={data.title} onChange={e => setData('title', e.target.value)} required />
-                    {errors.title && <p className="text-xs text-destructive">{errors.title}</p>}
-                </div>
-                <div className="grid grid-cols-2 gap-3">
+        <ScrollArea className="h-[75vh] px-2">
+            <div className="grid grid-cols-3 gap-x-6 gap-y-6 py-2">
+                {/* ── TOP METADATA ROW ── */}
+                
+                {/* COLUMN 1: Basic Info */}
+                <div className="space-y-4">
+                    <h3 className="font-semibold text-sm border-b pb-1.5">Basic Information</h3>
                     <div className="space-y-1.5">
-                        <Label className="text-xs">Category <span className="text-destructive">*</span></Label>
-                        <Select value={data.category} onValueChange={val => setData('category', val)}>
-                            <SelectTrigger className="h-9"><SelectValue placeholder="Category" /></SelectTrigger>
-                            <SelectContent>
-                                {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
+                        <Label htmlFor="title">Work Title <span className="text-destructive">*</span></Label>
+                        <Input id="title" value={data.title} onChange={e => setData('title', e.target.value)} required />
+                        {errors.title && <p className="text-xs text-destructive">{errors.title}</p>}
                     </div>
-                    <div className="space-y-1.5">
-                        <Label className="text-xs">Priority</Label>
-                        <Select value={data.priority} onValueChange={val => setData('priority', val)}>
-                            <SelectTrigger className="h-9"><SelectValue placeholder="Priority" /></SelectTrigger>
-                            <SelectContent>
-                                {['Low', 'Medium', 'High', 'Critical'].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                        <Label className="text-xs">Status</Label>
-                        <Select value={data.status} onValueChange={val => setData('status', val)}>
-                            <SelectTrigger className="h-9"><SelectValue placeholder="Status" /></SelectTrigger>
-                            <SelectContent>
-                                {statusColumns.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label className="text-xs">Est. Duration</Label>
-                        <Select value={data.estimated_duration || 'none'} onValueChange={val => setData('estimated_duration', val === 'none' ? '' : val)}>
-                            <SelectTrigger className="h-9"><SelectValue placeholder="None" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="none">None</SelectItem>
-                                {['1 Hour', '2 Hours', '4 Hours', '1 Day', '3 Days', '1 Week', '2 Weeks', '1 Month'].map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-
-                <h3 className="font-semibold text-sm border-b pb-1.5 pt-2">Relation</h3>
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                        <Label className="text-xs">Client</Label>
-                        <Select value={data.client_id || 'none'} onValueChange={val => setData('client_id', val === 'none' ? '' : val)}>
-                            <SelectTrigger className="h-9"><SelectValue placeholder="None" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="none">None</SelectItem>
-                                {clients.map((c: any) => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label className="text-xs">Project</Label>
-                        <Select value={data.project_id || 'none'} onValueChange={val => setData('project_id', val === 'none' ? '' : val)}>
-                            <SelectTrigger className="h-9"><SelectValue placeholder="None" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="none">None</SelectItem>
-                                {projects.map((p: any) => <SelectItem key={p.id} value={p.id.toString()}>{p.project_name}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-            </div>
-
-            {/* ── COLUMN 2: Assignment + Schedule + Settings ── */}
-            <div className="space-y-4">
-                <h3 className="font-semibold text-sm border-b pb-1.5">Assignment</h3>
-                <div className="space-y-1.5">
-                    <Label className="text-xs">Assigned To</Label>
-                    <Select value={data.user_id || 'none'} onValueChange={val => setData('user_id', val === 'none' ? '' : val)}>
-                        <SelectTrigger className="h-9"><SelectValue placeholder="Unassigned" /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="none">Unassigned</SelectItem>
-                            {users.map((u: any) => <SelectItem key={u.id} value={u.id.toString()}>{u.name}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="space-y-1.5">
-                    <Label className="text-xs">Collaborators</Label>
-                    <div className="max-h-20 overflow-y-auto border rounded p-2 space-y-1">
-                        {users.map((u: any) => (
-                            <label key={u.id} className="flex items-center space-x-2 text-xs">
-                                <input
-                                    type="checkbox"
-                                    checked={data.collaborators.includes(u.id)}
-                                    onChange={(e) => {
-                                        if (e.target.checked) {
-                                            setData('collaborators', [...data.collaborators, u.id]);
-                                        } else {
-                                            setData('collaborators', data.collaborators.filter(id => id !== u.id));
-                                        }
-                                    }}
-                                    className="rounded border-gray-300 text-primary focus:ring-primary"
-                                />
-                                <span>{u.name}</span>
-                            </label>
-                        ))}
-                    </div>
-                </div>
-
-                <h3 className="font-semibold text-sm border-b pb-1.5 pt-2">Schedule</h3>
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                        <Label className="text-xs">Start Date</Label>
-                        <Input type="date" className="h-9" value={data.start_date} onChange={e => setData('start_date', e.target.value)} />
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label className="text-xs">Due Date</Label>
-                        <Input type="date" className="h-9" value={data.due_date} onChange={e => setData('due_date', e.target.value)} />
-                    </div>
-                </div>
-
-                <h3 className="font-semibold text-sm border-b pb-1.5 pt-2">Settings</h3>
-                <div className="space-y-1.5">
-                    <Label className="text-xs">Reminder</Label>
-                    <Select value={data.reminder || 'None'} onValueChange={val => setData('reminder', val)}>
-                        <SelectTrigger className="h-9"><SelectValue placeholder="None" /></SelectTrigger>
-                        <SelectContent>
-                            {['None', '1 Hour Before', '1 Day Before', '3 Days Before', 'Custom'].map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="flex items-center justify-between border rounded p-2.5">
-                    <Label className="text-xs">Repeat Work</Label>
-                    <Switch checked={data.is_recurring} onCheckedChange={(checked) => setData('is_recurring', checked)} />
-                </div>
-                {data.is_recurring && (
-                    <div className="space-y-1.5">
-                        <Label className="text-xs">Frequency</Label>
-                        <Select value={data.recurring_frequency || 'Daily'} onValueChange={val => setData('recurring_frequency', val)}>
-                            <SelectTrigger className="h-9"><SelectValue placeholder="Frequency" /></SelectTrigger>
-                            <SelectContent>
-                                {['Daily', 'Weekly', 'Monthly', 'Yearly'].map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                )}
-            </div>
-
-            {/* ── COLUMN 3: Description + Checklist + Attachments ── */}
-            <div className="space-y-4">
-                <h3 className="font-semibold text-sm border-b pb-1.5">Description</h3>
-                <Textarea
-                    value={data.description}
-                    onChange={(e) => setData('description', e.target.value)}
-                    placeholder="Describe the work in detail..."
-                    rows={4}
-                    className="text-sm"
-                />
-
-                <h3 className="font-semibold text-sm border-b pb-1.5 pt-1">Checklist</h3>
-                <div className="flex gap-2">
-                    <Input
-                        value={checklistInput}
-                        onChange={e => setChecklistInput(e.target.value)}
-                        placeholder="Add item..."
-                        className="h-9 text-sm"
-                        onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addChecklistItem())}
-                    />
-                    <Button type="button" onClick={addChecklistItem} variant="secondary" size="sm">Add</Button>
-                </div>
-                <div className="space-y-1 max-h-24 overflow-y-auto">
-                    {data.checklist.map(item => (
-                        <div key={item.id} className="flex items-center justify-between p-1.5 border rounded text-sm">
-                            <div className="flex items-center gap-2">
-                                <input type="checkbox" checked={item.is_completed} onChange={() => toggleChecklist(item.id)} className="rounded" />
-                                <span className={item.is_completed ? 'line-through text-muted-foreground' : ''}>{item.text}</span>
-                            </div>
-                            <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => removeChecklist(item.id)}>
-                                <Trash2 className="h-3 w-3 text-destructive" />
-                            </Button>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                            <Label className="text-xs">Category <span className="text-destructive">*</span></Label>
+                            <Select value={data.category} onValueChange={val => setData('category', val)}>
+                                <SelectTrigger className="h-9"><SelectValue placeholder="Category" /></SelectTrigger>
+                                <SelectContent>
+                                    {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
                         </div>
-                    ))}
+                        <div className="space-y-1.5">
+                            <Label className="text-xs">Priority</Label>
+                            <Select value={data.priority} onValueChange={val => setData('priority', val)}>
+                                <SelectTrigger className="h-9"><SelectValue placeholder="Priority" /></SelectTrigger>
+                                <SelectContent>
+                                    {['Low', 'Medium', 'High', 'Critical'].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                            <Label className="text-xs">Status</Label>
+                            <Select value={data.status} onValueChange={val => setData('status', val)}>
+                                <SelectTrigger className="h-9"><SelectValue placeholder="Status" /></SelectTrigger>
+                                <SelectContent>
+                                    {statusColumns.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs">Est. Duration</Label>
+                            <Select value={data.estimated_duration || 'none'} onValueChange={val => setData('estimated_duration', val === 'none' ? '' : val)}>
+                                <SelectTrigger className="h-9"><SelectValue placeholder="None" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">None</SelectItem>
+                                    {['1 Hour', '2 Hours', '4 Hours', '1 Day', '3 Days', '1 Week', '2 Weeks', '1 Month'].map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
                 </div>
 
-                <h3 className="font-semibold text-sm border-b pb-1.5 pt-1">Attachments</h3>
-                <Input
-                    type="file"
-                    multiple
-                    accept=".pdf,.docx,.pptx,.xlsx,.png,.jpg,.jpeg,.zip"
-                    onChange={e => setData('new_attachments', Array.from(e.target.files || []))}
-                    className="text-sm"
-                />
-                {selectedWork?.attachments && selectedWork.attachments.length > 0 && (
-                    <div className="text-xs text-muted-foreground">
-                        {selectedWork.attachments.length} existing attachment(s).
+                {/* COLUMN 2: Assignment + Relation */}
+                <div className="space-y-4">
+                    <h3 className="font-semibold text-sm border-b pb-1.5">Assignment & Relation</h3>
+                    <div className="space-y-1.5">
+                        <Label className="text-xs">Assigned To</Label>
+                        <Select value={data.user_id || 'none'} onValueChange={val => setData('user_id', val === 'none' ? '' : val)}>
+                            <SelectTrigger className="h-9"><SelectValue placeholder="Unassigned" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="none">Unassigned</SelectItem>
+                                {users.map((u: any) => <SelectItem key={u.id} value={u.id.toString()}>{u.name}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
                     </div>
-                )}
+                    <div className="space-y-1.5">
+                        <Label className="text-xs">Collaborators</Label>
+                        <div className="max-h-20 overflow-y-auto border rounded p-2 space-y-1">
+                            {users.map((u: any) => (
+                                <label key={u.id} className="flex items-center space-x-2 text-xs">
+                                    <input
+                                        type="checkbox"
+                                        checked={data.collaborators.includes(u.id)}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setData('collaborators', [...data.collaborators, u.id]);
+                                            } else {
+                                                setData('collaborators', data.collaborators.filter(id => id !== u.id));
+                                            }
+                                        }}
+                                        className="rounded border-gray-300 text-primary focus:ring-primary"
+                                    />
+                                    <span>{u.name}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 pt-1">
+                        <div className="space-y-1.5">
+                            <Label className="text-xs">Client</Label>
+                            <Select value={data.client_id || 'none'} onValueChange={val => setData('client_id', val === 'none' ? '' : val)}>
+                                <SelectTrigger className="h-9"><SelectValue placeholder="None" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">None</SelectItem>
+                                    {clients.map((c: any) => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs">Project</Label>
+                            <Select value={data.project_id || 'none'} onValueChange={val => setData('project_id', val === 'none' ? '' : val)}>
+                                <SelectTrigger className="h-9"><SelectValue placeholder="None" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">None</SelectItem>
+                                    {projects.map((p: any) => <SelectItem key={p.id} value={p.id.toString()}>{p.project_name}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </div>
+
+                {/* COLUMN 3: Schedule + Settings */}
+                <div className="space-y-4">
+                    <h3 className="font-semibold text-sm border-b pb-1.5">Schedule & Settings</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                            <Label className="text-xs">Start Date</Label>
+                            <Input type="date" className="h-9" value={data.start_date} onChange={e => setData('start_date', e.target.value)} />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs">Due Date</Label>
+                            <Input type="date" className="h-9" value={data.due_date} onChange={e => setData('due_date', e.target.value)} />
+                        </div>
+                    </div>
+
+                    <div className="space-y-1.5 pt-1">
+                        <Label className="text-xs">Reminder</Label>
+                        <Select value={data.reminder || 'None'} onValueChange={val => setData('reminder', val)}>
+                            <SelectTrigger className="h-9"><SelectValue placeholder="None" /></SelectTrigger>
+                            <SelectContent>
+                                {['None', '1 Hour Before', '1 Day Before', '3 Days Before', 'Custom'].map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="flex items-center justify-between border rounded p-2.5">
+                        <Label className="text-xs">Repeat Work</Label>
+                        <Switch checked={data.is_recurring} onCheckedChange={(checked) => setData('is_recurring', checked)} />
+                    </div>
+                    {data.is_recurring && (
+                        <div className="space-y-1.5">
+                            <Label className="text-xs">Frequency</Label>
+                            <Select value={data.recurring_frequency || 'Daily'} onValueChange={val => setData('recurring_frequency', val)}>
+                                <SelectTrigger className="h-9"><SelectValue placeholder="Frequency" /></SelectTrigger>
+                                <SelectContent>
+                                    {['Daily', 'Weekly', 'Monthly', 'Yearly'].map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
+                </div>
+
+                {/* ── BOTTOM FULL-WIDTH ROW ── */}
+                <div className="col-span-3 space-y-6 pt-2 border-t">
+                    <div className="space-y-2">
+                        <h3 className="font-semibold text-sm">Description (Brief)</h3>
+                        <Textarea
+                            value={data.description}
+                            onChange={(e) => setData('description', e.target.value)}
+                            placeholder="Describe the brief and details of the work here..."
+                            rows={12}
+                            className="text-sm resize-y"
+                        />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <h3 className="font-semibold text-sm">Checklist</h3>
+                            <div className="flex gap-2">
+                                <Input
+                                    value={checklistInput}
+                                    onChange={e => setChecklistInput(e.target.value)}
+                                    placeholder="Add checklist item..."
+                                    className="h-9 text-sm"
+                                    onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addChecklistItem())}
+                                />
+                                <Button type="button" onClick={addChecklistItem} variant="secondary" size="sm">Add</Button>
+                            </div>
+                            <div className="space-y-1 max-h-32 overflow-y-auto">
+                                {data.checklist.map(item => (
+                                    <div key={item.id} className="flex items-center justify-between p-1.5 border rounded text-sm bg-card">
+                                        <div className="flex items-center gap-2">
+                                            <input type="checkbox" checked={item.is_completed} onChange={() => toggleChecklist(item.id)} className="rounded" />
+                                            <span className={item.is_completed ? 'line-through text-muted-foreground' : ''}>{item.text}</span>
+                                        </div>
+                                        <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => removeChecklist(item.id)}>
+                                            <Trash2 className="h-3 w-3 text-destructive" />
+                                        </Button>
+                                    </div>
+                                ))}
+                                {data.checklist.length === 0 && (
+                                    <div className="text-xs text-muted-foreground italic text-center py-2">No checklist items added.</div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <h3 className="font-semibold text-sm">Attachments</h3>
+                            <Input
+                                type="file"
+                                multiple
+                                accept=".pdf,.docx,.pptx,.xlsx,.png,.jpg,.jpeg,.zip"
+                                onChange={e => setData('new_attachments', Array.from(e.target.files || []))}
+                                className="text-sm"
+                            />
+                            {selectedWork?.attachments && selectedWork.attachments.length > 0 && (
+                                <div className="text-xs text-muted-foreground">
+                                    {selectedWork.attachments.length} existing attachment(s) will be kept unless deleted.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </ScrollArea>
     );
 
     return (
