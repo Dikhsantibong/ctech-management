@@ -91,15 +91,17 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
     const submitEdit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        // Use post with _method PUT to support file uploads in Laravel Inertia
-        post(`/works/${selectedWork?.id}`, {
+        // Use router.post with _method PUT to support file uploads in Laravel Inertia
+        router.post(`/works/${selectedWork?.id}`, {
             _method: 'put',
             ...data,
+        }, {
             onSuccess: () => {
                 setIsEditModalOpen(false);
                 reset();
             },
-        } as any);
+            forceFormData: true
+        });
     };
 
     const submitDelete = (e: React.FormEvent) => {
