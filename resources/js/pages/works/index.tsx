@@ -206,7 +206,7 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
         return `${completed}/${checklist.length}`;
     };
 
-    const FormContent = () => (
+    const renderFormContent = () => (
         <div className="grid grid-cols-3 gap-x-6 gap-y-4 py-2">
             {/* ── COLUMN 1: Basic Info + Relation ── */}
             <div className="space-y-4">
@@ -629,7 +629,7 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
                         <DialogDescription>Create a new work item.</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={submitCreate}>
-                        <FormContent />
+                        {renderFormContent()}
                         <DialogFooter className="mt-4 pt-4 border-t">
                             <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
                             <Button type="submit" disabled={processing}>Save Work</Button>
@@ -645,7 +645,7 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
                         <DialogDescription>Update details for {selectedWork?.title}.</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={submitEdit}>
-                        <FormContent />
+                        {renderFormContent()}
                         <DialogFooter className="mt-4 pt-4 border-t">
                             <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
                             <Button type="submit" disabled={processing}>Update Work</Button>
