@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -45,6 +46,26 @@ export default function NewsIndex({ news, filters }: { news: any, filters?: any 
         status: 'Draft',
         image: null as File | null,
     });
+
+    const quillModules = {
+        toolbar: [
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+            ['link', 'image', 'video'],
+            [{ 'align': [] }],
+            [{ 'color': [] }, { 'background': [] }],
+            ['clean']
+        ],
+    };
+
+    const quillFormats = [
+        'header',
+        'bold', 'italic', 'underline', 'strike', 'blockquote',
+        'list', 'bullet', 'indent',
+        'link', 'image', 'video',
+        'align', 'color', 'background'
+    ];
 
     const openCreateModal = () => {
         reset();
@@ -255,7 +276,16 @@ export default function NewsIndex({ news, filters }: { news: any, filters?: any 
 
                             <div className="space-y-2">
                                 <Label htmlFor="content">Isi Berita</Label>
-                                <Textarea id="content" className="min-h-[250px]" value={data.content} onChange={e => setData('content', e.target.value)} required />
+                                <div className="bg-white rounded-md border border-input">
+                                    <ReactQuill 
+                                        theme="snow" 
+                                        value={data.content} 
+                                        onChange={(content) => setData('content', content)} 
+                                        modules={quillModules}
+                                        formats={quillFormats}
+                                        className="h-[300px] mb-12"
+                                    />
+                                </div>
                                 {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
                             </div>
                         </div>
@@ -315,7 +345,16 @@ export default function NewsIndex({ news, filters }: { news: any, filters?: any 
 
                             <div className="space-y-2">
                                 <Label htmlFor="edit-content">Isi Berita</Label>
-                                <Textarea id="edit-content" className="min-h-[250px]" value={data.content} onChange={e => setData('content', e.target.value)} required />
+                                <div className="bg-white rounded-md border border-input">
+                                    <ReactQuill 
+                                        theme="snow" 
+                                        value={data.content} 
+                                        onChange={(content) => setData('content', content)} 
+                                        modules={quillModules}
+                                        formats={quillFormats}
+                                        className="h-[300px] mb-12"
+                                    />
+                                </div>
                                 {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
                             </div>
                         </div>

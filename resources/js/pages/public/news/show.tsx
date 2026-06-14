@@ -3,113 +3,9 @@ import { User, Calendar, Tag } from 'lucide-react';
 import { useRef, useEffect } from 'react';
 import PublicNavbar from '@/components/public-navbar';
 
-type NewsBlock =
-    | { type: 'html'; html: string }
-    | { type: 'paragraph'; text: string }
-    | { type: 'ordered-list'; items: string[] }
-    | { type: 'unordered-list'; items: string[] };
-
-function normalizeContent(content: string) {
-    return (content || '').replace(/\r\n/g, '\n').trim();
-}
-
-function parseNewsContent(content: string): NewsBlock[] {
-    const normalized = normalizeContent(content);
-
-    if (!normalized) return [];
-
-    if (/<[a-z][\s\S]*>/i.test(normalized)) {
-        return [{ type: 'html', html: normalized }];
-    }
-
-    const lines = normalized.split('\n');
-    const blocks: NewsBlock[] = [];
-    let index = 0;
-
-    const isOrderedItem = (line: string) => /^\d+\.\s+/.test(line);
-    const isUnorderedItem = (line: string) => /^(?:[-*]|\u2022)\s+/.test(line);
-
-    while (index < lines.length) {
-        const line = lines[index].trim();
-
-        if (!line) { index++; continue; }
-
-        if (isOrderedItem(line)) {
-            const items: string[] = [];
-            while (index < lines.length && isOrderedItem(lines[index].trim())) {
-                items.push(lines[index].trim().replace(/^\d+\.\s+/, ''));
-                index++;
-            }
-            blocks.push({ type: 'ordered-list', items });
-            continue;
-        }
-
-        if (isUnorderedItem(line)) {
-            const items: string[] = [];
-            while (index < lines.length && isUnorderedItem(lines[index].trim())) {
-                items.push(lines[index].trim().replace(/^(?:[-*]|\u2022)\s+/, ''));
-                index++;
-            }
-            blocks.push({ type: 'unordered-list', items });
-            continue;
-        }
-
-        const paragraphLines: string[] = [];
-        while (
-            index < lines.length &&
-            lines[index].trim() &&
-            !isOrderedItem(lines[index].trim()) &&
-            !isUnorderedItem(lines[index].trim())
-        ) {
-            paragraphLines.push(lines[index].trim());
-            index++;
-        }
-        blocks.push({ type: 'paragraph', text: paragraphLines.join(' ') });
-    }
-
-    return blocks;
-}
-
-/**
- * Renumber semua <ol><li> dalam container secara berurutan global (1, 2, 3, ...)
- * meskipun setiap <li> berada dalam <ol> yang terpisah-pisah.
- */
-function renumberOrderedLists(container: HTMLElement) {
-    const allOlItems = container.querySelectorAll('ol li');
-    allOlItems.forEach((li, i) => {
-        const el = li as HTMLElement;
-        el.style.listStyleType = 'none';
-        el.style.position = 'relative';
-        el.style.paddingLeft = '2rem';
-
-        // Hapus pseudo-counter lama jika ada
-        const existing = el.querySelector('.custom-counter');
-        if (existing) existing.remove();
-
-        const counter = document.createElement('span');
-        counter.className = 'custom-counter';
-        counter.textContent = `${i + 1}.`;
-        counter.style.cssText = `
-            position: absolute;
-            left: 0;
-            top: 0;
-            font-variant-numeric: tabular-nums;
-            min-width: 1.5rem;
-            text-align: left;
-        `;
-        el.insertBefore(counter, el.firstChild);
-    });
-}
+import 'react-quill-new/dist/quill.core.css';
 
 export default function PublicNewsShow({ news, relatedNews }: { news: any; relatedNews: any[] }) {
-    const contentBlocks = parseNewsContent(news.content || '');
-    const articleRef = useRef<HTMLElement>(null);
-
-    useEffect(() => {
-        if (articleRef.current) {
-            renumberOrderedLists(articleRef.current);
-        }
-    }, [contentBlocks]);
 
     return (
         <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-blue-600 selection:text-white">
@@ -152,44 +48,9 @@ export default function PublicNewsShow({ news, relatedNews }: { news: any; relat
                     </div>
                 )}
 
-                <article
-                    ref={articleRef}
-                    className="prose prose-lg prose-slate max-w-none mx-auto prose-headings:font-bold prose-p:leading-8 prose-li:leading-8 prose-ul:pl-6 prose-ol:pl-6"
-                >
-                    {contentBlocks.length > 0 ? (
-                        contentBlocks.map((block, i) => {
-                            if (block.type === 'html') {
-                                return (
-                                    <div
-                                        key={i}
-                                        dangerouslySetInnerHTML={{ __html: block.html }}
-                                    />
-                                );
-                            }
-
-                            if (block.type === 'paragraph') {
-                                return <p key={i} className="text-justify mb-4">{block.text}</p>;
-                            }
-
-                            const ListTag = block.type === 'ordered-list' ? 'ol' : 'ul';
-
-                            return (
-                                <ListTag
-                                    key={i}
-                                    className={
-                                        block.type === 'ordered-list'
-                                            ? 'my-6 list-decimal space-y-2 pl-6'
-                                            : 'my-6 list-disc space-y-2 pl-6'
-                                    }
-                                >
-                                    {block.items.map((item, itemIndex) => (
-                                        <li key={itemIndex} className="pl-1">
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ListTag>
-                            );
-                        })
+                <article className="ql-editor prose prose-lg prose-slate max-w-none mx-auto prose-headings:font-bold prose-p:leading-8 prose-li:leading-8 prose-img:rounded-xl">
+                    {news.content ? (
+                        <div dangerouslySetInnerHTML={{ __html: news.content }} />
                     ) : (
                         <p className="text-slate-500 italic">Tidak ada isi berita.</p>
                     )}

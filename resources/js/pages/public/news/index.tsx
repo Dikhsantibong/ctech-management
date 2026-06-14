@@ -37,9 +37,7 @@ export default function PublicNewsIndex({ news }: { news: any }) {
                                 <h3 className="text-xl font-bold text-slate-900 mb-3 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
                                     {item.title}
                                 </h3>
-                                <p className="text-slate-600 text-sm leading-relaxed line-clamp-3 mb-4 flex-grow">
-                                    {item.content.replace(/<[^>]+>/g, '')}
-                                </p>
+                                <p className="text-slate-600 text-sm leading-relaxed line-clamp-3 mb-4 flex-grow" dangerouslySetInnerHTML={{ __html: item.content.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ') }} />
                                 <span className="inline-flex items-center gap-1.5 text-blue-600 font-semibold text-sm mt-auto group-hover:gap-2 transition-all">
                                     Baca Selengkapnya &rarr;
                                 </span>
