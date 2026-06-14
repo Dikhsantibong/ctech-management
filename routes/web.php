@@ -177,6 +177,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('tasks', \App\Http\Controllers\TaskController::class);
         Route::get('works/report', [\App\Http\Controllers\WorkController::class, 'report'])->name('works.report');
         Route::resource('works', \App\Http\Controllers\WorkController::class);
+        Route::get('content-plans/report', [\App\Http\Controllers\ContentPlanController::class, 'report'])->name('content-plans.report');
         Route::resource('content-plans', \App\Http\Controllers\ContentPlanController::class)->except(['create', 'edit', 'show']);
         Route::resource('news', \App\Http\Controllers\NewsController::class)->except(['create', 'edit', 'show']);
         Route::resource('portfolios', \App\Http\Controllers\PortfolioController::class)->except(['create', 'edit', 'show']);

@@ -131,8 +131,40 @@ class ContentPlanController extends Controller
 
     public function destroy(ContentPlan $contentPlan)
     {
-        $this->logActivity('deleted', 'ContentPlan', $contentPlan->id, "Menghapus content plan: {$contentPlan->title}");
+        $this->logActivity('deleted', 'Content Plan', $contentPlan->id, "Menghapus content plan: {$contentPlan->title}");
         $contentPlan->delete();
-        return redirect()->back()->with('success', 'Content plan deleted.');
+
+        return redirect()->back()->with('success', 'Content plan deleted successfully.');
+    }
+
+    public function report()
+    {
+        $user = Auth::user();
+
+        // Similar to index, scope by user if not director
+        if (in_array($user->role, ['staff', 'admin_operasional'])) {
+            $contentPlans = ContentPlan::with(['creator', 'assignedTo'])
+                ->where(function($query) use ($user) {
+                    $query->where('assigned_to', $user->id)
+                          ->orWhereNull('assigned_to');
+                })
+                ->get();
+        } else {
+            $contentPlans = ContentPlan::with(['creator', 'assignedTo'])->get();
+        }
+        
+        $metrics = [
+            'totalContent' => $contentPlans->count(),
+            'publishedContent' => $contentPlans->where('status', 'Published')->count(),
+            'activeContent' => $contentPlans->whereIn('status', ['Idea', 'Drafting', 'Review', 'Scheduled'])->count(),
+            'overdueContent' => $contentPlans->where('scheduled_date', '<', now()->format('Y-m-d'))->where('status', '!=', 'Published')->count(),
+        ];
+        
+        $metrics['completionRate'] = $metrics['totalContent'] > 0 ? round(($metrics['publishedContent'] / $metrics['totalContent']) * 100) : 0;
+
+        return Inertia::render('content-plans/report', [
+            'contentPlans' => $contentPlans,
+            'metrics' => $metrics
+        ]);
     }
 }

@@ -1,6 +1,6 @@
 import { Head, useForm, router } from '@inertiajs/react';
 import { useState, useRef } from 'react';
-import { Plus, MoreVertical, Edit2, Trash2, Calendar, Kanban, List, GripVertical } from 'lucide-react';
+import { Plus, MoreVertical, Edit2, Trash2, Calendar, Kanban, List, GripVertical, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -371,6 +371,9 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
                                 <List className="h-4 w-4" />
                             </Button>
                         </div>
+                        <Button variant="outline" onClick={() => router.get('/content-plans/report')}>
+                            <BarChart3 className="mr-2 h-4 w-4" /> Reporting
+                        </Button>
                         <Button onClick={openCreateModal}>
                             <Plus className="mr-2 h-4 w-4" /> Buat Konten
                         </Button>
