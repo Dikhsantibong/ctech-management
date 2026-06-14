@@ -27,7 +27,7 @@ interface Announcement {
     created_at: string;
 }
 
-export default function Dashboard({ user_role, stats, upcoming_tasks, task_status_counts, tasks_last_7_days, announcements, content_plan_status_counts, content_plan_platform_counts, news_category_counts, portfolio_category_counts, content_plans_last_7_days }: { user_role: string, stats?: any, upcoming_tasks?: any[], task_status_counts?: Record<string, number>, tasks_last_7_days?: { labels: string[], data: number[] }, announcements?: Announcement[], content_plan_status_counts?: Record<string, number>, content_plan_platform_counts?: Record<string, number>, news_category_counts?: Record<string, number>, portfolio_category_counts?: Record<string, number>, content_plans_last_7_days?: { labels: string[], data: number[] } }) {
+export default function Dashboard({ user_role, stats, upcoming_tasks, task_status_counts, tasks_last_7_days, announcements, content_plan_status_counts, content_plan_platform_counts, news_category_counts, portfolio_category_counts, content_plans_last_7_days, work_stats, upcoming_works }: { user_role: string, stats?: any, upcoming_tasks?: any[], task_status_counts?: Record<string, number>, tasks_last_7_days?: { labels: string[], data: number[] }, announcements?: Announcement[], content_plan_status_counts?: Record<string, number>, content_plan_platform_counts?: Record<string, number>, news_category_counts?: Record<string, number>, portfolio_category_counts?: Record<string, number>, content_plans_last_7_days?: { labels: string[], data: number[] }, work_stats?: any, upcoming_works?: any[] }) {
     return (
         <>
             <Head title="Dashboard" />
@@ -78,6 +78,57 @@ export default function Dashboard({ user_role, stats, upcoming_tasks, task_statu
                             <CardContent>
                                 <div className="text-2xl font-bold">{stats.team_members}</div>
                                 <p className="text-xs text-muted-foreground">Active in the system</p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                )}
+
+                {/* Work Management Widgets */}
+                {work_stats && (user_role === 'direktur_utama' || user_role === 'direktur_operasional') && (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Today's Works</CardTitle>
+                                <Briefcase className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{work_stats.today}</div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Active Works</CardTitle>
+                                <Activity className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-blue-600">{work_stats.active}</div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Overdue Works</CardTitle>
+                                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-destructive">{work_stats.overdue}</div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Upcoming Deadlines</CardTitle>
+                                <Bell className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{upcoming_works?.length || 0}</div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Completed This Week</CardTitle>
+                                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-emerald-600">{work_stats.completed_this_week}</div>
                             </CardContent>
                         </Card>
                     </div>

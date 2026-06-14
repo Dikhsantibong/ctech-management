@@ -77,6 +77,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     'team_members' => \App\Models\User::count(),
                 ];
                 $data['upcoming_tasks'] = \App\Models\Task::with('project')->where('status', '!=', 'Done')->whereNotNull('deadline')->orderBy('deadline')->take(5)->get();
+                $data['upcoming_works'] = \App\Models\Work::with('client')->where('status', '!=', 'Done')->whereNotNull('due_date')->orderBy('due_date')->take(5)->get();
+                $data['work_stats'] = [
+                    'active' => \App\Models\Work::whereIn('status', ['Todo', 'In Progress', 'Waiting', 'Review'])->count(),
+                    'overdue' => \App\Models\Work::where('due_date', '<', now()->format('Y-m-d'))->where('status', '!=', 'Done')->count(),
+                    'completed_this_week' => \App\Models\Work::where('status', 'Done')->where('updated_at', '>=', now()->startOfWeek())->count(),
+                    'today' => \App\Models\Work::whereDate('created_at', now()->format('Y-m-d'))->count(),
+                ];
                 $data['task_status_counts'] = DB::table('tasks')
                     ->select('status', DB::raw('count(*) as count'))
                     ->groupBy('status')
@@ -168,6 +175,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::resource('projects', \App\Http\Controllers\ProjectController::class);
         Route::resource('tasks', \App\Http\Controllers\TaskController::class);
+        Route::get('works/report', [\App\Http\Controllers\WorkController::class, 'report'])->name('works.report');
+        Route::resource('works', \App\Http\Controllers\WorkController::class);
         Route::resource('content-plans', \App\Http\Controllers\ContentPlanController::class)->except(['create', 'edit', 'show']);
         Route::resource('news', \App\Http\Controllers\NewsController::class)->except(['create', 'edit', 'show']);
         Route::resource('portfolios', \App\Http\Controllers\PortfolioController::class)->except(['create', 'edit', 'show']);
