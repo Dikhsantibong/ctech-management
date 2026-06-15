@@ -42,6 +42,7 @@ class TaskController extends Controller
             'status' => 'required|in:Todo,Progress,Review,Done',
             'priority' => 'required|in:Low,Medium,High',
             'deadline' => 'nullable|date',
+            'metadata' => 'nullable|array',
         ]);
 
         $task = Task::create($validated);
@@ -61,6 +62,7 @@ class TaskController extends Controller
             'status' => 'required|in:Todo,Progress,Review,Done',
             'priority' => 'required|in:Low,Medium,High',
             'deadline' => 'nullable|date',
+            'metadata' => 'nullable|array',
         ]);
 
         $task->update($validated);

@@ -1,6 +1,6 @@
 import { Head, useForm, router } from '@inertiajs/react';
 import { useState, useRef, useEffect } from 'react';
-import { Plus, MoreVertical, Edit2, Trash2, LayoutGrid, List, GripVertical, Paperclip, CheckSquare, Search, BarChart3, Filter } from 'lucide-react';
+import { Plus, MoreVertical, Edit2, Trash2, LayoutGrid, List, GripVertical, Paperclip, CheckSquare, Search, BarChart3, Filter, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -597,9 +597,15 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
                                                 <h4 className="font-medium text-sm mb-1 line-clamp-2 cursor-pointer" onClick={() => openEditModal(work)}>{work.title}</h4>
                                                 
                                                 {work.client?.name && (
-                                                    <div className="text-xs text-muted-foreground truncate mb-2">
-                                                        🏢 {work.client.name}
+                                                    <div className="mb-2">
+                                                        <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary">
+                                                            🏢 {work.client.name}
+                                                        </Badge>
                                                     </div>
+                                                )}
+
+                                                {work.description && (
+                                                    <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{work.description}</p>
                                                 )}
 
                                                 <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-3">
@@ -615,19 +621,24 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
                                                     )}
                                                 </div>
 
-                                                <div className="flex items-center justify-between mt-auto">
+                                                <div className="flex items-center justify-between mt-auto pt-2 border-t border-muted/50">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="rounded border px-1.5 py-0.5 text-[10px] text-muted-foreground">{work.category}</span>
+                                                        {work.due_date && (
+                                                            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                                                                <Calendar className="h-3 w-3" />
+                                                                {new Date(work.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                     {work.assignee ? (
-                                                        <div className="flex items-center gap-1.5" title={work.assignee.name}>
-                                                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-[10px] font-semibold border border-background">
+                                                        <div className="flex items-center gap-1" title={work.assignee.name}>
+                                                            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-[10px] font-medium border border-background">
                                                                 {work.assignee.name.charAt(0)}
                                                             </div>
+                                                            <span className="text-[10px] text-muted-foreground truncate max-w-[60px]">{work.assignee.name}</span>
                                                         </div>
-                                                    ) : <div className="h-6 w-6"></div>}
-                                                    {work.due_date && (
-                                                        <span className="text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">
-                                                            📅 {new Date(work.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                                        </span>
-                                                    )}
+                                                    ) : <div className="h-5 w-5"></div>}
                                                 </div>
                                             </div>
                                         ))}

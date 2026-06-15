@@ -39,11 +39,80 @@ export default function TasksIndex({ tasks, projects, users, filters }: { tasks:
         status: 'Todo',
         priority: 'Medium',
         deadline: '',
+        metadata: {} as any,
     });
+
+    const getSelectedProjectType = (projectId: string) => {
+        const project = projects.find(p => p.id.toString() === projectId);
+        return project ? project.project_type : 'Lainnya';
+    };
+
+    const handleMetaChange = (key: string, value: string) => {
+        setData('metadata', { ...data.metadata, [key]: value });
+    };
+
+    const renderDynamicFields = () => {
+        const type = getSelectedProjectType(data.project_id);
+        if (type === 'Aplikasi') {
+            return (
+                <>
+                    <div className="space-y-2 col-span-2 md:col-span-1">
+                        <Label>Platform (Web/Mobile)</Label>
+                        <Input value={data.metadata?.platform || ''} onChange={e => handleMetaChange('platform', e.target.value)} placeholder="e.g. Web App" />
+                    </div>
+                    <div className="space-y-2 col-span-2 md:col-span-1">
+                        <Label>Tipe Tugas (Bug/Fitur)</Label>
+                        <Input value={data.metadata?.task_type || ''} onChange={e => handleMetaChange('task_type', e.target.value)} placeholder="e.g. Bug Fix, New Feature" />
+                    </div>
+                    <div className="space-y-2 col-span-2">
+                        <Label>Environment</Label>
+                        <Input value={data.metadata?.environment || ''} onChange={e => handleMetaChange('environment', e.target.value)} placeholder="e.g. Production, Staging" />
+                    </div>
+                </>
+            );
+        } else if (type === 'Video/Animasi') {
+            return (
+                <>
+                    <div className="space-y-2 col-span-2 md:col-span-1">
+                        <Label>Scene/Durasi</Label>
+                        <Input value={data.metadata?.scene || ''} onChange={e => handleMetaChange('scene', e.target.value)} placeholder="e.g. Scene 1 / 00:30" />
+                    </div>
+                    <div className="space-y-2 col-span-2 md:col-span-1">
+                        <Label>Kebutuhan Aset</Label>
+                        <Input value={data.metadata?.assets_needed || ''} onChange={e => handleMetaChange('assets_needed', e.target.value)} placeholder="e.g. Voice Over, B-Roll" />
+                    </div>
+                </>
+            );
+        } else if (type === 'Desain') {
+            return (
+                <>
+                    <div className="space-y-2 col-span-2 md:col-span-1">
+                        <Label>Dimensi/Resolusi</Label>
+                        <Input value={data.metadata?.dimensions || ''} onChange={e => handleMetaChange('dimensions', e.target.value)} placeholder="e.g. 1080x1080px" />
+                    </div>
+                    <div className="space-y-2 col-span-2 md:col-span-1">
+                        <Label>Format File</Label>
+                        <Input value={data.metadata?.file_format || ''} onChange={e => handleMetaChange('file_format', e.target.value)} placeholder="e.g. PNG, PDF, AI" />
+                    </div>
+                </>
+            );
+        }
+        return null;
+    };
 
     const openCreateModal = () => {
         reset();
-        setData('project_id', filters.project_id || (projects.length > 0 ? projects[0].id.toString() : ''));
+        const defaultProjectId = filters.project_id || (projects.length > 0 ? projects[0].id.toString() : '');
+        setData({
+            project_id: defaultProjectId,
+            user_id: '',
+            title: '',
+            description: '',
+            status: 'Todo',
+            priority: 'Medium',
+            deadline: '',
+            metadata: {},
+        });
         setIsCreateModalOpen(true);
     };
 
@@ -57,6 +126,7 @@ export default function TasksIndex({ tasks, projects, users, filters }: { tasks:
             status: task.status,
             priority: task.priority,
             deadline: task.deadline || '',
+            metadata: task.metadata || {},
         });
         setIsEditModalOpen(true);
     };
@@ -108,6 +178,7 @@ export default function TasksIndex({ tasks, projects, users, filters }: { tasks:
             status: newStatus,
             priority: task.priority,
             deadline: task.deadline || null,
+            metadata: task.metadata || {},
         }, { preserveScroll: true });
     };
 
@@ -363,22 +434,37 @@ export default function TasksIndex({ tasks, projects, users, filters }: { tasks:
                                                     </DropdownMenu>
                                                 </div>
                                                 <h4 className="font-medium text-sm mb-1 line-clamp-2 cursor-pointer" onClick={() => openEditModal(task)}>{task.title}</h4>
-                                                <div className="text-xs text-muted-foreground truncate mb-2" title={task.project?.project_name}>
-                                                    {task.project?.project_name}
+                                                <div className="mb-2">
+                                                    <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary">
+                                                        {task.project?.project_name}
+                                                    </Badge>
                                                 </div>
-                                                <div className="flex items-center justify-between mt-3">
+                                                {task.description && (
+                                                    <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{task.description}</p>
+                                                )}
+                                                
+                                                {task.metadata && Object.keys(task.metadata).length > 0 && (
+                                                    <div className="flex flex-wrap gap-1 mb-2">
+                                                        {Object.values(task.metadata).map((val: any, idx: number) => 
+                                                            val ? <span key={idx} className="rounded border bg-muted/30 px-1 py-0.5 text-[9px] text-muted-foreground">{val}</span> : null
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                <div className="flex items-center justify-between mt-auto pt-2 border-t border-muted/50">
                                                     {task.assignee ? (
-                                                        <div className="flex items-center gap-1.5">
-                                                            <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-medium border border-background" title={task.assignee.name}>
+                                                        <div className="flex items-center gap-1" title={task.assignee.name}>
+                                                            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-[10px] font-medium border border-background">
                                                                 {task.assignee.name.charAt(0)}
                                                             </div>
+                                                            <span className="text-[10px] text-muted-foreground truncate max-w-[60px]">{task.assignee.name}</span>
                                                         </div>
                                                     ) : (
-                                                        <div className="h-5 w-5"></div>
+                                                        <span className="text-[10px] text-muted-foreground">Unassigned</span>
                                                     )}
                                                     {task.deadline && (
                                                         <span className="text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">
-                                                            {new Date(task.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                                            📅 {new Date(task.deadline).toLocaleDateString('id-ID', { month: 'short', day: 'numeric' })}
                                                         </span>
                                                     )}
                                                 </div>
@@ -481,6 +567,8 @@ export default function TasksIndex({ tasks, projects, users, filters }: { tasks:
                             {errors.deadline && <p className="text-sm text-destructive">{errors.deadline}</p>}
                         </div>
                         
+                        {renderDynamicFields()}
+                        
                         <div className="col-span-2 flex justify-end space-x-2 mt-4">
                             <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
                             <Button type="submit" disabled={processing}>Save Task</Button>
@@ -570,6 +658,8 @@ export default function TasksIndex({ tasks, projects, users, filters }: { tasks:
                             <Input id="edit-deadline" type="date" value={data.deadline} onChange={e => setData('deadline', e.target.value)} />
                             {errors.deadline && <p className="text-sm text-destructive">{errors.deadline}</p>}
                         </div>
+                        
+                        {renderDynamicFields()}
                         
                         <div className="col-span-2 flex justify-end space-x-2 mt-4">
                             <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>

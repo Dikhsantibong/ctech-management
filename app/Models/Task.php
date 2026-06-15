@@ -15,7 +15,15 @@ class Task extends Model
         'status',
         'priority',
         'deadline',
+        'metadata',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'metadata' => 'array',
+        ];
+    }
 
     public function project(): BelongsTo
     {
