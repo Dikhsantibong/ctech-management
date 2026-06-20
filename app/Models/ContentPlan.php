@@ -20,6 +20,7 @@ class ContentPlan extends Model
         'user_id',
         'campaign_name',
         'brief',
+        'visual',
         'reference_links',
         'visual_assets_url',
         'target_audience',

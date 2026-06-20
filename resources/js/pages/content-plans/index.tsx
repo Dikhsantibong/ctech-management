@@ -67,6 +67,7 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
         notes: '',
         campaign_name: '',
         brief: '',
+        visual: '',
         reference_links: '',
         visual_assets_url: '',
         target_audience: '',
@@ -93,6 +94,7 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
             notes: plan.notes || '',
             campaign_name: plan.campaign_name || '',
             brief: plan.brief || '',
+            visual: plan.visual || '',
             reference_links: plan.reference_links || '',
             visual_assets_url: plan.visual_assets_url || '',
             target_audience: plan.target_audience || '',
@@ -178,6 +180,7 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
                 notes: draggedPlan.notes || '',
                 campaign_name: draggedPlan.campaign_name || '',
                 brief: draggedPlan.brief || '',
+                visual: draggedPlan.visual || '',
                 reference_links: draggedPlan.reference_links || '',
                 visual_assets_url: draggedPlan.visual_assets_url || '',
                 target_audience: draggedPlan.target_audience || '',
@@ -333,8 +336,12 @@ export default function ContentPlansIndex({ contentPlans, staffUsers, userRole }
                         <Input value={data.visual_assets_url} onChange={e => setData('visual_assets_url', e.target.value)} placeholder="https://..." />
                     </div>
                     <div className="space-y-2 col-span-2">
+                        <Label>Visual</Label>
+                        <Textarea value={data.visual} onChange={e => setData('visual', e.target.value)} placeholder="Tuliskan detail visual konten..." className="h-[120px] resize-none" />
+                    </div>
+                    <div className="space-y-2 col-span-2">
                         <Label>Briefing / Detail Tugas</Label>
-                        <Textarea value={data.brief} onChange={e => setData('brief', e.target.value)} placeholder="Tuliskan arahan visual, copywriting angle, dll..." className="h-[80px] resize-none" />
+                        <Textarea value={data.brief} onChange={e => setData('brief', e.target.value)} placeholder="Tuliskan arahan visual, copywriting angle, dll..." className="h-[120px] resize-none" />
                     </div>
                     <div className="space-y-2 col-span-2">
                         <Label>Reference Links</Label>
