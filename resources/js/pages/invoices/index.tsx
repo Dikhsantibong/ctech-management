@@ -1,6 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { Plus, MoreVertical, FileText, Trash2, Eye } from 'lucide-react';
+import { Plus, MoreVertical, FileText, Trash2, Eye, Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -22,19 +22,42 @@ import {
 
 export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
 
-    const { data, setData, post, delete: destroy, processing, errors, reset } = useForm({
+    const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         client_name: '',
         due_date: '',
         tax_rate: 11, // Default to 11% tax
-        items: [{ description: '', quantity: 1, price: 0 }]
+        items: [{ id: null, description: '', quantity: 1, price: 0 }] as any[]
     });
 
     const openCreateModal = () => {
         reset();
         setIsCreateModalOpen(true);
+    };
+
+    const openEditModal = (invoice: any) => {
+        setSelectedInvoice(invoice);
+        
+        let taxRate = 0;
+        if (invoice.subtotal > 0) {
+            taxRate = Math.round((invoice.tax / invoice.subtotal) * 100);
+        }
+
+        setData({
+            client_name: invoice.client_name,
+            due_date: invoice.due_date ? invoice.due_date.split('T')[0] : '',
+            tax_rate: taxRate,
+            items: invoice.items && invoice.items.length > 0 ? invoice.items.map((item: any) => ({
+                id: item.id,
+                description: item.description,
+                quantity: item.quantity,
+                price: parseFloat(item.price)
+            })) : [{ id: null, description: '', quantity: 1, price: 0 }]
+        });
+        setIsEditModalOpen(true);
     };
 
     const openDeleteModal = (invoice: any) => {
@@ -43,7 +66,7 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
     };
 
     const addItem = () => {
-        setData('items', [...data.items, { description: '', quantity: 1, price: 0 }]);
+        setData('items', [...data.items, { id: null, description: '', quantity: 1, price: 0 }]);
     };
 
     const updateItem = (index: number, field: string, value: any) => {
@@ -65,6 +88,16 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
         post('/invoices', {
             onSuccess: () => {
                 setIsCreateModalOpen(false);
+                reset();
+            },
+        });
+    };
+
+    const submitEdit = (e: React.FormEvent) => {
+        e.preventDefault();
+        put(`/invoices/${selectedInvoice?.id}`, {
+            onSuccess: () => {
+                setIsEditModalOpen(false);
                 reset();
             },
         });
@@ -159,6 +192,9 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
                                                             <Link href={`/invoices/${invoice.id}`} className="cursor-pointer">
                                                                 <Eye className="mr-2 h-4 w-4" /> View Details
                                                             </Link>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => openEditModal(invoice)}>
+                                                            <Edit2 className="mr-2 h-4 w-4" /> Edit
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem asChild>
                                                             <a href={`/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
@@ -261,6 +297,85 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
                         <DialogFooter className="mt-6">
                             <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
                             <Button type="submit" disabled={processing}>Generate Invoice</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Edit Modal */}
+            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+                <DialogContent className="max-w-3xl">
+                    <DialogHeader>
+                        <DialogTitle>Edit Invoice</DialogTitle>
+                        <DialogDescription>Update the client details and line items.</DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={submitEdit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="edit_client_name">Client Name</Label>
+                                <Input id="edit_client_name" value={data.client_name} onChange={e => setData('client_name', e.target.value)} required />
+                                {errors.client_name && <p className="text-sm text-destructive">{errors.client_name}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="edit_due_date">Due Date</Label>
+                                <Input id="edit_due_date" type="date" value={data.due_date} onChange={e => setData('due_date', e.target.value)} required />
+                                {errors.due_date && <p className="text-sm text-destructive">{errors.due_date}</p>}
+                            </div>
+                            <div className="space-y-2 col-span-2">
+                                <Label htmlFor="edit_tax_rate">Tax Rate (%)</Label>
+                                <Input id="edit_tax_rate" type="number" min="0" max="100" value={data.tax_rate} onChange={e => setData('tax_rate', parseFloat(e.target.value))} required />
+                                {errors.tax_rate && <p className="text-sm text-destructive">{errors.tax_rate}</p>}
+                            </div>
+                        </div>
+
+                        <div className="space-y-2 mt-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <Label>Invoice Items</Label>
+                                <Button type="button" variant="outline" size="sm" onClick={addItem}>
+                                    <Plus className="mr-2 h-4 w-4" /> Add Item
+                                </Button>
+                            </div>
+                            {data.items.map((item, index) => (
+                                <div key={index} className="flex items-end gap-2 p-2 border rounded-md bg-muted/20">
+                                    <div className="flex-1 space-y-1">
+                                        <Label className="text-xs">Description</Label>
+                                        <Input value={item.description} onChange={e => updateItem(index, 'description', e.target.value)} required />
+                                    </div>
+                                    <div className="w-24 space-y-1">
+                                        <Label className="text-xs">Qty</Label>
+                                        <Input type="number" min="1" value={item.quantity} onChange={e => updateItem(index, 'quantity', parseInt(e.target.value))} required />
+                                    </div>
+                                    <div className="w-32 space-y-1">
+                                        <Label className="text-xs">Price (IDR)</Label>
+                                        <Input type="number" min="0" value={item.price} onChange={e => updateItem(index, 'price', parseInt(e.target.value))} required />
+                                    </div>
+                                    <Button type="button" variant="ghost" size="icon" className="text-destructive mb-0.5" onClick={() => removeItem(index)} disabled={data.items.length === 1}>
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ))}
+                            {errors.items && <p className="text-sm text-destructive">{errors.items}</p>}
+                        </div>
+
+                        {/* Live Calculation Summary */}
+                        <div className="mt-4 rounded-lg border bg-muted/30 p-4 space-y-2">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Subtotal</span>
+                                <span className="font-medium">{formatCurrency(computedSubtotal)}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Pajak ({data.tax_rate || 0}%)</span>
+                                <span className="font-medium">{formatCurrency(computedTax)}</span>
+                            </div>
+                            <div className="border-t pt-2 flex justify-between text-base">
+                                <span className="font-bold">Grand Total</span>
+                                <span className="font-bold text-primary">{formatCurrency(computedTotal)}</span>
+                            </div>
+                        </div>
+                        
+                        <DialogFooter className="mt-6">
+                            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
+                            <Button type="submit" disabled={processing}>Update Invoice</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

@@ -13,7 +13,7 @@ class InvoiceController extends Controller
     use LogsActivity;
     public function index()
     {
-        $invoices = Invoice::latest()->get();
+        $invoices = Invoice::with('items')->latest()->get();
         return Inertia::render('invoices/index', [
             'invoices' => $invoices
         ]);
@@ -76,6 +76,60 @@ class InvoiceController extends Controller
         return Inertia::render('invoices/show', [
             'invoice' => $invoice
         ]);
+    }
+
+    public function update(Request $request, Invoice $invoice)
+    {
+        $validated = $request->validate([
+            'client_name' => 'required|string|max:255',
+            'due_date' => 'required|date',
+            'tax_rate' => 'required|numeric|min:0',
+            'items' => 'required|array|min:1',
+            'items.*.id' => 'nullable',
+            'items.*.description' => 'required|string',
+            'items.*.quantity' => 'required|numeric|min:1',
+            'items.*.price' => 'required|numeric|min:0',
+        ]);
+
+        $subtotal = 0;
+        foreach ($validated['items'] as $item) {
+            $subtotal += $item['quantity'] * $item['price'];
+        }
+        $tax = $subtotal * ($validated['tax_rate'] / 100);
+        $total = $subtotal + $tax;
+
+        $invoice->update([
+            'client_name' => $validated['client_name'],
+            'due_date' => $validated['due_date'],
+            'subtotal' => $subtotal,
+            'tax' => $tax,
+            'total' => $total,
+        ]);
+
+        $itemIds = collect($validated['items'])->pluck('id')->filter()->toArray();
+        $invoice->items()->whereNotIn('id', $itemIds)->delete();
+
+        foreach ($validated['items'] as $item) {
+            if (isset($item['id']) && $item['id']) {
+                $invoice->items()->where('id', $item['id'])->update([
+                    'description' => $item['description'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'total' => $item['quantity'] * $item['price'],
+                ]);
+            } else {
+                $invoice->items()->create([
+                    'description' => $item['description'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'total' => $item['quantity'] * $item['price'],
+                ]);
+            }
+        }
+
+        $this->logActivity('updated', 'Invoice', $invoice->id, "Mengupdate invoice: {$invoice->invoice_number}");
+
+        return redirect()->back()->with('success', 'Invoice updated successfully.');
     }
 
     public function updateStatus(Request $request, Invoice $invoice)
