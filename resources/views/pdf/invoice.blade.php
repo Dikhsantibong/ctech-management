@@ -138,6 +138,9 @@
                     <td style="width: 45%; text-align: left; vertical-align: middle; padding-left: 10px;">
                         <h1 style="margin:0; font-size: 20px; color:#2563eb;">{{ $settings->company_name ?? 'PT KREATIF TEKNOLOGI MAJU BERSAMA' }}</h1>
                         <p style="margin:5px 0 0 0; color:#666; font-size: 12px;">{{ $settings->address ?? 'Technology Solutions' }}</p>
+                        @if(!empty($settings->phone))
+                        <p style="margin:2px 0 0 0; color:#666; font-size: 12px;">Telp: {{ $settings->phone }}</p>
+                        @endif
                     </td>
                     <td style="width: 40%; text-align: right; vertical-align: middle;">
                         <div class="title" style="margin-bottom: 5px;">INVOICE</div>
@@ -207,7 +210,7 @@
 
         <div class="footer">
             <p>Terima kasih atas kepercayaan Anda!</p>
-            <p style="margin-top:10px;">Jika ada pertanyaan mengenai invoice ini, silakan hubungi tim kami.</p>
+            <p style="margin-top:10px;">Jika ada pertanyaan mengenai invoice ini, silakan hubungi tim kami @if(!empty($settings->phone)) di {{ $settings->phone }} @endif.</p>
         </div>
     </div>
 </body>
