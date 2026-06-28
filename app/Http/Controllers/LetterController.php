@@ -63,12 +63,21 @@ class LetterController extends Controller
 
         $typeCode = $codeMap[$validated['type']] ?? 'SRT';
         
-        // Count specific to the letter type and year for a cleaner sequence
+        $year = date('Y');
+        $month = date('m');
+        $romanMonths = [
+            '01' => 'I', '02' => 'II', '03' => 'III', '04' => 'IV', '05' => 'V', '06' => 'VI',
+            '07' => 'VII', '08' => 'VIII', '09' => 'IX', '10' => 'X', '11' => 'XI', '12' => 'XII'
+        ];
+        $monthRoman = $romanMonths[$month];
+        
+        // Count specific to the letter type, year, and month for a cleaner sequence
         $count = Letter::where('type', $validated['type'])
-                       ->whereYear('created_at', date('Y'))
+                       ->whereYear('created_at', $year)
+                       ->whereMonth('created_at', $month)
                        ->count() + 1;
                        
-        $refNumber = str_pad($count, 3, '0', STR_PAD_LEFT) . '/CT/' . $typeCode . '/' . date('Y');
+        $refNumber = str_pad($count, 3, '0', STR_PAD_LEFT) . '/' . $typeCode . '/CTECH/' . $monthRoman . '/' . $year;
 
         $letter = Letter::create([
             'reference_number' => $refNumber,

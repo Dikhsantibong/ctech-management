@@ -31,9 +31,13 @@ class InvoiceController extends Controller
             'items.*.price' => 'required|numeric|min:0',
         ]);
 
-        // Generate invoice number e.g. INV-2026-001
-        $count = Invoice::whereYear('created_at', date('Y'))->count() + 1;
-        $invoiceNumber = 'INV-' . date('Y') . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+        // Generate invoice number e.g. CTECH/2026/06/001
+        $year = date('Y');
+        $month = date('m');
+        $count = Invoice::whereYear('created_at', $year)
+                        ->whereMonth('created_at', $month)
+                        ->count() + 1;
+        $invoiceNumber = 'CTECH/' . $year . '/' . $month . '/' . str_pad($count, 3, '0', STR_PAD_LEFT);
 
         $subtotal = 0;
         foreach ($validated['items'] as $item) {
