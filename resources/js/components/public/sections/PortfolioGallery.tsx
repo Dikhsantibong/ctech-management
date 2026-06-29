@@ -60,7 +60,7 @@ function ProjectCard({ project, index }: { project: any, index: number }) {
                 <img 
                     src={project.image ? (project.image.startsWith('http') ? project.image : `/storage/${project.image}`) : ''} 
                     alt={project.title} 
-                    className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700 ease-out" 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ease-out" 
                 />
             </div>
             <div className="flex flex-col flex-grow">

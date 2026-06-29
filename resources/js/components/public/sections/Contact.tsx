@@ -1,8 +1,32 @@
 import { motion } from "framer-motion";
 import { fadeUp } from "@/lib/animations/motionVariants";
 import { MagneticButton } from "@/components/ui/MagneticButton";
+import { useState } from "react";
 
 export function Contact() {
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        message: ""
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (!formData.name || !formData.email || !formData.message) {
+            alert("Mohon lengkapi semua data sebelum mengirim pesan.");
+            return;
+        }
+
+        const text = `Halo tim CTECH,\n\nSaya ingin berdiskusi mengenai proyek.\n\n*Nama:* ${formData.name}\n*Email:* ${formData.email}\n\n*Pesan / Detail Proyek:*\n${formData.message}`;
+        const whatsappUrl = `https://wa.me/6282293118410?text=${encodeURIComponent(text)}`;
+        
+        window.open(whatsappUrl, '_blank');
+        
+        // Reset form
+        setFormData({ name: "", email: "", message: "" });
+    };
+
     return (
         <section className="py-32 bg-[var(--premium-dark)] text-white relative">
             <div className="px-8 md:px-16 w-full max-w-[1920px] mx-auto swiss-grid">
@@ -39,6 +63,7 @@ export function Contact() {
 
                 <div className="col-span-12 md:col-span-5 md:col-start-8 mt-16 md:mt-0">
                     <motion.form 
+                        onSubmit={handleSubmit}
                         initial="initial"
                         whileInView="animate"
                         viewport={{ once: true }}
@@ -47,20 +72,43 @@ export function Contact() {
                     >
                         <div className="flex flex-col gap-4">
                             <label className="font-['Space_Grotesk',_monospace] text-sm tracking-widest uppercase text-gray-400">Siapa nama Anda?</label>
-                            <input type="text" placeholder="Budi Santoso *" className="bg-transparent border-b border-gray-600 pb-4 text-xl focus:outline-none focus:border-[var(--premium-gold)] transition-colors text-white placeholder-gray-600" />
+                            <input 
+                                type="text" 
+                                required
+                                value={formData.name}
+                                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                placeholder="Budi Santoso *" 
+                                className="bg-transparent border-b border-gray-600 pb-4 text-xl focus:outline-none focus:border-[var(--premium-gold)] transition-colors text-white placeholder-gray-600" 
+                            />
                         </div>
                         <div className="flex flex-col gap-4">
                             <label className="font-['Space_Grotesk',_monospace] text-sm tracking-widest uppercase text-gray-400">Apa alamat email Anda?</label>
-                            <input type="email" placeholder="budi@perusahaan.com *" className="bg-transparent border-b border-gray-600 pb-4 text-xl focus:outline-none focus:border-[var(--premium-gold)] transition-colors text-white placeholder-gray-600" />
+                            <input 
+                                type="email" 
+                                required
+                                value={formData.email}
+                                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                placeholder="budi@perusahaan.com *" 
+                                className="bg-transparent border-b border-gray-600 pb-4 text-xl focus:outline-none focus:border-[var(--premium-gold)] transition-colors text-white placeholder-gray-600" 
+                            />
                         </div>
                         <div className="flex flex-col gap-4">
                             <label className="font-['Space_Grotesk',_monospace] text-sm tracking-widest uppercase text-gray-400">Ceritakan tentang proyek Anda</label>
-                            <textarea placeholder="Halo CTECH, saya butuh bantuan untuk... *" rows={4} className="bg-transparent border-b border-gray-600 pb-4 text-xl focus:outline-none focus:border-[var(--premium-gold)] transition-colors text-white placeholder-gray-600 resize-none"></textarea>
+                            <textarea 
+                                required
+                                value={formData.message}
+                                onChange={(e) => setFormData({...formData, message: e.target.value})}
+                                placeholder="Halo CTECH, saya butuh bantuan untuk... *" 
+                                rows={4} 
+                                className="bg-transparent border-b border-gray-600 pb-4 text-xl focus:outline-none focus:border-[var(--premium-gold)] transition-colors text-white placeholder-gray-600 resize-none"
+                            ></textarea>
                         </div>
                         
-                        <MagneticButton variant="primary" className="self-start mt-4 bg-white text-black hover:bg-[var(--premium-gold)] hover:text-white">
-                            Kirim Pesan
-                        </MagneticButton>
+                        <button type="submit" className="self-start mt-4">
+                            <MagneticButton variant="primary" className="bg-white text-black hover:bg-[var(--premium-gold)] hover:text-white pointer-events-none">
+                                Kirim Pesan
+                            </MagneticButton>
+                        </button>
                     </motion.form>
                 </div>
 
