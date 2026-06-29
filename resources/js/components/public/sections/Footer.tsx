@@ -10,10 +10,10 @@ export function Footer() {
                     </div>
                     <div className="flex gap-16 font-['Space_Grotesk',_monospace] text-sm tracking-widest uppercase">
                         <ul className="flex flex-col gap-4">
-                            <li><a href="#" className="hover:text-[var(--premium-gold)] transition-colors">Home</a></li>
-                            <li><a href="#about" className="hover:text-[var(--premium-gold)] transition-colors">About</a></li>
-                            <li><a href="#services" className="hover:text-[var(--premium-gold)] transition-colors">Services</a></li>
-                            <li><a href="#portfolio" className="hover:text-[var(--premium-gold)] transition-colors">Work</a></li>
+                            <li><a href="#" className="hover:text-[var(--premium-gold)] transition-colors">Beranda</a></li>
+                            <li><a href="#about" className="hover:text-[var(--premium-gold)] transition-colors">Tentang</a></li>
+                            <li><a href="#services" className="hover:text-[var(--premium-gold)] transition-colors">Layanan</a></li>
+                            <li><a href="#portfolio" className="hover:text-[var(--premium-gold)] transition-colors">Karya</a></li>
                         </ul>
                         <ul className="flex flex-col gap-4">
                             <li><a href="#" className="hover:text-[var(--premium-gold)] transition-colors">Instagram</a></li>
@@ -25,10 +25,10 @@ export function Footer() {
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/10 font-['Space_Grotesk',_monospace] text-xs text-gray-500 uppercase tracking-widest gap-4">
-                    <p>&copy; {new Date().getFullYear()} CTECH Enterprise. All rights reserved.</p>
+                    <p>&copy; {new Date().getFullYear()} CTECH Enterprise. Hak Cipta Dilindungi.</p>
                     <div className="flex gap-8">
-                        <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-                        <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+                        <a href="#" className="hover:text-white transition-colors">Kebijakan Privasi</a>
+                        <a href="#" className="hover:text-white transition-colors">Syarat & Ketentuan</a>
                     </div>
                 </div>
             </div>

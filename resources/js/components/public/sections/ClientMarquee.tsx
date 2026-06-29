@@ -15,7 +15,7 @@ export function ClientMarquee() {
     return (
         <section className="py-24 bg-white border-y border-gray-100 overflow-hidden flex flex-col items-center">
             <span className="font-['Space_Grotesk',_monospace] text-xs uppercase tracking-widest text-gray-400 mb-12 block text-center">
-                Trusted by industry leaders
+                Dipercaya oleh pemimpin industri
             </span>
             <div className="relative w-full max-w-[1920px] mx-auto flex overflow-x-hidden">
                 <div className="absolute left-0 top-0 w-32 h-full bg-gradient-to-r from-white to-transparent z-10"></div>

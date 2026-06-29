@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { User, Calendar, Tag } from 'lucide-react';
 import { useRef, useEffect } from 'react';
-import PublicNavbar from '@/components/public-navbar';
+import { PremiumNavbar as PublicNavbar } from '@/components/ui/PremiumNavbar';
 
 import 'react-quill-new/dist/quill.core.css';
 

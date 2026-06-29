@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { useEffect } from 'react';
 import Lenis from 'lenis';
-import PublicNavbar from '@/components/public-navbar';
+import { PremiumNavbar } from '@/components/ui/PremiumNavbar';
 
 import { Hero } from '@/components/public/sections/Hero';
 import { About } from '@/components/public/sections/About';
@@ -42,14 +42,11 @@ export default function Welcome() {
     return (
         <div className="bg-[var(--premium-bg)] text-[var(--premium-text)] selection:bg-[var(--premium-gold)] selection:text-[var(--premium-dark)] font-['Inter',_sans-serif]">
             <Head>
-                <title>CTECH | Award-Winning Digital Agency</title>
-                <meta name="description" content="We don't just build software. We craft digital legacies." />
+                <title>CTECH | Agensi Digital Pemenang Penghargaan</title>
+                <meta name="description" content="Kami tidak sekadar membuat software. Kami merancang warisan digital." />
             </Head>
 
-            {/* A transparent or blur nav if needed, reusing the existing one or modifying it */}
-            <div className="fixed top-0 w-full z-50 mix-blend-difference text-white">
-                <PublicNavbar />
-            </div>
+            <PremiumNavbar />
 
             <main className="w-full overflow-hidden">
                 <Hero />

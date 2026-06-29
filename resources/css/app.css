@@ -101,14 +101,14 @@
     --sidebar-border: oklch(0.6 0.1 250);
     --sidebar-ring: oklch(0.985 0 0);
 
-    /* Premium Agency Design System Tokens */
-    --premium-bg: #F5F5F3;
-    --premium-bg-alt: #ECE8E1;
-    --premium-dark: #0F0F10;
-    --premium-gold: #C9A96E;
-    --premium-beige: #DCCCB8;
-    --premium-gray: #F8F8F8;
-    --premium-text: #181818;
+    /* Premium Agency Design System Tokens (Blue & White) */
+    --premium-bg: #FFFFFF;
+    --premium-bg-alt: #F8FAFC;
+    --premium-dark: #0f3460;
+    --premium-gold: #1D4ED8; /* Using bright blue instead of gold for accent */
+    --premium-beige: #EFF6FF;
+    --premium-gray: #F1F5F9;
+    --premium-text: #1E293B;
 }
 
 .dark {

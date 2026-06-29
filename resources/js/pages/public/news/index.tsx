@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import PublicNavbar from '@/components/public-navbar';
+import { PremiumNavbar as PublicNavbar } from '@/components/ui/PremiumNavbar';
 
 export default function PublicNewsIndex({ news }: { news: any }) {
     return (

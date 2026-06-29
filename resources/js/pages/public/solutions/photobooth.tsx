@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import PublicNavbar from '@/components/public-navbar';
+import { PremiumNavbar as PublicNavbar } from '@/components/ui/PremiumNavbar';
 import PublicFooter from '@/components/public-footer';
 import { Camera, Image as ImageIcon, Smartphone, Cloud, ArrowRight, CheckCircle2, MessageCircle, Aperture, Settings, Zap } from 'lucide-react';
 

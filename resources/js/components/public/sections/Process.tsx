@@ -3,10 +3,10 @@ import { useRef } from "react";
 import { fadeUp } from "@/lib/animations/motionVariants";
 
 const PROCESS_STEPS = [
-    { num: "01", title: "Discovery & Strategy", desc: "We dive deep into your business logic, understanding the core problems before writing a single line of code." },
-    { num: "02", title: "Architecture & Design", desc: "Crafting the blueprint. We design scalable systems and award-winning interfaces simultaneously." },
-    { num: "03", title: "Engineering", desc: "Agile sprints focused on high-performance execution, utilizing the bleeding edge of modern web technology." },
-    { num: "04", title: "Deployment & Scaling", desc: "Flawless launch and continuous integration. We ensure your system is ready for hyper-growth." },
+    { num: "01", title: "Riset & Strategi", desc: "Kami menyelami logika bisnis Anda, memahami inti masalah sebelum menulis satu baris kode pun." },
+    { num: "02", title: "Arsitektur & Desain", desc: "Merancang cetak biru. Kami membangun sistem yang skalabel sekaligus antarmuka yang elegan secara bersamaan." },
+    { num: "03", title: "Pengembangan", desc: "Siklus kerja gesit (Agile) yang berfokus pada eksekusi tinggi, menggunakan teknologi web mutakhir." },
+    { num: "04", title: "Peluncuran & Skala", desc: "Peluncuran tanpa cacat dan integrasi berkelanjutan. Kami memastikan sistem Anda siap untuk pertumbuhan yang pesat." },
 ];
 
 export function Process() {
@@ -27,16 +27,16 @@ export function Process() {
                     className="mb-24 md:w-1/2"
                 >
                     <span className="font-['Space_Grotesk',_monospace] text-sm uppercase tracking-widest text-[var(--premium-gold)] mb-6 block">
-                        Our Methodology
+                        Metodologi Kami
                     </span>
                     <h2 className="font-['Clash_Display',_sans-serif] text-4xl md:text-6xl font-medium text-[var(--premium-dark)] leading-tight">
-                        Precision in every phase.
+                        Presisi dalam setiap fase.
                     </h2>
                 </motion.div>
 
                 <div className="relative">
                     {/* Vertical Line */}
-                    <div className="absolute left-4 md:left-[50%] top-0 bottom-0 w-[1px] bg-gray-300 transform md:-translate-x-1/2 hidden md:block">
+                    <div className="absolute left-4 md:left-[50%] top-0 bottom-0 w-[1px] bg-blue-200 transform md:-translate-x-1/2 hidden md:block">
                         <motion.div 
                             style={{ scaleY: scrollYProgress, transformOrigin: "top" }}
                             className="w-full h-full bg-[var(--premium-dark)]"
@@ -58,9 +58,9 @@ export function Process() {
                                             whileInView={{ opacity: 1, x: 0 }}
                                             transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
                                             viewport={{ once: true, margin: "-100px" }}
-                                            className="bg-[var(--premium-bg)] p-10 rounded-2xl shadow-sm border border-gray-200 hover:shadow-xl transition-shadow duration-500"
+                                            className="bg-[var(--premium-bg)] p-10 rounded-2xl shadow-sm border border-blue-100 hover:shadow-xl transition-shadow duration-500"
                                         >
-                                            <div className="font-['Space_Grotesk',_monospace] text-4xl font-light text-gray-300 mb-6">{step.num}</div>
+                                            <div className="font-['Space_Grotesk',_monospace] text-4xl font-light text-blue-300 mb-6">{step.num}</div>
                                             <h3 className="font-['Clash_Display',_sans-serif] text-2xl font-medium text-[var(--premium-dark)] mb-4">{step.title}</h3>
                                             <p className="font-['Inter',_sans-serif] text-[var(--premium-text)] leading-relaxed">{step.desc}</p>
                                         </motion.div>

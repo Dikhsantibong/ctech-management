@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { useEffect } from 'react';
-import PublicNavbar from '@/components/public-navbar';
+import { PremiumNavbar as PublicNavbar } from '@/components/ui/PremiumNavbar';
 
 export default function CaseStudies({ portfolios, categories, filters }: { portfolios: any[], categories: string[], filters: any }) {
     useEffect(() => {

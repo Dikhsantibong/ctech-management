@@ -4,12 +4,12 @@ import { useState } from "react";
 
 const TESTIMONIALS = [
     {
-        quote: "CTECH didn't just build a software; they completely re-engineered our operational workflow. The new cloud architecture handled our Black Friday traffic without a single hiccup.",
+        quote: "CTECH tidak sekadar membuat software; mereka merancang ulang seluruh alur kerja operasional kami. Arsitektur cloud baru ini mampu menangani lonjakan pengunjung tanpa hambatan sedikitpun.",
         author: "Budi Santoso",
-        role: "COO, Retail Nasional",
+        role: "COO, Ritel Nasional",
     },
     {
-        quote: "The most professional engineering team we've ever partnered with. From discovery to deployment, their attention to both UI/UX and backend scalability is unmatched.",
+        quote: "Tim teknis paling profesional yang pernah bekerja sama dengan kami. Mulai dari perumusan masalah hingga peluncuran, perhatian mereka pada estetika antarmuka dan ketangguhan backend sangat luar biasa.",
         author: "Andi Pratama",
         role: "CEO, Enterprise Corp",
     }
@@ -23,7 +23,7 @@ export function Testimonials() {
             <div className="px-8 md:px-16 w-full max-w-[1920px] mx-auto min-h-[50vh] flex flex-col justify-center">
                 <div className="flex justify-between items-end mb-16 border-b border-[var(--premium-dark)]/20 pb-8">
                     <span className="font-['Space_Grotesk',_monospace] text-sm uppercase tracking-widest">
-                        Voices of our Partners
+                        Suara Mitra Kami
                     </span>
                     <div className="flex gap-4">
                         {TESTIMONIALS.map((_, i) => (

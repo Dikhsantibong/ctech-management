@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { User, Calendar, ExternalLink, Tag } from 'lucide-react';
-import PublicNavbar from '@/components/public-navbar';
+import { PremiumNavbar as PublicNavbar } from '@/components/ui/PremiumNavbar';
 import PublicFooter from '@/components/public-footer';
 export default function PublicPortfolioShow({ portfolio, relatedPortfolios }: { portfolio: any, relatedPortfolios: any[] }) {
     return (

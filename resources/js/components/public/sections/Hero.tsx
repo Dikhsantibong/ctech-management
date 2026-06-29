@@ -24,7 +24,6 @@ export function Hero() {
                 style={{ y, opacity }}
                 className="absolute inset-0 z-0 pointer-events-none"
             >
-                {/* Abstract animated gradient or high-end imagery could go here */}
                 <div className="absolute top-[20%] left-[60%] w-[40vw] h-[40vw] rounded-full bg-[var(--premium-bg-alt)] mix-blend-multiply filter blur-[100px] opacity-70 animate-pulse"></div>
                 <div className="absolute bottom-[10%] right-[70%] w-[30vw] h-[30vw] rounded-full bg-[var(--premium-beige)] mix-blend-multiply filter blur-[80px] opacity-50"></div>
             </motion.div>
@@ -41,13 +40,13 @@ export function Hero() {
                     >
                         <div className="overflow-hidden">
                             <motion.h1 variants={revealLine} className="font-['Clash_Display',_sans-serif] text-[clamp(3rem,8vw,9rem)] leading-[0.9] tracking-[-0.02em] font-medium text-[var(--premium-dark)] uppercase">
-                                Engineering
+                                Rekayasa
                             </motion.h1>
                         </div>
                         <div className="overflow-hidden flex items-center gap-4 md:gap-8">
                             <motion.div variants={fadeUp} className="w-16 md:w-32 h-[2px] bg-[var(--premium-gold)] hidden md:block"></motion.div>
                             <motion.h1 variants={revealLine} className="font-['Clash_Display',_sans-serif] text-[clamp(3rem,8vw,9rem)] leading-[0.9] tracking-[-0.02em] font-medium text-[var(--premium-dark)] uppercase">
-                                Digital Elegance
+                                Keanggunan Digital
                             </motion.h1>
                         </div>
                     </motion.div>
@@ -59,7 +58,7 @@ export function Hero() {
                         className="mt-12 md:mt-24 max-w-xl"
                     >
                         <p className="font-['Inter',_sans-serif] text-lg md:text-2xl text-[var(--premium-text)] leading-relaxed font-light">
-                            We craft award-winning digital experiences that merge Swiss precision with avant-garde motion design.
+                            Kami merancang pengalaman digital berkelas yang menggabungkan presisi teknis tingkat tinggi dengan desain antarmuka avant-garde.
                         </p>
                     </motion.div>
 
@@ -71,7 +70,7 @@ export function Hero() {
                     >
                         <Link href="/kontak">
                             <MagneticButton>
-                                Discover Our Work <ArrowRight className="w-4 h-4" />
+                                Mulai Proyek <ArrowRight className="w-4 h-4" />
                             </MagneticButton>
                         </Link>
                     </motion.div>
@@ -79,7 +78,7 @@ export function Hero() {
             </div>
 
             <div className="absolute bottom-10 left-8 md:left-16 flex items-center gap-4 text-xs font-['Space_Grotesk',_monospace] uppercase tracking-widest text-[var(--premium-text)] opacity-60">
-                <span>Scroll to explore</span>
+                <span>Gulir ke bawah</span>
                 <motion.div 
                     animate={{ y: [0, 10, 0] }} 
                     transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}

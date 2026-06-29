@@ -29,7 +29,7 @@ import {
     Mail,
     MessageCircle
 } from 'lucide-react';
-import PublicNavbar from '@/components/public-navbar';
+import { PremiumNavbar as PublicNavbar } from '@/components/ui/PremiumNavbar';
 
 const features = [
     {

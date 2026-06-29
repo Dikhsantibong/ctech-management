@@ -16,10 +16,10 @@ export function About() {
                     className="col-span-12 md:col-span-5 flex flex-col justify-between"
                 >
                     <motion.span variants={fadeUp} className="font-['Space_Grotesk',_monospace] text-sm uppercase tracking-widest text-[var(--premium-gold)] mb-8 block">
-                        Our Vision & Mission
+                        Visi & Misi Kami
                     </motion.span>
                     <motion.h2 variants={fadeUp} className="font-['Clash_Display',_sans-serif] text-4xl md:text-6xl font-medium leading-tight mb-12">
-                        We don't just build software. We craft digital legacies.
+                        Kami tidak sekadar membuat software. Kami merancang warisan digital.
                     </motion.h2>
                 </motion.div>
 
@@ -31,10 +31,10 @@ export function About() {
                         variants={fadeUp}
                     >
                         <p className="font-['Inter',_sans-serif] text-xl md:text-3xl font-light leading-relaxed mb-8">
-                            Founded on the principles of brutalist architecture and editorial design, our studio merges high-performance engineering with breathtaking aesthetics.
+                            Didirikan di atas prinsip arsitektur yang tangguh dan desain editorial, studio kami menggabungkan rekayasa berkinerja tinggi dengan estetika yang memukau.
                         </p>
                         <p className="font-['Inter',_sans-serif] text-lg text-gray-400 font-light leading-relaxed">
-                            Every project is an opportunity to push the boundaries of what is possible on the web. We are a collective of senior architects, award-winning designers, and motion experts who believe that the digital world deserves the same craftsmanship as high-end physical products.
+                            Setiap proyek adalah peluang untuk mendobrak batasan inovasi di dunia web. Kami adalah kumpulan arsitek senior, desainer pemenang penghargaan, dan ahli animasi yang percaya bahwa dunia digital layak mendapatkan keahlian kerajinan tangan yang sama seperti produk fisik mewah.
                         </p>
                     </motion.div>
 
@@ -47,10 +47,10 @@ export function About() {
                     >
                         <img 
                             src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop" 
-                            alt="Luxury Office" 
+                            alt="Kantor Mewah" 
                             className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-1000 ease-out"
                         />
-                        <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-1000"></div>
+                        <div className="absolute inset-0 bg-[var(--premium-dark)]/20 group-hover:bg-transparent transition-colors duration-1000"></div>
                     </motion.div>
                 </div>
 

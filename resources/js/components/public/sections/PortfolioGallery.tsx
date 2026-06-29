@@ -6,18 +6,18 @@ import { Link } from "@inertiajs/react";
 
 const PROJECTS = [
     {
-        title: "Fintech Dashboard",
-        category: "Enterprise Software",
+        title: "Dasbor Fintech",
+        category: "Software Enterprise",
         img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop",
     },
     {
-        title: "Logistics ERP",
-        category: "B2B Platform",
+        title: "ERP Logistik",
+        category: "Platform B2B",
         img: "https://images.unsplash.com/photo-1586528116311-ad8ed7c663be?q=80&w=2070&auto=format&fit=crop",
     },
     {
-        title: "E-Commerce Architecture",
-        category: "Web Application",
+        title: "Arsitektur E-Commerce",
+        category: "Aplikasi Web",
         img: "https://images.unsplash.com/photo-1661956602116-aa6865609028?q=80&w=1964&auto=format&fit=crop",
     }
 ];
@@ -30,15 +30,15 @@ export function PortfolioGallery() {
             <div className="px-8 md:px-16 w-full max-w-[1920px] mx-auto mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <div>
                     <span className="font-['Space_Grotesk',_monospace] text-sm uppercase tracking-widest text-[var(--premium-gold)] mb-6 block">
-                        Selected Works
+                        Karya Pilihan
                     </span>
                     <h2 className="font-['Clash_Display',_sans-serif] text-4xl md:text-7xl font-medium text-[var(--premium-dark)] leading-none">
-                        Immersive<br/>Portfolios.
+                        Portfolio<br/>Imersif.
                     </h2>
                 </div>
                 <Link href="/portfolio">
                     <MagneticButton variant="outline">
-                        View All Projects <ArrowRight className="w-4 h-4" />
+                        Lihat Semua Proyek <ArrowRight className="w-4 h-4" />
                     </MagneticButton>
                 </Link>
             </div>

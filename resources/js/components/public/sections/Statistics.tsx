@@ -2,10 +2,10 @@ import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 const STATS = [
-    { value: 250, label: "Projects Completed", suffix: "+" },
-    { value: 98, label: "Client Satisfaction", suffix: "%" },
-    { value: 10, label: "Years Experience", suffix: "+" },
-    { value: 50, label: "Expert Engineers", suffix: "+" },
+    { value: 250, label: "Proyek Selesai", suffix: "+" },
+    { value: 98, label: "Kepuasan Klien", suffix: "%" },
+    { value: 10, label: "Tahun Pengalaman", suffix: "+" },
+    { value: 50, label: "Tim Ahli", suffix: "+" },
 ];
 
 function AnimatedCounter({ value, suffix }: { value: number, suffix: string }) {
@@ -58,7 +58,7 @@ export function Statistics() {
                         <h4 className="font-['Clash_Display',_sans-serif] text-5xl md:text-7xl font-medium mb-4 text-[var(--premium-gold)]">
                             <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                         </h4>
-                        <p className="font-['Space_Grotesk',_monospace] text-sm tracking-widest text-gray-400 group-hover:text-white transition-colors duration-500">
+                        <p className="font-['Space_Grotesk',_monospace] text-sm tracking-widest text-gray-400 group-hover:text-white transition-colors duration-500 uppercase">
                             {stat.label}
                         </p>
                     </motion.div>
