@@ -5,7 +5,7 @@ import { PremiumNavbar } from '@/components/ui/PremiumNavbar';
 import { Footer } from '@/components/public/sections/Footer';
 import { PortfolioGallery } from '@/components/public/sections/PortfolioGallery';
 
-export default function PortfolioIndex({ portfolios = [] }: { portfolios?: any[] }) {
+export default function PortfolioIndex({ portfolios }: { portfolios?: any }) {
     useEffect(() => {
         const lenis = new Lenis({
             duration: 1.2,

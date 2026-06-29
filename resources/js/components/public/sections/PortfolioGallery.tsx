@@ -22,11 +22,12 @@ const PROJECTS = [
     }
 ];
 
-export function PortfolioGallery({ portfolios = [] }: { portfolios?: any[] }) {
+export function PortfolioGallery({ portfolios = [] }: { portfolios?: any }) {
     const containerRef = useRef(null);
     
     // Gunakan data dari database jika ada, jika kosong gunakan data dummy
-    const displayProjects = portfolios.length > 0 ? portfolios : PROJECTS;
+    const actualPortfolios = Array.isArray(portfolios) ? portfolios : (portfolios?.data || []);
+    const displayProjects = actualPortfolios.length > 0 ? actualPortfolios : PROJECTS;
     
     return (
         <section id="portfolio" className="py-32 bg-[var(--premium-bg)] overflow-hidden">
