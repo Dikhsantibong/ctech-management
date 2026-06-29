@@ -2,6 +2,8 @@ import { Head } from '@inertiajs/react';
 import { useEffect } from 'react';
 import Lenis from 'lenis';
 import { PremiumNavbar } from '@/components/ui/PremiumNavbar';
+import { Footer } from '@/components/public/sections/Footer';
+import { PortfolioGallery } from '@/components/public/sections/PortfolioGallery';
 import { SEO } from '@/components/SEO';
 
 export default function PortfolioIndex({ portfolios }: { portfolios?: any }) {
