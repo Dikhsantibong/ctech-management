@@ -100,6 +100,15 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(0.6 0.1 250);
     --sidebar-ring: oklch(0.985 0 0);
+
+    /* Premium Agency Design System Tokens */
+    --premium-bg: #F5F5F3;
+    --premium-bg-alt: #ECE8E1;
+    --premium-dark: #0F0F10;
+    --premium-gold: #C9A96E;
+    --premium-beige: #DCCCB8;
+    --premium-gray: #F8F8F8;
+    --premium-text: #181818;
 }
 
 .dark {
@@ -169,4 +178,21 @@
 
 ::-webkit-scrollbar-thumb:hover {
     background-color: rgba(156, 163, 175, 0.6);
+}
+
+/* Swiss Grid Utilities */
+.swiss-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 2rem;
+}
+
+.text-editorial {
+    font-size: clamp(3rem, 8vw, 8rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+}
+
+.padding-editorial {
+    padding: clamp(4rem, 10vw, 12rem) 0;
 }
