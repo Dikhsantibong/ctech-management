@@ -13,7 +13,7 @@ import { Testimonials } from '@/components/public/sections/Testimonials';
 import { Contact } from '@/components/public/sections/Contact';
 import { Footer } from '@/components/public/sections/Footer';
 
-export default function Welcome() {
+export default function Welcome({ portfolios = [] }: { portfolios?: any[] }) {
     useEffect(() => {
         const lenis = new Lenis({
             duration: 1.2,
@@ -52,7 +52,7 @@ export default function Welcome() {
                 <Hero />
                 <About />
                 <Process />
-                <PortfolioGallery />
+                <PortfolioGallery portfolios={portfolios} />
                 <Statistics />
                 <ClientMarquee />
                 <Testimonials />

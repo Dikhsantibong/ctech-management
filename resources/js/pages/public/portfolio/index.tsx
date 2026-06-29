@@ -34,7 +34,7 @@ export default function PortfolioIndex({ portfolios = [] }: { portfolios?: any[]
             </div>
 
             <main className="w-full overflow-hidden pt-12">
-                <PortfolioGallery />
+                <PortfolioGallery portfolios={portfolios} />
             </main>
 
             <Footer />

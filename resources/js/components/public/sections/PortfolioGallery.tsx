@@ -22,8 +22,11 @@ const PROJECTS = [
     }
 ];
 
-export function PortfolioGallery() {
+export function PortfolioGallery({ portfolios = [] }: { portfolios?: any[] }) {
     const containerRef = useRef(null);
+    
+    // Gunakan data dari database jika ada, jika kosong gunakan data dummy
+    const displayProjects = portfolios.length > 0 ? portfolios : PROJECTS;
     
     return (
         <section id="portfolio" className="py-32 bg-[var(--premium-bg)] overflow-hidden">
@@ -44,8 +47,8 @@ export function PortfolioGallery() {
             </div>
 
             <div className="flex flex-col gap-32 px-8 md:px-16 w-full max-w-[1920px] mx-auto">
-                {PROJECTS.map((project, i) => {
-                    return <ProjectCard key={i} project={project} index={i} />;
+                {displayProjects.map((project, i) => {
+                    return <ProjectCard key={project.id || i} project={project} index={i} />;
                 })}
             </div>
         </section>
@@ -73,7 +76,7 @@ function ProjectCard({ project, index }: { project: any, index: number }) {
             <div className="w-full md:w-3/5 overflow-hidden rounded-2xl">
                 <motion.div style={{ y }} className="w-full h-[50vh] md:h-[80vh] scale-110">
                     <img 
-                        src={project.img} 
+                        src={project.image ? (project.image.startsWith('http') ? project.image : `/storage/${project.image}`) : project.img} 
                         alt={project.title} 
                         className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 ease-out" 
                     />

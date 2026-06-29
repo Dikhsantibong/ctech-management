@@ -30,10 +30,10 @@ export function Contact() {
                         className="mt-12 md:mt-0 font-['Space_Grotesk',_monospace]"
                     >
                         <p className="text-gray-400 mb-2 uppercase text-sm tracking-widest">Email kami</p>
-                        <a href="mailto:hello@ctech.co" className="text-2xl hover:text-[var(--premium-gold)] transition-colors">hello@ctech.co</a>
+                        <a href="mailto:hello@ctechcreative.com" className="text-2xl hover:text-[var(--premium-gold)] transition-colors">hello@ctechcreative.com</a>
                         
                         <p className="text-gray-400 mt-8 mb-2 uppercase text-sm tracking-widest">Hubungi kami</p>
-                        <a href="tel:+6281112345678" className="text-2xl hover:text-[var(--premium-gold)] transition-colors">+62 811 1234 5678</a>
+                        <a href="tel:+6282293118410" className="text-2xl hover:text-[var(--premium-gold)] transition-colors">0822 9311 8410</a>
                     </motion.div>
                 </div>
 

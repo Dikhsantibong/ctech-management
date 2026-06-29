@@ -59,10 +59,6 @@ export function PremiumNavbar() {
                             <span className="absolute -bottom-2 left-0 w-0 h-[1px] bg-[var(--premium-gold)] transition-all duration-300 group-hover:w-full"></span>
                         </Link>
                     ))}
-                    
-                    <Link href="/login" className="px-6 py-2 border border-white/20 text-white hover:bg-white hover:text-[var(--premium-dark)] transition-colors duration-300">
-                        Login
-                    </Link>
                 </div>
 
                 {/* Mobile Menu Toggle */}
@@ -95,13 +91,6 @@ export function PremiumNavbar() {
                                 {item.name}
                             </Link>
                         ))}
-                        <Link 
-                            href="/login"
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="mt-8 px-8 py-3 border border-white/20 text-white font-['Space_Grotesk',_monospace] text-sm uppercase tracking-widest"
-                        >
-                            Login
-                        </Link>
                     </motion.div>
                 )}
             </AnimatePresence>

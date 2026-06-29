@@ -16,10 +16,8 @@ export function Footer() {
                             <li><a href="#portfolio" className="hover:text-[var(--premium-gold)] transition-colors">Karya</a></li>
                         </ul>
                         <ul className="flex flex-col gap-4">
-                            <li><a href="#" className="hover:text-[var(--premium-gold)] transition-colors">Instagram</a></li>
-                            <li><a href="#" className="hover:text-[var(--premium-gold)] transition-colors">LinkedIn</a></li>
-                            <li><a href="#" className="hover:text-[var(--premium-gold)] transition-colors">Twitter</a></li>
-                            <li><a href="#" className="hover:text-[var(--premium-gold)] transition-colors">Awwwards</a></li>
+                            <li><a href="https://www.instagram.com/ctech.agency/" target="_blank" rel="noreferrer" className="hover:text-[var(--premium-gold)] transition-colors">Instagram</a></li>
+                            <li><a href="https://www.linkedin.com/company/pt-creativetech/" target="_blank" rel="noreferrer" className="hover:text-[var(--premium-gold)] transition-colors">LinkedIn</a></li>
                         </ul>
                     </div>
                 </div>
