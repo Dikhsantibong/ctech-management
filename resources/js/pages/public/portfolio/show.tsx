@@ -1,11 +1,17 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { User, Calendar, ExternalLink, Tag } from 'lucide-react';
 import { PremiumNavbar as PublicNavbar } from '@/components/ui/PremiumNavbar';
 import PublicFooter from '@/components/public-footer';
+import { SEO } from '@/components/SEO';
 export default function PublicPortfolioShow({ portfolio, relatedPortfolios }: { portfolio: any, relatedPortfolios: any[] }) {
     return (
         <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-blue-600 selection:text-white">
-            <Head title={portfolio.title} />
+            <SEO 
+                title={`${portfolio.title} | Portfolio CTECH`}
+                description={portfolio.description?.replace(/(<([^>]+)>)/gi, "").substring(0, 160) || "Detail portfolio project kami."}
+                image={portfolio.image ? (portfolio.image.startsWith('http') ? portfolio.image : `/storage/${portfolio.image}`) : undefined}
+                url={`/portfolio/${portfolio.id}`}
+            />
             
             <PublicNavbar isLandingPage={false} />
 

@@ -9,6 +9,8 @@ Route::get('/', function () {
     return inertia('welcome', ['news' => $news, 'portfolios' => $portfolios]);
 })->name('home');
 
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+
 Route::get('/berita', [\App\Http\Controllers\PublicController::class, 'newsIndex'])->name('public.news.index');
 Route::get('/berita/{slug}', [\App\Http\Controllers\PublicController::class, 'newsShow'])->name('public.news.show');
 

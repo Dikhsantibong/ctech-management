@@ -6,6 +6,8 @@ import { Footer } from '@/components/public/sections/Footer';
 import { motion } from 'framer-motion';
 import { Process } from '@/components/public/sections/Process';
 
+import { SEO } from '@/components/SEO';
+
 export default function ServicesIndex() {
     useEffect(() => {
         const lenis = new Lenis({
@@ -26,9 +28,11 @@ export default function ServicesIndex() {
 
     return (
         <div className="bg-[var(--premium-bg)] text-[var(--premium-text)] selection:bg-[var(--premium-gold)] selection:text-[var(--premium-dark)] font-['Inter',_sans-serif]">
-            <Head>
-                <title>Layanan | CTECH</title>
-            </Head>
+            <SEO 
+                title="Layanan | CTECH Creative" 
+                description="Layanan utama CTECH Creative meliputi pengembangan Software Enterprise (ERP, CRM), Aplikasi Web berkinerja tinggi, dan Desain UI/UX yang memukau."
+                url="/layanan"
+            />
 
             <div className="fixed top-0 w-full z-50 mix-blend-difference text-white">
                 <PremiumNavbar />

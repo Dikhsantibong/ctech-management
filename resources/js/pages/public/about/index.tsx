@@ -5,6 +5,8 @@ import { PremiumNavbar } from '@/components/ui/PremiumNavbar';
 import { Footer } from '@/components/public/sections/Footer';
 import { motion } from 'framer-motion';
 
+import { SEO } from '@/components/SEO';
+
 export default function AboutIndex() {
     useEffect(() => {
         const lenis = new Lenis({
@@ -25,9 +27,11 @@ export default function AboutIndex() {
 
     return (
         <div className="bg-[var(--premium-bg)] text-[var(--premium-text)] selection:bg-[var(--premium-gold)] selection:text-[var(--premium-dark)] font-['Inter',_sans-serif]">
-            <Head>
-                <title>Tentang Kami | CTECH</title>
-            </Head>
+            <SEO 
+                title="Tentang Kami | CTECH Creative" 
+                description="Pelajari lebih lanjut tentang CTECH Creative, tim ahli di balik solusi software dan desain digital pemenang penghargaan. Kami menggabungkan estetika premium dengan kode yang tangguh."
+                url="/tentang"
+            />
 
             <div className="fixed top-0 w-full z-50 mix-blend-difference text-white">
                 <PremiumNavbar />

@@ -1,15 +1,22 @@
 import { Head, Link } from '@inertiajs/react';
 import { User, Calendar, Tag } from 'lucide-react';
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { PremiumNavbar as PublicNavbar } from '@/components/ui/PremiumNavbar';
+import { SEO } from '@/components/SEO';
 
 import 'react-quill-new/dist/quill.core.css';
 
-export default function PublicNewsShow({ news, relatedNews }: { news: any; relatedNews: any[] }) {
+export default function PublicNewsShow({ news, relatedNews }: { news: any, relatedNews: any[] }) {
+    const contentRef = useRef<HTMLDivElement>(null);
 
     return (
-        <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-blue-600 selection:text-white">
-            <Head title={news.title} />
+        <div className="min-h-screen bg-slate-50 flex flex-col font-['Inter',_sans-serif]">
+            <SEO 
+                title={`${news.title} | Berita CTECH`}
+                description={news.excerpt || news.content?.replace(/(<([^>]+)>)/gi, "").substring(0, 160)}
+                image={news.image ? (news.image.startsWith('http') ? news.image : `/storage/${news.image}`) : undefined}
+                url={`/berita/${news.slug}`}
+            />
 
             <PublicNavbar isLandingPage={false} />
 

@@ -13,6 +13,8 @@ import { Testimonials } from '@/components/public/sections/Testimonials';
 import { Contact } from '@/components/public/sections/Contact';
 import { Footer } from '@/components/public/sections/Footer';
 
+import { SEO } from '@/components/SEO';
+
 export default function Welcome({ portfolios = [] }: { portfolios?: any[] }) {
     useEffect(() => {
         const lenis = new Lenis({
@@ -41,10 +43,11 @@ export default function Welcome({ portfolios = [] }: { portfolios?: any[] }) {
 
     return (
         <div className="bg-[var(--premium-bg)] text-[var(--premium-text)] selection:bg-[var(--premium-gold)] selection:text-[var(--premium-dark)] font-['Inter',_sans-serif]">
-            <Head>
-                <title>CTECH | Agensi Digital Pemenang Penghargaan</title>
-                <meta name="description" content="Kami tidak sekadar membuat software. Kami merancang warisan digital." />
-            </Head>
+            <SEO 
+                title="CTECH | Agensi Digital Pemenang Penghargaan" 
+                description="CTECH Creative adalah agensi digital premium yang berfokus pada pengembangan software enterprise, aplikasi web memukau, dan desain UI/UX kelas dunia."
+                url="/"
+            />
 
             <PremiumNavbar />
 
