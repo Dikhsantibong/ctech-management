@@ -39,12 +39,7 @@ export function PremiumNavbar() {
             <div className="max-w-[1920px] mx-auto px-8 md:px-16 h-24 flex items-center justify-between">
                 {/* Logo */}
                 <Link href="/" className="group flex items-center gap-2">
-                    <div className="w-8 h-8 bg-[var(--premium-gold)] flex items-center justify-center font-['Space_Grotesk',_monospace] font-bold text-[var(--premium-dark)] text-sm group-hover:bg-white transition-colors">
-                        CT
-                    </div>
-                    <span className="font-['Clash_Display',_sans-serif] font-medium tracking-widest text-white text-xl">
-                        CTECH.
-                    </span>
+                    <img src="/logo/sidebar-logo.png" alt="CTECH Logo" className="h-8 md:h-10 w-auto" />
                 </Link>
 
                 {/* Desktop Menu */}

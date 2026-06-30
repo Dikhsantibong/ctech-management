@@ -55,23 +55,25 @@ function ProjectCard({ project, index }: { project: any, index: number }) {
             viewport={{ once: true, margin: "-50px" }}
             className="w-full flex flex-col group cursor-pointer"
         >
-            <div className="w-full aspect-[4/3] overflow-hidden rounded-2xl mb-6 relative">
-                <div className="absolute inset-0 bg-[var(--premium-dark)]/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
-                <img 
-                    src={project.image ? (project.image.startsWith('http') ? project.image : `/storage/${project.image}`) : ''} 
-                    alt={project.title} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ease-out" 
-                />
-            </div>
-            <div className="flex flex-col flex-grow">
-                <span className="font-['Space_Grotesk',_monospace] text-xs tracking-widest text-gray-500 mb-3 block uppercase">
-                    {project.category}
-                </span>
-                <h3 className="font-['Clash_Display',_sans-serif] text-2xl md:text-3xl font-medium text-[var(--premium-dark)] mb-4 group-hover:text-[var(--premium-gold)] transition-colors duration-500 line-clamp-2">
-                    {project.title}
-                </h3>
-                <div className="w-full h-[1px] bg-gray-200 mt-auto group-hover:bg-[var(--premium-gold)] transition-colors duration-500"></div>
-            </div>
+            <Link href={`/portfolio/${project.id}`} className="flex flex-col h-full w-full">
+                <div className="w-full aspect-[4/3] overflow-hidden rounded-2xl mb-6 relative">
+                    <div className="absolute inset-0 bg-[var(--premium-dark)]/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
+                    <img 
+                        src={project.image ? (project.image.startsWith('http') ? project.image : `/storage/${project.image}`) : ''} 
+                        alt={project.title} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ease-out" 
+                    />
+                </div>
+                <div className="flex flex-col flex-grow">
+                    <span className="font-['Space_Grotesk',_monospace] text-xs tracking-widest text-gray-500 mb-3 block uppercase">
+                        {project.category}
+                    </span>
+                    <h3 className="font-['Clash_Display',_sans-serif] text-2xl md:text-3xl font-medium text-[var(--premium-dark)] mb-4 group-hover:text-[var(--premium-gold)] transition-colors duration-500 line-clamp-2">
+                        {project.title}
+                    </h3>
+                    <div className="w-full h-[1px] bg-gray-200 mt-auto group-hover:bg-[var(--premium-gold)] transition-colors duration-500"></div>
+                </div>
+            </Link>
         </motion.div>
     );
 }

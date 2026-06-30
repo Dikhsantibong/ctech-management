@@ -5,8 +5,8 @@ export function Footer() {
         <footer className="bg-[var(--premium-dark)] text-white pt-32 pb-10 border-t border-white/10 overflow-hidden">
             <div className="px-8 md:px-16 w-full max-w-[1920px] mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-24 gap-12">
-                    <div className="text-[12vw] leading-[0.8] font-['Clash_Display',_sans-serif] font-medium tracking-tight uppercase">
-                        CTECH.
+                    <div>
+                        <img src="/logo/sidebar-logo.png" alt="CTECH Logo" className="h-16 md:h-24 w-auto opacity-90 hover:opacity-100 transition-opacity" />
                     </div>
                     <div className="flex gap-16 font-['Space_Grotesk',_monospace] text-sm tracking-widest uppercase">
                         <ul className="flex flex-col gap-4">
