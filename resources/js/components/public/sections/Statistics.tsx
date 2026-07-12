@@ -1,6 +1,8 @@
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
 const STATS = [
     { value: 250, label: "Proyek Selesai", suffix: "+" },
     { value: 98, label: "Kepuasan Klien", suffix: "%" },
@@ -8,7 +10,7 @@ const STATS = [
     { value: 50, label: "Tim Ahli", suffix: "+" },
 ];
 
-function AnimatedCounter({ value, suffix }: { value: number, suffix: string }) {
+function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, margin: "-100px" });
     const [count, setCount] = useState(0);
@@ -19,7 +21,7 @@ function AnimatedCounter({ value, suffix }: { value: number, suffix: string }) {
             const end = value;
             const duration = 2000;
             const increment = end / (duration / 16);
-            
+
             const timer = setInterval(() => {
                 start += increment;
                 if (start >= end) {
@@ -29,7 +31,7 @@ function AnimatedCounter({ value, suffix }: { value: number, suffix: string }) {
                     setCount(Math.floor(start));
                 }
             }, 16);
-            
+
             return () => clearInterval(timer);
         }
     }, [isInView, value]);
@@ -43,22 +45,21 @@ function AnimatedCounter({ value, suffix }: { value: number, suffix: string }) {
 
 export function Statistics() {
     return (
-        <section className="py-32 bg-[var(--premium-dark)] text-white relative overflow-hidden">
-            <div className="absolute inset-0 z-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "40px 40px" }}></div>
-            <div className="px-8 md:px-16 w-full max-w-[1920px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 relative z-10">
+        <section className="py-24 md:py-32 bg-white text-[#0d0d0d] border-t border-gray-100">
+            <div className="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-2 md:grid-cols-4">
                 {STATS.map((stat, i) => (
-                    <motion.div 
-                        key={i}
-                        initial={{ opacity: 0, y: 40 }}
+                    <motion.div
+                        key={stat.label}
+                        initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: i * 0.1, ease: [0.76, 0, 0.24, 1] }}
-                        viewport={{ once: true }}
-                        className="flex flex-col items-center justify-center text-center group"
+                        transition={{ duration: 0.8, delay: i * 0.15, ease: EASE }}
+                        viewport={{ once: true, margin: "-80px" }}
+                        className={`flex flex-col gap-4 py-8 md:py-4 px-6 md:px-10 ${i > 0 ? "md:border-l md:border-gray-200" : ""} ${i % 2 === 1 ? "border-l border-gray-200 md:border-l" : ""}`}
                     >
-                        <h4 className="font-['Clash_Display',_sans-serif] text-5xl md:text-7xl font-medium mb-4 text-[var(--premium-gold)]">
+                        <h4 className="font-display text-5xl md:text-7xl font-semibold tracking-tight">
                             <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                         </h4>
-                        <p className="font-['Space_Grotesk',_monospace] text-sm tracking-widest text-gray-400 group-hover:text-white transition-colors duration-500 uppercase">
+                        <p className="font-body text-xs md:text-sm uppercase tracking-[0.2em] text-gray-400">
                             {stat.label}
                         </p>
                     </motion.div>

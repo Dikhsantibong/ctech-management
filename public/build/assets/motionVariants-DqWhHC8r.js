@@ -1,1 +1,0 @@
-var e=[.76,0,.24,1],t={initial:{y:40,opacity:0},animate:{y:0,opacity:1,transition:{duration:.8,ease:e}}},n={initial:{y:`100%`},animate:{y:0,transition:{duration:1,ease:[.76,0,.24,1]}}};export{t as n,n as r,e as t};

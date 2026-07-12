@@ -56,7 +56,7 @@ export default function Industries({ portfolios }: { portfolios: any[] }) {
             </Head>
 
             <div className="bg-white text-slate-900 font-body-md antialiased min-h-screen">
-                <PublicNavbar />
+                <PublicNavbar isLandingPage={false} />
 
                 <main className="pt-20">
                     {/* Hero Section */}

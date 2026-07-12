@@ -39,7 +39,7 @@ export default function Process() {
             </Head>
 
             <div className="bg-white text-slate-900 font-body-md selection:bg-blue-600-fixed selection:text-on-secondary-fixed min-h-screen">
-                <PublicNavbar />
+                <PublicNavbar isLandingPage={false} />
 
                 <main className="pt-20">
                     {/* Hero Section */}

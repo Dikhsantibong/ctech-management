@@ -101,14 +101,17 @@
     --sidebar-border: oklch(0.6 0.1 250);
     --sidebar-ring: oklch(0.985 0 0);
 
-    /* Premium Agency Design System Tokens (Blue & White) */
+    /* Premium Agency Design System Tokens (Dark Editorial + Blue Accent) */
     --premium-bg: #FFFFFF;
-    --premium-bg-alt: #F8FAFC;
-    --premium-dark: #0f3460;
-    --premium-gold: #1D4ED8; /* Using bright blue instead of gold for accent */
-    --premium-beige: #EFF6FF;
-    --premium-gray: #F1F5F9;
-    --premium-text: #1E293B;
+    --premium-bg-alt: #f9fafb;
+    --premium-dark: #0d0d0d;
+    --premium-surface: #1a1a1a;
+    --premium-gold: #3b82f6; /* Accent blue (kept var name for backward compat) */
+    --premium-gold-deep: #1e3a8a;
+    --premium-beige: #f9fafb;
+    --premium-gray: #f4f4f5;
+    --premium-text: #27272a;
+    --premium-text-muted: #a1a1aa;
 }
 
 .dark {
@@ -195,4 +198,23 @@
 
 .padding-editorial {
     padding: clamp(4rem, 10vw, 12rem) 0;
+}
+
+/* Premium public pages: typography & effects */
+.font-display {
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+}
+
+.font-body {
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+.text-stroke-light {
+    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.3);
+    color: transparent;
+}
+
+.text-stroke-dark {
+    -webkit-text-stroke: 1.5px rgba(13, 13, 13, 0.25);
+    color: transparent;
 }

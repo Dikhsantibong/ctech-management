@@ -1,43 +1,23 @@
-import { Head } from '@inertiajs/react';
-import { useEffect } from 'react';
-import Lenis from 'lenis';
 import { PremiumNavbar } from '@/components/ui/PremiumNavbar';
 import { Footer } from '@/components/public/sections/Footer';
 import { Contact } from '@/components/public/sections/Contact';
-
+import { useLenis } from '@/hooks/use-lenis';
 import { SEO } from '@/components/SEO';
 
 export default function ContactIndex() {
-    useEffect(() => {
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            direction: 'vertical',
-            gestureDirection: 'vertical',
-            smooth: true,
-        });
-
-        function raf(time: number) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
-        }
-        requestAnimationFrame(raf);
-        return () => lenis.destroy();
-    }, []);
+    useLenis();
 
     return (
-        <div className="bg-[var(--premium-bg)] text-[var(--premium-text)] selection:bg-[var(--premium-gold)] selection:text-[var(--premium-dark)] font-['Inter',_sans-serif]">
-            <SEO 
-                title="Hubungi Kami | CTECH Creative" 
+        <div className="bg-[#0d0d0d] text-white selection:bg-[var(--premium-gold)] selection:text-white font-body">
+            <SEO
+                title="Hubungi Kami | CTECH Creative"
                 description="Mulai proyek Anda hari ini. Hubungi tim ahli kami untuk mendiskusikan kebutuhan sistem, aplikasi, dan desain UI/UX Anda."
                 url="/kontak"
             />
 
-            <div className="fixed top-0 w-full z-50 mix-blend-difference text-white">
-                <PremiumNavbar />
-            </div>
+            <PremiumNavbar />
 
-            <main className="w-full overflow-hidden pt-20 bg-[var(--premium-dark)]">
+            <main className="w-full overflow-hidden pt-20 md:pt-24 bg-[#0d0d0d]">
                 <Contact />
             </main>
 

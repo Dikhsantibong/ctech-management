@@ -1,42 +1,29 @@
-import { Head } from '@inertiajs/react';
-import { useEffect } from 'react';
-import Lenis from 'lenis';
 import { PremiumNavbar } from '@/components/ui/PremiumNavbar';
 import { Footer } from '@/components/public/sections/Footer';
+import { PageHeader } from '@/components/public/PageHeader';
 import { PortfolioGallery } from '@/components/public/sections/PortfolioGallery';
+import { useLenis } from '@/hooks/use-lenis';
 import { SEO } from '@/components/SEO';
 
 export default function PortfolioIndex({ portfolios }: { portfolios?: any }) {
-    useEffect(() => {
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            direction: 'vertical',
-            gestureDirection: 'vertical',
-            smooth: true,
-        });
-
-        function raf(time: number) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
-        }
-        requestAnimationFrame(raf);
-        return () => lenis.destroy();
-    }, []);
+    useLenis();
 
     return (
-        <div className="bg-[var(--premium-bg)] text-[var(--premium-text)] selection:bg-[var(--premium-gold)] selection:text-[var(--premium-dark)] font-['Inter',_sans-serif]">
-            <SEO 
-                title="Karya Pilihan | CTECH Creative" 
+        <div className="bg-white text-[var(--premium-text)] selection:bg-[var(--premium-gold)] selection:text-white font-body">
+            <SEO
+                title="Karya Pilihan | CTECH Creative"
                 description="Jelajahi karya pilihan kami, mulai dari arsitektur e-commerce yang kompleks hingga dasbor fintech modern. Bukti nyata keahlian digital kami."
                 url="/portfolio"
             />
 
-            <div className="fixed top-0 w-full z-50 mix-blend-difference text-white">
-                <PremiumNavbar />
-            </div>
+            <PremiumNavbar />
 
-            <main className="w-full overflow-hidden pt-12">
+            <main className="w-full overflow-hidden">
+                <PageHeader
+                    eyebrow="Karya Pilihan"
+                    title="Portfolio Imersif."
+                    description="Bukti nyata keahlian digital kami — dari arsitektur e-commerce yang kompleks hingga dasbor fintech modern."
+                />
                 <PortfolioGallery portfolios={portfolios} />
             </main>
 

@@ -53,7 +53,7 @@ export default function CaseStudies({ portfolios, categories, filters }: { portf
             </Head>
 
             <div className="font-body-md text-body-md min-h-screen flex flex-col">
-                <PublicNavbar />
+                <PublicNavbar isLandingPage={false} />
 
                 <main className="pt-32 pb-stack-xl flex-grow">
                     {/* Hero Section */}
