@@ -1,1 +1,0 @@
-import{q as e}from"./app-Ovn9_1Wh.js";var t=e(`ChevronLeft`,[[`path`,{d:`m15 18-6-6 6-6`,key:`1wnfg3`}]]);export{t};

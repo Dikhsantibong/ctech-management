@@ -6,7 +6,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LetterEditor from '@/components/letter-editor';
+import LetterPageSettings from '@/components/letter-page-settings';
 import { LETTER_TEMPLATES } from '@/lib/letter-templates';
+
+const DEFAULT_PAGE_SETTINGS = {
+    margin_top: 14,
+    margin_right: 20,
+    margin_bottom: 18,
+    margin_left: 20,
+    line_spacing: '1.5',
+};
 
 export default function LetterForm({ letter }: { letter: any }) {
     const isEdit = Boolean(letter);
@@ -19,6 +28,11 @@ export default function LetterForm({ letter }: { letter: any }) {
         subject: letter?.subject ?? '',
         content: letter?.content ?? '',
         status: letter?.status ?? 'Draft',
+        margin_top: letter?.margin_top ?? DEFAULT_PAGE_SETTINGS.margin_top,
+        margin_right: letter?.margin_right ?? DEFAULT_PAGE_SETTINGS.margin_right,
+        margin_bottom: letter?.margin_bottom ?? DEFAULT_PAGE_SETTINGS.margin_bottom,
+        margin_left: letter?.margin_left ?? DEFAULT_PAGE_SETTINGS.margin_left,
+        line_spacing: letter?.line_spacing ?? DEFAULT_PAGE_SETTINGS.line_spacing,
     });
 
     useEffect(() => {
@@ -31,6 +45,11 @@ export default function LetterForm({ letter }: { letter: any }) {
                 subject: letter.subject ?? '',
                 content: letter.content ?? '',
                 status: letter.status ?? 'Draft',
+                margin_top: letter.margin_top ?? DEFAULT_PAGE_SETTINGS.margin_top,
+                margin_right: letter.margin_right ?? DEFAULT_PAGE_SETTINGS.margin_right,
+                margin_bottom: letter.margin_bottom ?? DEFAULT_PAGE_SETTINGS.margin_bottom,
+                margin_left: letter.margin_left ?? DEFAULT_PAGE_SETTINGS.margin_left,
+                line_spacing: letter.line_spacing ?? DEFAULT_PAGE_SETTINGS.line_spacing,
             });
         }
     }, [letter]);
@@ -155,6 +174,8 @@ export default function LetterForm({ letter }: { letter: any }) {
                                 </Select>
                             </div>
                         </div>
+
+                        <LetterPageSettings data={data} setData={setData} />
                     </div>
                 </form>
             </div>

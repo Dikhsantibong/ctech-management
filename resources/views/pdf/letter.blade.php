@@ -3,17 +3,24 @@
 <head>
     <meta charset="utf-8">
     <title>{{ $letter->reference_number }}</title>
+    @php
+        $marginTop = $letter->margin_top ?? 14;
+        $marginRight = $letter->margin_right ?? 20;
+        $marginBottom = $letter->margin_bottom ?? 18;
+        $marginLeft = $letter->margin_left ?? 20;
+        $lineSpacing = $letter->line_spacing ?? '1.5';
+    @endphp
     <style>
         @page {
             size: A4 portrait;
-            margin: 14mm 20mm 18mm 20mm;
+            margin: {{ $marginTop }}mm {{ $marginRight }}mm {{ $marginBottom }}mm {{ $marginLeft }}mm;
         }
         *, *::before, *::after { box-sizing: border-box; }
         body {
             font-family: 'Times New Roman', Times, serif;
             color: #000;
             font-size: 12pt;
-            line-height: 1.5;
+            line-height: {{ $lineSpacing }};
             margin: 0;
         }
 
@@ -98,7 +105,9 @@
             text-align: justify;
             widows: 2;
             orphans: 2;
+            word-wrap: break-word; /* jangan biarkan teks panjang keluar dari halaman */
         }
+        .content img { max-width: 100%; }
         .content p { margin: 0 0 8px 0; }
         .content ol, .content ul {
             margin: 0 0 8px 0;
@@ -109,6 +118,10 @@
             margin-top: 4px;
             margin-bottom: 0;
         }
+        /* Penomoran bertingkat: 1. → a. → i. (list bernomor yang di-indent) */
+        .content ol { list-style-type: decimal; }
+        .content ol ol { list-style-type: lower-alpha; }
+        .content ol ol ol { list-style-type: lower-roman; }
         /* Kelas format dari editor (Quill) agar align & indent ikut terbawa ke PDF */
         .content .ql-align-center  { text-align: center; }
         .content .ql-align-right   { text-align: right; }

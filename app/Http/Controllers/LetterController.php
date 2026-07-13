@@ -42,6 +42,11 @@ class LetterController extends Controller
             'recipient' => 'required|string|max:255',
             'subject' => 'required|string|max:255',
             'content' => 'nullable|string', // kosong = hanya reservasi nomor surat
+            'margin_top' => 'nullable|integer|min:5|max:60',
+            'margin_right' => 'nullable|integer|min:5|max:60',
+            'margin_bottom' => 'nullable|integer|min:5|max:60',
+            'margin_left' => 'nullable|integer|min:5|max:60',
+            'line_spacing' => 'nullable|in:1,1.15,1.5,2',
         ]);
 
         // Generate proper type code based on the letter type
@@ -91,6 +96,11 @@ class LetterController extends Controller
             'content' => $validated['content'] ?? null,
             'status' => 'Draft',
             'created_by' => Auth::id(),
+            'margin_top' => $validated['margin_top'] ?? null,
+            'margin_right' => $validated['margin_right'] ?? null,
+            'margin_bottom' => $validated['margin_bottom'] ?? null,
+            'margin_left' => $validated['margin_left'] ?? null,
+            'line_spacing' => $validated['line_spacing'] ?? null,
         ]);
 
         $this->logActivity('created', 'Letter', $letter->id, $isNumberOnly
@@ -132,6 +142,11 @@ class LetterController extends Controller
             'subject' => 'required|string|max:255',
             'content' => 'nullable|string',
             'status' => 'required|in:Draft,Final',
+            'margin_top' => 'nullable|integer|min:5|max:60',
+            'margin_right' => 'nullable|integer|min:5|max:60',
+            'margin_bottom' => 'nullable|integer|min:5|max:60',
+            'margin_left' => 'nullable|integer|min:5|max:60',
+            'line_spacing' => 'nullable|in:1,1.15,1.5,2',
         ]);
 
         $letter->update($validated);
@@ -174,6 +189,10 @@ class LetterController extends Controller
 
         $letter->load('creator');
         $settings = \App\Models\CompanySetting::first();
+
+        // Konten hasil paste dari Word/PDF sering penuh non-breaking space sehingga
+        // dompdf tidak bisa memotong baris dan teks keluar dari halaman
+        $letter->content = preg_replace('/(&nbsp;|\x{00A0})/u', ' ', $letter->content);
 
         // Dompdf butuh ekstensi GD untuk merender PNG; tanpa guard ini server tanpa GD akan 500
         $logo = null;

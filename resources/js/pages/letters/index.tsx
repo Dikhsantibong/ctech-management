@@ -7,7 +7,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LetterEditor from '@/components/letter-editor';
+import LetterPageSettings from '@/components/letter-page-settings';
 import { LETTER_TEMPLATES } from '@/lib/letter-templates';
+
+const DEFAULT_PAGE_SETTINGS = {
+    margin_top: 14,
+    margin_right: 20,
+    margin_bottom: 18,
+    margin_left: 20,
+    line_spacing: '1.5',
+};
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -41,6 +50,7 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
         subject: '',
         content: '',
         status: 'Draft',
+        ...DEFAULT_PAGE_SETTINGS,
     });
 
     const openCreateModal = () => {
@@ -55,6 +65,7 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
             subject: template.subject,
             content: template.content,
             status: 'Draft',
+            ...DEFAULT_PAGE_SETTINGS,
         });
         setIsCreateModalOpen(true);
     };
@@ -70,6 +81,7 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
             subject: '',
             content: '',
             status: 'Draft',
+            ...DEFAULT_PAGE_SETTINGS,
         });
         setIsNumberModalOpen(true);
     };
@@ -103,6 +115,11 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
             subject: letter.subject,
             content: letter.content || '',
             status: letter.status,
+            margin_top: letter.margin_top ?? DEFAULT_PAGE_SETTINGS.margin_top,
+            margin_right: letter.margin_right ?? DEFAULT_PAGE_SETTINGS.margin_right,
+            margin_bottom: letter.margin_bottom ?? DEFAULT_PAGE_SETTINGS.margin_bottom,
+            margin_left: letter.margin_left ?? DEFAULT_PAGE_SETTINGS.margin_left,
+            line_spacing: letter.line_spacing ?? DEFAULT_PAGE_SETTINGS.line_spacing,
         });
         setIsEditModalOpen(true);
     };
@@ -373,9 +390,12 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                             </div>
                             <div className="space-y-2 col-span-2">
                                 <Label htmlFor="content">Isi Surat</Label>
-                                <p className="text-xs text-muted-foreground">Kop surat, tanggal, penerima, dan tanda tangan otomatis ditambahkan pada PDF — cukup tulis isi suratnya saja.</p>
+                                <p className="text-xs text-muted-foreground">Kop surat, tanggal, penerima, dan tanda tangan otomatis ditambahkan pada PDF — cukup tulis isi suratnya saja. Untuk poin a, b, c: buat list bernomor lalu tekan tombol indent (Tab).</p>
                                 <LetterEditor value={data.content} onChange={(value) => setData('content', value)} />
                                 {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
+                            </div>
+                            <div className="col-span-2">
+                                <LetterPageSettings data={data} setData={setData} />
                             </div>
                         </div>
                         
@@ -456,9 +476,12 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                             </div>
                             <div className="space-y-2 col-span-2">
                                 <Label htmlFor="edit-content">Isi Surat</Label>
-                                <p className="text-xs text-muted-foreground">Kop surat, tanggal, penerima, dan tanda tangan otomatis ditambahkan pada PDF — cukup tulis isi suratnya saja.</p>
+                                <p className="text-xs text-muted-foreground">Kop surat, tanggal, penerima, dan tanda tangan otomatis ditambahkan pada PDF — cukup tulis isi suratnya saja. Untuk poin a, b, c: buat list bernomor lalu tekan tombol indent (Tab).</p>
                                 <LetterEditor value={data.content} onChange={(value) => setData('content', value)} />
                                 {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
+                            </div>
+                            <div className="col-span-2">
+                                <LetterPageSettings data={data} setData={setData} />
                             </div>
                         </div>
                         

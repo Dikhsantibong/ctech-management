@@ -17,6 +17,11 @@ class Letter extends Model
         'content',
         'status',
         'created_by',
+        'margin_top',
+        'margin_right',
+        'margin_bottom',
+        'margin_left',
+        'line_spacing',
     ];
 
     protected $casts = [
