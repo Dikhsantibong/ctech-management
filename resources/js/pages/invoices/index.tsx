@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -29,6 +30,7 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         client_name: '',
         due_date: '',
+        use_tax: true,
         tax_rate: 11, // Default to 11% tax
         items: [{ id: null, description: '', quantity: 1, price: 0 }] as any[]
     });
@@ -49,7 +51,8 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
         setData({
             client_name: invoice.client_name,
             due_date: invoice.due_date ? invoice.due_date.split('T')[0] : '',
-            tax_rate: taxRate,
+            use_tax: parseFloat(invoice.tax) > 0,
+            tax_rate: taxRate > 0 ? taxRate : 11,
             items: invoice.items && invoice.items.length > 0 ? invoice.items.map((item: any) => ({
                 id: item.id,
                 description: item.description,
@@ -118,7 +121,7 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
 
     // Live calculation for create form
     const computedSubtotal = data.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-    const computedTax = computedSubtotal * ((data.tax_rate || 0) / 100);
+    const computedTax = data.use_tax ? computedSubtotal * ((data.tax_rate || 0) / 100) : 0;
     const computedTotal = computedSubtotal + computedTax;
 
     const statusBadgeColor = (status: string) => {
@@ -242,11 +245,22 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
                                 <Input id="due_date" type="date" value={data.due_date} onChange={e => setData('due_date', e.target.value)} required />
                                 {errors.due_date && <p className="text-sm text-destructive">{errors.due_date}</p>}
                             </div>
-                            <div className="space-y-2 col-span-2">
-                                <Label htmlFor="tax_rate">Tax Rate (%)</Label>
-                                <Input id="tax_rate" type="number" min="0" max="100" value={data.tax_rate} onChange={e => setData('tax_rate', parseFloat(e.target.value))} required />
-                                {errors.tax_rate && <p className="text-sm text-destructive">{errors.tax_rate}</p>}
+                            <div className="col-span-2 flex items-center justify-between rounded-md border p-3">
+                                <div className="space-y-0.5">
+                                    <Label htmlFor="use_tax">Gunakan Pajak (PPN)</Label>
+                                    <p className="text-xs text-muted-foreground">Aktifkan jika invoice ini dikenakan pajak.</p>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    {data.use_tax && (
+                                        <div className="flex items-center gap-1">
+                                            <Input id="tax_rate" type="number" min="0" max="100" className="w-20 text-right" value={data.tax_rate} onChange={e => setData('tax_rate', parseFloat(e.target.value))} required />
+                                            <span className="text-sm text-muted-foreground">%</span>
+                                        </div>
+                                    )}
+                                    <Switch id="use_tax" checked={data.use_tax} onCheckedChange={checked => setData('use_tax', checked)} />
+                                </div>
                             </div>
+                            {errors.tax_rate && <p className="col-span-2 text-sm text-destructive">{errors.tax_rate}</p>}
                         </div>
 
                         <div className="space-y-2 mt-4">
@@ -284,10 +298,12 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
                                 <span className="text-muted-foreground">Subtotal</span>
                                 <span className="font-medium">{formatCurrency(computedSubtotal)}</span>
                             </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Pajak ({data.tax_rate || 0}%)</span>
-                                <span className="font-medium">{formatCurrency(computedTax)}</span>
-                            </div>
+                            {data.use_tax && (
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Pajak ({data.tax_rate || 0}%)</span>
+                                    <span className="font-medium">{formatCurrency(computedTax)}</span>
+                                </div>
+                            )}
                             <div className="border-t pt-2 flex justify-between text-base">
                                 <span className="font-bold">Grand Total</span>
                                 <span className="font-bold text-primary">{formatCurrency(computedTotal)}</span>
@@ -321,11 +337,22 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
                                 <Input id="edit_due_date" type="date" value={data.due_date} onChange={e => setData('due_date', e.target.value)} required />
                                 {errors.due_date && <p className="text-sm text-destructive">{errors.due_date}</p>}
                             </div>
-                            <div className="space-y-2 col-span-2">
-                                <Label htmlFor="edit_tax_rate">Tax Rate (%)</Label>
-                                <Input id="edit_tax_rate" type="number" min="0" max="100" value={data.tax_rate} onChange={e => setData('tax_rate', parseFloat(e.target.value))} required />
-                                {errors.tax_rate && <p className="text-sm text-destructive">{errors.tax_rate}</p>}
+                            <div className="col-span-2 flex items-center justify-between rounded-md border p-3">
+                                <div className="space-y-0.5">
+                                    <Label htmlFor="edit_use_tax">Gunakan Pajak (PPN)</Label>
+                                    <p className="text-xs text-muted-foreground">Aktifkan jika invoice ini dikenakan pajak.</p>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    {data.use_tax && (
+                                        <div className="flex items-center gap-1">
+                                            <Input id="edit_tax_rate" type="number" min="0" max="100" className="w-20 text-right" value={data.tax_rate} onChange={e => setData('tax_rate', parseFloat(e.target.value))} required />
+                                            <span className="text-sm text-muted-foreground">%</span>
+                                        </div>
+                                    )}
+                                    <Switch id="edit_use_tax" checked={data.use_tax} onCheckedChange={checked => setData('use_tax', checked)} />
+                                </div>
                             </div>
+                            {errors.tax_rate && <p className="col-span-2 text-sm text-destructive">{errors.tax_rate}</p>}
                         </div>
 
                         <div className="space-y-2 mt-4">
@@ -363,10 +390,12 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
                                 <span className="text-muted-foreground">Subtotal</span>
                                 <span className="font-medium">{formatCurrency(computedSubtotal)}</span>
                             </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Pajak ({data.tax_rate || 0}%)</span>
-                                <span className="font-medium">{formatCurrency(computedTax)}</span>
-                            </div>
+                            {data.use_tax && (
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Pajak ({data.tax_rate || 0}%)</span>
+                                    <span className="font-medium">{formatCurrency(computedTax)}</span>
+                                </div>
+                            )}
                             <div className="border-t pt-2 flex justify-between text-base">
                                 <span className="font-bold">Grand Total</span>
                                 <span className="font-bold text-primary">{formatCurrency(computedTotal)}</span>

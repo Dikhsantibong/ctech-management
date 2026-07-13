@@ -105,10 +105,14 @@ export default function InvoiceShow({ invoice }: { invoice: any }) {
                                                 <td colSpan={3} className="p-3 text-right font-medium text-muted-foreground">Subtotal</td>
                                                 <td className="p-3 text-right font-medium">{formatCurrency(invoice.subtotal)}</td>
                                             </tr>
-                                            <tr className="border-b bg-muted/20">
-                                                <td colSpan={3} className="p-3 text-right font-medium text-muted-foreground">Tax</td>
-                                                <td className="p-3 text-right font-medium">{formatCurrency(invoice.tax)}</td>
-                                            </tr>
+                                            {parseFloat(invoice.tax) > 0 && (
+                                                <tr className="border-b bg-muted/20">
+                                                    <td colSpan={3} className="p-3 text-right font-medium text-muted-foreground">
+                                                        Pajak{invoice.subtotal > 0 ? ` (${Math.round((invoice.tax / invoice.subtotal) * 100)}%)` : ''}
+                                                    </td>
+                                                    <td className="p-3 text-right font-medium">{formatCurrency(invoice.tax)}</td>
+                                                </tr>
+                                            )}
                                             <tr className="bg-muted/50">
                                                 <td colSpan={3} className="p-4 text-right font-bold">Grand Total</td>
                                                 <td className="p-4 text-right font-bold text-lg">{formatCurrency(invoice.total)}</td>

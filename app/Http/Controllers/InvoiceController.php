@@ -24,7 +24,8 @@ class InvoiceController extends Controller
         $validated = $request->validate([
             'client_name' => 'required|string|max:255',
             'due_date' => 'required|date',
-            'tax_rate' => 'required|numeric|min:0',
+            'use_tax' => 'required|boolean',
+            'tax_rate' => 'nullable|required_if:use_tax,true|numeric|min:0|max:100',
             'items' => 'required|array|min:1',
             'items.*.description' => 'required|string',
             'items.*.quantity' => 'required|numeric|min:1',
@@ -43,7 +44,8 @@ class InvoiceController extends Controller
         foreach ($validated['items'] as $item) {
             $subtotal += $item['quantity'] * $item['price'];
         }
-        $tax = $subtotal * ($validated['tax_rate'] / 100);
+        $taxRate = $validated['use_tax'] ? (float) $validated['tax_rate'] : 0;
+        $tax = $subtotal * ($taxRate / 100);
         $total = $subtotal + $tax;
 
         $invoice = Invoice::create([
@@ -83,7 +85,8 @@ class InvoiceController extends Controller
         $validated = $request->validate([
             'client_name' => 'required|string|max:255',
             'due_date' => 'required|date',
-            'tax_rate' => 'required|numeric|min:0',
+            'use_tax' => 'required|boolean',
+            'tax_rate' => 'nullable|required_if:use_tax,true|numeric|min:0|max:100',
             'items' => 'required|array|min:1',
             'items.*.id' => 'nullable',
             'items.*.description' => 'required|string',
@@ -95,7 +98,8 @@ class InvoiceController extends Controller
         foreach ($validated['items'] as $item) {
             $subtotal += $item['quantity'] * $item['price'];
         }
-        $tax = $subtotal * ($validated['tax_rate'] / 100);
+        $taxRate = $validated['use_tax'] ? (float) $validated['tax_rate'] : 0;
+        $tax = $subtotal * ($taxRate / 100);
         $total = $subtotal + $tax;
 
         $invoice->update([
@@ -155,9 +159,22 @@ class InvoiceController extends Controller
     public function downloadPdf(Invoice $invoice)
     {
         $invoice->load('items');
-        
-        $pdf = Pdf::loadView('pdf.invoice', ['invoice' => $invoice]);
-        
-        return $pdf->stream($invoice->invoice_number . '.pdf');
+
+        $settings = \App\Models\CompanySetting::first();
+
+        // Dompdf butuh ekstensi GD untuk merender PNG; tanpa guard ini server tanpa GD akan 500
+        $logo = null;
+        $logoPath = public_path('letter/main-logo.png');
+        if (is_file($logoPath) && extension_loaded('gd')) {
+            $logo = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+        }
+
+        $pdf = Pdf::loadView('pdf.invoice', [
+            'invoice' => $invoice,
+            'settings' => $settings,
+            'logo' => $logo,
+        ])->setPaper('a4');
+
+        return $pdf->stream(str_replace('/', '-', $invoice->invoice_number) . '.pdf');
     }
 }
