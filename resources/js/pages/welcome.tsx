@@ -9,12 +9,13 @@ import { ProjectsShowcase } from '@/components/public/sections/ProjectsShowcase'
 import { Statistics } from '@/components/public/sections/Statistics';
 import { ClientMarquee } from '@/components/public/sections/ClientMarquee';
 import { Testimonials } from '@/components/public/sections/Testimonials';
+import { NewsHighlight } from '@/components/public/sections/NewsHighlight';
 import { Contact } from '@/components/public/sections/Contact';
 import { Footer } from '@/components/public/sections/Footer';
 
 import { SEO } from '@/components/SEO';
 
-export default function Welcome({ portfolios = [] }: { portfolios?: any[] }) {
+export default function Welcome({ portfolios = [], news = [] }: { portfolios?: any[]; news?: any[] }) {
     useLenis();
 
     return (
@@ -36,6 +37,7 @@ export default function Welcome({ portfolios = [] }: { portfolios?: any[] }) {
                 <Statistics />
                 <ClientMarquee />
                 <Testimonials />
+                <NewsHighlight news={news} />
                 <Contact />
             </main>
 
