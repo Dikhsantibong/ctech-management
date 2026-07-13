@@ -234,7 +234,7 @@
                 <p style="margin: 0;"><strong>{{ $settings->company_name ?? '' }}</strong></p>
                 <div class="signature-space"></div>
                 <p class="signature-name">{{ $settings->leader_name ?? ($letter->creator->name ?? '') }}</p>
-                <p class="signature-role">Direktur</p>
+                <p class="signature-role">Direktur Utama</p>
             </td>
         </tr>
     </table>
