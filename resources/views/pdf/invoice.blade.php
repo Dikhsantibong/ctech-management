@@ -278,11 +278,11 @@
                             </tr>
                             <tr>
                                 <td class="k">Tanggal Terbit</td>
-                                <td class="v">{{ date('d F Y', strtotime($invoice->created_at)) }}</td>
+                                <td class="v">{{ \Carbon\Carbon::parse($invoice->created_at)->locale('id')->translatedFormat('d F Y') }}</td>
                             </tr>
                             <tr>
                                 <td class="k">Jatuh Tempo</td>
-                                <td class="v due-highlight">{{ date('d F Y', strtotime($invoice->due_date)) }}</td>
+                                <td class="v due-highlight">{{ \Carbon\Carbon::parse($invoice->due_date)->locale('id')->translatedFormat('d F Y') }}</td>
                             </tr>
                         </table>
                     </div>

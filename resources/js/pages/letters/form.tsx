@@ -1,23 +1,12 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-
-const LETTER_TEMPLATES: Record<string, { subject: string; content: string }> = {
-    'Surat Keputusan': {
-        subject: 'Keputusan tentang [isi perihal]',
-        content: `KEPUTUSAN MANAJEMEN / MANAGEMENT DECREE\n\nTentang: [Perihal/Topik Keputusan]\n\nMempertimbangkan:\nBahwa dalam rangka [alasan/tujuan/project], manajemen perlu menetapkan keputusan ini.\n\nMEMUTUSKAN:\n\n1. [Keputusan utama yang diambil]\n2. [Ketentuan operasional tambahan]\n3. [Hal-hal lain yang terkait]\n\nKeputusan ini mulai berlaku secara efektif sejak tanggal ditetapkan.\n\n[Tempat], [Tanggal]\n\n[Nama Direktur/Manager]\n[Posisi/Role]`,
-    },
-    'Surat Tugas': {
-        subject: 'Assignment Letter untuk [nama/tujuan]',
-        content: `SURAT TUGAS / ASSIGNMENT LETTER\n\nProject / Klien: [Nama Project atau Klien]\nReferensi      : [Kontrak/Brief/Dokumen pendukung]\n\nKami menugaskan kepada tim berikut:\nNama         : [Nama Anggota Tim]\nPosisi/Role  : [Posisi]\n\nUntuk menangani ruang lingkup pekerjaan (Scope of Work):\n[Uraian tugas / deliverables yang harus diselesaikan]\n\nTimeline Pelaksanaan:\nMulai        : [Tanggal Mulai]\nSelesai      : [Tanggal Selesai]\nLokasi       : [Studio/On-site/Remote]\n\nSemua pengeluaran operasional terkait project ini ditanggung oleh [Sumber Anggaran].\n\nDemikian assignment ini diberikan untuk dijalankan secara profesional.\n\n[Tempat], [Tanggal]\n\n[Nama Penugas]\n[Posisi Penugas]`,
-    },
-    // keep basic templates; additional templates available in index page
-};
+import LetterEditor from '@/components/letter-editor';
+import { LETTER_TEMPLATES } from '@/lib/letter-templates';
 
 export default function LetterForm({ letter }: { letter: any }) {
     const isEdit = Boolean(letter);
@@ -129,9 +118,10 @@ export default function LetterForm({ letter }: { letter: any }) {
                             </div>
                         </div>
 
-                        <div>
+                        <div className="space-y-1">
                             <Label>Content</Label>
-                            <Textarea className="min-h-[320px] font-serif" value={data.content} onChange={e => setData('content', e.target.value)} />
+                            <p className="text-xs text-muted-foreground">Kop surat, tanggal, penerima, dan tanda tangan otomatis ditambahkan pada PDF — cukup tulis isi suratnya saja.</p>
+                            <LetterEditor value={data.content} onChange={(value) => setData('content', value)} />
                         </div>
 
                         <div className="flex items-center gap-3">
@@ -145,9 +135,10 @@ export default function LetterForm({ letter }: { letter: any }) {
                     <div className="space-y-4">
                         <div className="rounded-lg border p-4">
                             <Label>Preview</Label>
-                            <div className="prose prose-sm max-w-none dark:prose-invert whitespace-pre-wrap font-serif mt-2">
-                                {data.content}
-                            </div>
+                            <div
+                                className="prose prose-sm max-w-none dark:prose-invert font-serif mt-2"
+                                dangerouslySetInnerHTML={{ __html: data.content }}
+                            />
                         </div>
 
                         <div className="rounded-lg border p-4">

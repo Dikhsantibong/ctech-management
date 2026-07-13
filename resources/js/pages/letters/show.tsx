@@ -53,11 +53,13 @@ export default function LetterShow({ letter }: { letter: any }) {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <Button asChild>
-                            <a href={`/letters/${letter.id}/pdf`} target="_blank" rel="noopener noreferrer">
-                                <Download className="mr-2 h-4 w-4" /> Download PDF
-                            </a>
-                        </Button>
+                        {letter.content && (
+                            <Button asChild>
+                                <a href={`/letters/${letter.id}/pdf`} target="_blank" rel="noopener noreferrer">
+                                    <Download className="mr-2 h-4 w-4" /> Download PDF
+                                </a>
+                            </Button>
+                        )}
                     </div>
                 </div>
 
@@ -81,9 +83,22 @@ export default function LetterShow({ letter }: { letter: any }) {
                                 </div>
                             </CardHeader>
                             <CardContent className="pt-6">
-                                <div className="prose prose-sm max-w-none dark:prose-invert whitespace-pre-wrap font-serif">
-                                    {letter.content}
-                                </div>
+                                {letter.content ? (
+                                    /<\w+[^>]*>/.test(letter.content) ? (
+                                        <div
+                                            className="prose prose-sm max-w-none dark:prose-invert font-serif"
+                                            dangerouslySetInnerHTML={{ __html: letter.content }}
+                                        />
+                                    ) : (
+                                        <div className="prose prose-sm max-w-none dark:prose-invert whitespace-pre-wrap font-serif">
+                                            {letter.content}
+                                        </div>
+                                    )
+                                ) : (
+                                    <p className="text-sm text-muted-foreground italic">
+                                        Surat ini hanya reservasi nomor — tidak memiliki isi surat untuk ditampilkan.
+                                    </p>
+                                )}
                             </CardContent>
                         </Card>
                     </div>

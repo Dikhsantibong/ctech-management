@@ -1,12 +1,13 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { Plus, MoreVertical, Mail, Trash2, Eye, Edit2, Search } from 'lucide-react';
+import { Plus, MoreVertical, Mail, Trash2, Eye, Edit2, Search, Hash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import LetterEditor from '@/components/letter-editor';
+import { LETTER_TEMPLATES } from '@/lib/letter-templates';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -22,361 +23,9 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 
-const LETTER_TEMPLATES = {
-    'Surat Keputusan': {
-        subject: 'Keputusan tentang [isi perihal]',
-        content: `KEPUTUSAN MANAJEMEN / MANAGEMENT DECREE
-
-Tentang: [Perihal/Topik Keputusan]
-
-Mempertimbangkan:
-Bahwa dalam rangka [alasan/tujuan/project], manajemen perlu menetapkan keputusan ini.
-
-MEMUTUSKAN:
-
-1. [Keputusan utama yang diambil]
-2. [Ketentuan operasional tambahan]
-3. [Hal-hal lain yang terkait]
-
-Keputusan ini mulai berlaku secara efektif sejak tanggal ditetapkan.
-
-[Tempat], [Tanggal]
-
-[Nama Direktur/Manager]
-[Posisi/Role]`,
-    },
-    'Surat Tugas': {
-        subject: 'Assignment Letter untuk [nama/tujuan]',
-        content: `SURAT TUGAS / ASSIGNMENT LETTER
-
-Project / Klien: [Nama Project atau Klien]
-Referensi      : [Kontrak/Brief/Dokumen pendukung]
-
-Kami menugaskan kepada tim berikut:
-Nama         : [Nama Anggota Tim]
-Posisi/Role  : [Posisi]
-
-Untuk menangani ruang lingkup pekerjaan (Scope of Work):
-[Uraian tugas / deliverables yang harus diselesaikan]
-
-Timeline Pelaksanaan:
-Mulai        : [Tanggal Mulai]
-Selesai      : [Tanggal Selesai]
-Lokasi       : [Studio/On-site/Remote]
-
-Semua pengeluaran operasional terkait project ini ditanggung oleh [Sumber Anggaran].
-
-Demikian assignment ini diberikan untuk dijalankan secara profesional.
-
-[Tempat], [Tanggal]
-
-[Nama Penugas]
-[Posisi Penugas]`,
-    },
-    'Surat Keterangan': {
-        subject: 'Keterangan tentang [isi perihal]',
-        content: `SURAT KETERANGAN / TO WHOM IT MAY CONCERN
-
-Yang bertanda tangan di bawah ini:
-Nama         : [Nama Pemberi Keterangan]
-Posisi       : [Posisi/Role]
-Perusahaan   : [Nama Creative Agency]
-
-Dengan ini menerangkan bahwa:
-Nama         : [Nama Pihak/Tim]
-[Identitas/Info Lain]: [Data]
-
-Adalah benar [uraian keterangan/status saat ini, misalnya: bagian dari tim kami untuk project X].
-
-Keterangan ini diberikan sebagai dukungan untuk keperluan [tujuan penggunaan, misalnya administrasi/izin lokasi].
-
-Demikian surat ini dibuat dengan sebenarnya.
-
-[Tempat], [Tanggal]
-
-[Nama Pemberi Keterangan]
-[Posisi]`,
-    },
-    'Surat Penawaran': {
-        subject: 'Commercial Proposal untuk [Nama Klien]',
-        content: `PROPOSAL PENAWARAN KERJA SAMA / COMMERCIAL PROPOSAL
-
-Kepada Yth.
-[Nama Klien/Penerima]
-[Posisi Penerima]
-[Perusahaan Klien]
-
-Halo [Nama Klien],
-
-Terima kasih atas ketertarikan Anda terhadap layanan kami. Bersama ini kami lampirkan penawaran kerja sama (Commercial Proposal) untuk kebutuhan [Nama Project/Campaign]:
-
-1. Scope of Work (Ruang Lingkup):
-   - [Deliverable 1]
-   - [Deliverable 2]
-
-2. Timeline / Jadwal Pelaksanaan:
-   [Estimasi timeline pengerjaan]
-
-3. Investment / Estimasi Biaya:
-   [Rincian harga / paket penawaran]
-
-4. Term of Payment (Syarat Pembayaran):
-   [Metode dan termin pembayaran, misal DP 50%]
-
-Proposal ini valid hingga [Tanggal Berlaku].
-
-Jika ada penyesuaian terkait scope atau budget, mari kita jadwalkan sesi diskusi (brainstorming) lebih lanjut.
-
-Terima kasih atas kepercayaan Anda. 
-
-Warm regards,
-
-[Tempat], [Tanggal]
-
-[Nama Penanda Tangan]
-[Posisi]`,
-    },
-    'Surat Peringatan': {
-        subject: 'Surat Peringatan / Warning Letter untuk [Nama Penerima]',
-        content: `SURAT PERINGATAN (WARNING LETTER)
-
-Kepada:
-Nama      : [Nama Penerima]
-Posisi    : [Posisi/Role]
-
-Berdasarkan evaluasi kinerja dan operasional terbaru, kami menemukan adanya hal yang tidak sejalan dengan standar profesional perusahaan (SOP), yaitu:
-
-[Jelaskan ketidaksesuaian/pelanggaran, misal: keterlambatan deliverable project X, dsb.]
-
-Hal ini sangat memengaruhi kelancaran alur kerja tim dan klien. Oleh karena itu, surat ini diterbitkan sebagai:
-[ ] Peringatan Pertama (SP1)
-[ ] Peringatan Kedua (SP2)
-[ ] Peringatan Ketiga (SP3)
-
-Kami sangat menghargai kontribusi Anda selama ini, namun perbaikan yang signifikan diharapkan dalam waktu [jumlah hari] hari ke depan. 
-
-Jika memerlukan dukungan atau sesi 1-on-1, pintu manajemen selalu terbuka. Apabila tidak ada perbaikan, manajemen akan mengambil langkah sesuai kebijakan perusahaan.
-
-[Tempat], [Tanggal]
-
-[Nama HR/Manajemen]
-[Posisi]`,
-    },
-    'Surat Undangan': {
-        subject: 'Invitation: Meeting/Event [Acara]',
-        content: `UNDANGAN / INVITATION
-
-Kepada Yth.
-[Nama Klien/Penerima]
-[Posisi/Perusahaan]
-
-Halo [Nama Penerima],
-
-Kami ingin mengundang Bapak/Ibu/Rekan-rekan untuk berdiskusi lebih lanjut mengenai [Topik Meeting / Project Kick-off / Pitching] yang akan diselenggarakan pada:
-
-Hari/Tanggal : [Hari, Tanggal]
-Waktu        : [Jam]
-Platform     : [Zoom / Google Meet / Offline Location]
-Link/Alamat  : [Tautan atau Alamat]
-
-Agenda utama yang akan kita bahas:
-- [Agenda 1]
-- [Agenda 2]
-
-Mohon konfirmasi kehadirannya. Jika ada pertanyaan lebih lanjut, silakan balas pesan ini.
-
-Terima kasih dan sampai jumpa!
-
-[Tempat], [Tanggal]
-
-[Nama Pengundang]
-[Posisi]`,
-    },
-    'Surat Izin': {
-        subject: 'Permohonan Izin / Leave Request: [Nama Karyawan]',
-        content: `FORM PERMOHONAN IZIN (LEAVE REQUEST)
-
-Yang bertanda tangan di bawah ini:
-Nama      : [Nama Karyawan]
-Posisi    : [Posisi/Role]
-Divisi    : [Nama Divisi/Departemen]
-
-Dengan ini mengajukan permohonan izin / cuti untuk keperluan [alasan izin, misal: urusan keluarga, sakit, dsb.] pada:
-
-Mulai Tanggal   : [Tanggal Mulai]
-Selesai Tanggal : [Tanggal Selesai]
-Total Hari      : [Jumlah Hari]
-
-Pekerjaan / project yang sedang berjalan ([Nama Project]) telah dikoordinasikan dengan [Nama Rekan/Back-up] selama masa izin ini.
-
-Demikian permohonan ini saya ajukan untuk dapat disetujui.
-
-[Tempat], [Tanggal]
-
-[Nama Karyawan]
-[Posisi]`,
-    },
-    'Surat Keterangan Kerja': {
-        subject: 'Certificate of Employment untuk [Nama Karyawan]',
-        content: `CERTIFICATE OF EMPLOYMENT (SURAT KETERANGAN KERJA)
-
-Hal: Surat Keterangan Pengalaman Kerja
-
-Kami yang bertanda tangan di bawah ini, mewakili manajemen [Nama Agency/Perusahaan], menerangkan bahwa:
-
-Nama      : [Nama Karyawan]
-Posisi    : [Posisi Terakhir]
-Periode   : [Tanggal Masuk] s.d. [Tanggal Keluar/Saat Ini]
-
-Selama bergabung bersama agensi kami, yang bersangkutan telah menunjukkan kinerja dan kreativitas yang baik dalam menangani berbagai project dan campaign klien.
-
-Surat keterangan ini diberikan atas permintaan yang bersangkutan untuk dipergunakan semestinya (misalnya keperluan administratif atau melamar pekerjaan baru).
-
-Kami mengucapkan terima kasih atas dedikasi yang diberikan dan mendoakan kesuksesan di masa depan.
-
-[Tempat], [Tanggal]
-
-[Nama HR/Manajemen]
-[Posisi]`,
-    },
-    'Surat Pengantar': {
-        subject: 'Transmittal / Pengantar [Perihal]',
-        content: `SURAT PENGANTAR (COVER LETTER / TRANSMITTAL)
-
-Kepada Yth.
-[Nama Klien/Penerima]
-[Posisi/Perusahaan]
-
-Halo [Nama Penerima],
-
-Bersama surat ini, kami mengirimkan beberapa dokumen/deliverables terkait [Nama Project/Campaign] untuk dapat direview/diproses lebih lanjut:
-
-1. [Nama Dokumen/File 1] (Jumlah: [Qty])
-2. [Nama Dokumen/File 2] (Jumlah: [Qty])
-
-Mohon bantuan Anda untuk memeriksa kelengkapan materi tersebut. Jika ada revisi atau feedback, silakan hubungi tim kami.
-
-Terima kasih atas kerja samanya!
-
-[Tempat], [Tanggal]
-
-[Nama Pengirim]
-[Posisi]`,
-    },
-    'Surat Pemberitahuan': {
-        subject: 'Announcement: [Topik Pemberitahuan]',
-        content: `PEMBERITAHUAN / ANNOUNCEMENT
-
-Kepada:
-[Seluruh Tim / Klien / Vendor]
-
-Halo semuanya,
-
-Melalui memo ini, manajemen bermaksud menginformasikan mengenai [Topik Pemberitahuan, misal: Libur Nasional / Perubahan Jam Operasional Studio / dsb.]:
-
-[Detail Informasi secara jelas dan ringkas]
-
-Ketentuan ini akan mulai diberlakukan pada tanggal [Tanggal Efektif]. 
-
-Jika ada pertanyaan atau butuh penyesuaian jadwal project, mohon hubungi Project Manager masing-masing.
-
-Terima kasih atas perhatiannya.
-
-[Tempat], [Tanggal]
-
-[Nama Manajemen/Pengirim]
-[Posisi]`,
-    },
-    'Surat Rekomendasi': {
-        subject: 'Letter of Recommendation untuk [Nama]',
-        content: `SURAT REKOMENDASI (LETTER OF RECOMMENDATION)
-
-To Whom It May Concern,
-
-Surat ini ditulis untuk merekomendasikan:
-
-Nama      : [Nama Karyawan/Freelancer]
-Posisi    : [Posisi/Role saat di agensi]
-
-Selama masa kerjanya, yang bersangkutan telah berpartisipasi dalam banyak project kreatif dan menunjukkan kemampuan analisis, eksekusi, serta kolaborasi tim yang luar biasa. 
-
-Skill utama yang kami highlight dari yang bersangkutan:
-- [Skill 1, misal: Art Direction yang kuat]
-- [Skill 2, misal: Mampu bekerja dalam tight deadline]
-
-Kami sangat merekomendasikan yang bersangkutan untuk peluang karier selanjutnya.
-
-[Tempat], [Tanggal]
-
-[Nama Pemberi Rekomendasi]
-[Posisi / Hubungan dengan kandidat]`,
-    },
-    'Surat Permohonan': {
-        subject: 'Request Letter: [Tujuan Permohonan]',
-        content: `SURAT PERMOHONAN (REQUEST LETTER)
-
-Kepada Yth.
-[Nama Penerima/Instansi/Klien]
-[Alamat/Lokasi]
-
-Dengan hormat,
-
-Kami dari [Nama Agency] bermaksud mengajukan permohonan [Tujuan Permohonan, misal: Izin Lokasi Syuting / Penggunaan Footage] untuk keperluan project campaign [Nama Project].
-
-Rincian kebutuhan/kegiatan adalah sebagai berikut:
-Hari/Tanggal : [Tanggal]
-Waktu        : [Jam]
-Kebutuhan    : [Detail kebutuhan/aktivitas]
-Jumlah Tim   : [Jumlah orang yang akan hadir]
-
-Kami berkomitmen untuk menjaga ketertiban dan mematuhi seluruh peraturan yang berlaku selama proses tersebut. 
-
-Atas perhatian dan kerja sama yang baik, kami ucapkan terima kasih.
-
-[Tempat], [Tanggal]
-
-[Nama Pemohon]
-[Posisi]`,
-    },
-    'Surat Kontrak': {
-        subject: 'Agreement / Kontrak Kerja Sama: [Nama Project]',
-        content: `AGREEMENT / KONTRAK KERJA SAMA
-
-Pada hari ini [Hari, Tanggal], kami yang bertanda tangan di bawah ini sepakat untuk menjalin kerja sama:
-
-Pihak Pertama (Agency) : [Nama Agency / Perwakilan]
-Pihak Kedua (Klien/Vendor) : [Nama Klien / Vendor]
-
-Kedua belah pihak menyetujui ketentuan kerja sama (SOW/SLA) sebagai berikut:
-
-1. Ruang Lingkup (Scope of Work):
-   [Detail pekerjaan/deliverables yang disepakati]
-
-2. Nilai Kontrak & Termin Pembayaran:
-   [Nominal Total]
-   [Termin Pembayaran, misal: DP 50%, Pelunasan 50% setelah final handover]
-
-3. Timeline Pekerjaan:
-   [Jadwal mulai hingga selesai]
-
-4. Revisi & Feedback:
-   [Batas maksimal revisi, misal: Max 2 kali revisi minor]
-
-5. Hak Cipta (Intellectual Property):
-   [Kepemilikan aset akhir setelah pelunasan]
-
-Demikian perjanjian ini dibuat secara sadar dan mengikat kedua belah pihak.
-
-[Tempat], [Tanggal]
-
-Pihak Pertama (Agency)                   Pihak Kedua (Klien/Vendor)
-
-(____________________)                   (____________________)`,
-    },
-};
-
 export default function LettersIndex({ letters, search: initialSearch }: { letters: any[], search?: string }) {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isNumberModalOpen, setIsNumberModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -408,6 +57,31 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
             status: 'Draft',
         });
         setIsCreateModalOpen(true);
+    };
+
+    // Reservasi nomor surat saja: surat tercatat & bernomor, tanpa isi (tidak bisa dicetak PDF)
+    const openNumberModal = () => {
+        reset();
+        setData({
+            type: 'Surat Keputusan',
+            letter_date: new Date().toISOString().split('T')[0],
+            sifat: 'Biasa',
+            recipient: '',
+            subject: '',
+            content: '',
+            status: 'Draft',
+        });
+        setIsNumberModalOpen(true);
+    };
+
+    const submitNumberOnly = (e: React.FormEvent) => {
+        e.preventDefault();
+        post('/letters', {
+            onSuccess: () => {
+                setIsNumberModalOpen(false);
+                reset();
+            },
+        });
     };
 
     const handleTypeChange = (newType: string) => {
@@ -521,9 +195,14 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                         <h2 className="text-2xl font-bold tracking-tight">Letters</h2>
                         <p className="text-muted-foreground">Manage official company correspondence.</p>
                     </div>
-                    <Button onClick={openCreateModal}>
-                        <Plus className="mr-2 h-4 w-4" /> Create Letter
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" onClick={openNumberModal}>
+                            <Hash className="mr-2 h-4 w-4" /> Generate Nomor Saja
+                        </Button>
+                        <Button onClick={openCreateModal}>
+                            <Plus className="mr-2 h-4 w-4" /> Create Letter
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="flex flex-col gap-4 rounded-xl border bg-card p-4 shadow-sm md:flex-row md:items-center md:justify-between">
@@ -567,7 +246,16 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                                                     {letter.reference_number}
                                                 </Link>
                                             </td>
-                                            <td className="p-4 align-middle">{letter.subject}</td>
+                                            <td className="p-4 align-middle">
+                                                <span className="flex items-center gap-2">
+                                                    {letter.subject}
+                                                    {!letter.content && (
+                                                        <Badge variant="outline" className="text-muted-foreground">
+                                                            <Hash className="mr-1 h-3 w-3" /> Nomor Saja
+                                                        </Badge>
+                                                    )}
+                                                </span>
+                                            </td>
                                             <td className="p-4 align-middle">{letter.type}</td>
                                             <td className="p-4 align-middle text-muted-foreground">
                                                 {letter.letter_date ? new Date(letter.letter_date).toLocaleDateString('id-ID') : '-'}
@@ -600,11 +288,13 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                                                         <DropdownMenuItem onClick={() => openEditModal(letter)}>
                                                             <Edit2 className="mr-2 h-4 w-4" /> Edit
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem asChild>
-                                                            <a href={`/letters/${letter.id}/preview`} target="_blank" rel="noreferrer" className="cursor-pointer flex items-center">
-                                                                <Eye className="mr-2 h-4 w-4" /> Preview PDF
-                                                            </a>
-                                                        </DropdownMenuItem>
+                                                        {letter.content && (
+                                                            <DropdownMenuItem asChild>
+                                                                <a href={`/letters/${letter.id}/preview`} target="_blank" rel="noreferrer" className="cursor-pointer flex items-center">
+                                                                    <Eye className="mr-2 h-4 w-4" /> Preview PDF
+                                                                </a>
+                                                            </DropdownMenuItem>
+                                                        )}
                                                         <DropdownMenuItem onClick={() => openDeleteModal(letter)} className="text-destructive">
                                                             <Trash2 className="mr-2 h-4 w-4" /> Delete
                                                         </DropdownMenuItem>
@@ -683,7 +373,8 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                             </div>
                             <div className="space-y-2 col-span-2">
                                 <Label htmlFor="content">Isi Surat</Label>
-                                <Textarea id="content" className="min-h-[200px]" value={data.content} onChange={e => setData('content', e.target.value)} required />
+                                <p className="text-xs text-muted-foreground">Kop surat, tanggal, penerima, dan tanda tangan otomatis ditambahkan pada PDF — cukup tulis isi suratnya saja.</p>
+                                <LetterEditor value={data.content} onChange={(value) => setData('content', value)} />
                                 {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
                             </div>
                         </div>
@@ -765,7 +456,8 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                             </div>
                             <div className="space-y-2 col-span-2">
                                 <Label htmlFor="edit-content">Isi Surat</Label>
-                                <Textarea id="edit-content" className="min-h-[200px]" value={data.content} onChange={e => setData('content', e.target.value)} required />
+                                <p className="text-xs text-muted-foreground">Kop surat, tanggal, penerima, dan tanda tangan otomatis ditambahkan pada PDF — cukup tulis isi suratnya saja.</p>
+                                <LetterEditor value={data.content} onChange={(value) => setData('content', value)} />
                                 {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
                             </div>
                         </div>
@@ -773,6 +465,73 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                         <DialogFooter className="mt-6">
                             <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
                             <Button type="submit" disabled={processing}>Update Letter</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Generate Number Only Modal */}
+            <Dialog open={isNumberModalOpen} onOpenChange={setIsNumberModalOpen}>
+                <DialogContent className="max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle>Generate Nomor Surat</DialogTitle>
+                        <DialogDescription>
+                            Reservasi nomor surat resmi tanpa membuat isi surat. Nomor tetap tercatat pada agenda surat dan urutannya tidak akan terpakai ganda.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={submitNumberOnly} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Jenis Surat</Label>
+                                <Select value={data.type} onValueChange={val => setData('type', val)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih jenis surat" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {Object.keys(LETTER_TEMPLATES).map((type) => (
+                                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="number-letter_date">Tanggal Surat</Label>
+                                <Input id="number-letter_date" type="date" value={data.letter_date} onChange={e => setData('letter_date', e.target.value)} required />
+                                {errors.letter_date && <p className="text-sm text-destructive">{errors.letter_date}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Sifat Surat</Label>
+                                <Select value={data.sifat} onValueChange={val => setData('sifat', val)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih sifat" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Biasa">Biasa</SelectItem>
+                                        <SelectItem value="Penting">Penting</SelectItem>
+                                        <SelectItem value="Segera">Segera</SelectItem>
+                                        <SelectItem value="Sangat Segera">Sangat Segera</SelectItem>
+                                        <SelectItem value="Rahasia">Rahasia</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                {errors.sifat && <p className="text-sm text-destructive">{errors.sifat}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="number-recipient">Penerima / Tujuan</Label>
+                                <Input id="number-recipient" value={data.recipient} onChange={e => setData('recipient', e.target.value)} required />
+                                {errors.recipient && <p className="text-sm text-destructive">{errors.recipient}</p>}
+                            </div>
+                            <div className="space-y-2 col-span-2">
+                                <Label htmlFor="number-subject">Perihal</Label>
+                                <Input id="number-subject" placeholder="Untuk keperluan apa nomor ini digunakan" value={data.subject} onChange={e => setData('subject', e.target.value)} required />
+                                {errors.subject && <p className="text-sm text-destructive">{errors.subject}</p>}
+                            </div>
+                        </div>
+                        <DialogFooter className="mt-6">
+                            <Button type="button" variant="outline" onClick={() => setIsNumberModalOpen(false)}>Cancel</Button>
+                            <Button type="submit" disabled={processing}>
+                                <Hash className="mr-2 h-4 w-4" /> Generate Nomor
+                            </Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

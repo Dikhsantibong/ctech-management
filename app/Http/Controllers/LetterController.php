@@ -41,7 +41,7 @@ class LetterController extends Controller
             'sifat' => 'required|string|max:255',
             'recipient' => 'required|string|max:255',
             'subject' => 'required|string|max:255',
-            'content' => 'required|string',
+            'content' => 'nullable|string', // kosong = hanya reservasi nomor surat
         ]);
 
         // Generate proper type code based on the letter type
@@ -79,6 +79,8 @@ class LetterController extends Controller
                        
         $refNumber = str_pad($count, 3, '0', STR_PAD_LEFT) . '/' . $typeCode . '/CTECH/' . $monthRoman . '/' . $year;
 
+        $isNumberOnly = empty($validated['content']);
+
         $letter = Letter::create([
             'reference_number' => $refNumber,
             'type' => $validated['type'],
@@ -86,12 +88,21 @@ class LetterController extends Controller
             'sifat' => $validated['sifat'],
             'recipient' => $validated['recipient'],
             'subject' => $validated['subject'],
-            'content' => $validated['content'],
+            'content' => $validated['content'] ?? null,
             'status' => 'Draft',
             'created_by' => Auth::id(),
         ]);
 
-        $this->logActivity('created', 'Letter', $letter->id, "Membuat surat baru: {$letter->reference_number}");
+        $this->logActivity('created', 'Letter', $letter->id, $isNumberOnly
+            ? "Generate nomor surat: {$letter->reference_number}"
+            : "Membuat surat baru: {$letter->reference_number}");
+
+        \Inertia\Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => $isNumberOnly
+                ? "Nomor surat berhasil digenerate: {$letter->reference_number}"
+                : "Surat berhasil dibuat: {$letter->reference_number}",
+        ]);
 
         return redirect()->back()->with('success', 'Letter created successfully.');
     }
@@ -119,7 +130,7 @@ class LetterController extends Controller
             'sifat' => 'required|string|max:255',
             'recipient' => 'required|string|max:255',
             'subject' => 'required|string|max:255',
-            'content' => 'required|string',
+            'content' => 'nullable|string',
             'status' => 'required|in:Draft,Final',
         ]);
 
@@ -147,17 +158,37 @@ class LetterController extends Controller
 
     public function downloadPdf(Letter $letter)
     {
-        $letter->load('creator');
-        $pdf = Pdf::loadView('pdf.letter', ['letter' => $letter]);
-        $pdf->setPaper('a4', 'portrait');
+        $pdf = $this->buildPdf($letter);
         return $pdf->download(str_replace('/', '-', $letter->reference_number) . '.pdf');
     }
 
     public function previewPdf(Letter $letter)
     {
-        $letter->load('creator');
-        $pdf = Pdf::loadView('pdf.letter', ['letter' => $letter]);
-        $pdf->setPaper('a4', 'portrait');
+        $pdf = $this->buildPdf($letter);
         return $pdf->stream(str_replace('/', '-', $letter->reference_number) . '.pdf');
+    }
+
+    private function buildPdf(Letter $letter)
+    {
+        abort_if(empty($letter->content), 404, 'Surat ini hanya reservasi nomor, tidak memiliki isi untuk dicetak.');
+
+        $letter->load('creator');
+        $settings = \App\Models\CompanySetting::first();
+
+        // Dompdf butuh ekstensi GD untuk merender PNG; tanpa guard ini server tanpa GD akan 500
+        $logo = null;
+        $logoPath = public_path('letter/main-logo.png');
+        if (is_file($logoPath) && extension_loaded('gd')) {
+            $logo = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+        }
+
+        $pdf = Pdf::loadView('pdf.letter', [
+            'letter' => $letter,
+            'settings' => $settings,
+            'logo' => $logo,
+        ]);
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf;
     }
 }
