@@ -13,10 +13,16 @@ class File extends Model
         'extension',
         'size',
         'created_by',
+        'client_id',
     ];
 
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
     }
 }

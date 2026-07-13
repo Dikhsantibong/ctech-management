@@ -1,4 +1,25 @@
 User-agent: *
 Allow: /
 
+# Area internal aplikasi — jangan dicrawl/diindeks
+Disallow: /dashboard
+Disallow: /files
+Disallow: /documents
+Disallow: /invoices
+Disallow: /letters
+Disallow: /clients
+Disallow: /projects
+Disallow: /tasks
+Disallow: /works
+Disallow: /users
+Disallow: /content-plans
+Disallow: /announcements
+Disallow: /activity-logs
+Disallow: /company-settings
+Disallow: /settings
+Disallow: /calendar
+Disallow: /login
+Disallow: /register
+Disallow: /storage
+
 Sitemap: https://ctechcreative.com/sitemap.xml
