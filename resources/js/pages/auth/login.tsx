@@ -55,7 +55,7 @@ export default function Login({ status, canResetPassword }: Props) {
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="mt-4 w-full rounded-full bg-[#0d0d0d] text-white hover:bg-[var(--premium-gold)] hover:text-white transition-colors duration-500 font-body tracking-widest uppercase text-xs h-11"
                                 tabIndex={3}
                                 disabled={processing}
                                 data-test="login-button"

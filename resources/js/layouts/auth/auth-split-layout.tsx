@@ -3,6 +3,8 @@ import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
 
+import { HeroShaderCanvas } from '@/components/public/HeroShaderCanvas';
+
 export default function AuthSplitLayout({
     children,
     title,
@@ -11,40 +13,34 @@ export default function AuthSplitLayout({
     const { name } = usePage().props;
 
     return (
-        <div className="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
-            <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800" />
-                <div className="absolute inset-0 bg-[url('/data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgNDBMMDQwIDBIMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIiAvPjwvc3ZnPg==')] opacity-20" />
+        <div className="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0 font-body">
+            <div className="relative hidden h-full flex-col bg-[#0d0d0d] p-10 text-white lg:flex border-r border-[#222] overflow-hidden">
+                <div className="absolute inset-0 z-0">
+                    <HeroShaderCanvas />
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#0d0d0d]/40 via-transparent to-[#0d0d0d]"></div>
+                </div>
                 <div className="relative z-20 flex flex-col h-full">
                     <Link
                         href={home()}
                         className="flex items-center text-lg font-semibold"
                     >
-                        <AppLogoIcon className="mr-2 size-10 fill-current text-white" />
-                        <span className="text-2xl">{name}</span>
+                        <AppLogoIcon className="mr-2 size-10 fill-current text-[var(--premium-gold,white)]" />
+                        <span className="text-2xl font-display">{name}</span>
                     </Link>
-                    <div className="flex-1 flex flex-col justify-center items-center text-center space-y-6 mt-8">
-                        <div className="space-y-4">
-                            <h2 className="text-4xl font-bold leading-tight">
-                                Welcome Back
-                            </h2>
-                            <p className="text-lg text-blue-100 max-w-md">
-                                Manage your projects, track tasks, and streamline your workflow with our powerful management platform.
+                    <div className="flex-1"></div>
+                    <div className="mt-auto flex flex-col gap-8 pb-4">
+                        <blockquote className="space-y-4 max-w-lg">
+                            <p className="text-xl md:text-2xl font-display text-white/90 leading-relaxed font-light italic">
+                                "Inovasi sejati bukan hanya tentang menciptakan teknologi baru, melainkan tentang bagaimana teknologi tersebut membentuk ulang cara dunia memandang sebuah keindahan dan efisiensi."
                             </p>
+                            <footer className="flex flex-col text-sm text-white/80">
+                                <span className="font-semibold text-[var(--premium-gold,white)] tracking-wide text-base">Dikhsan Dwirangga Tibong</span>
+                                <span className="font-light opacity-75">Direktur Utama</span>
+                            </footer>
+                        </blockquote>
+                        <div className="text-white/40 tracking-widest uppercase text-[10px]">
+                            © {new Date().getFullYear()} {name}. All rights reserved.
                         </div>
-                        <div className="grid grid-cols-2 gap-6 mt-8">
-                            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                                <div className="text-3xl font-bold">24/7</div>
-                                <div className="text-sm text-blue-100">Support</div>
-                            </div>
-                            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                                <div className="text-3xl font-bold">100%</div>
-                                <div className="text-sm text-blue-100">Secure</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="text-sm text-blue-200">
-                        © 2026 {name}. All rights reserved.
                     </div>
                 </div>
             </div>

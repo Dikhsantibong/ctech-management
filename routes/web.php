@@ -244,6 +244,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('letters', \App\Http\Controllers\LetterController::class);
         Route::get('letters/{letter}/preview', [\App\Http\Controllers\LetterController::class, 'previewPdf'])->name('letters.preview');
         Route::get('letters/{letter}/pdf', [\App\Http\Controllers\LetterController::class, 'downloadPdf'])->name('letters.pdf');
+        Route::resource('incoming-letters', \App\Http\Controllers\IncomingLetterController::class)->except(['create', 'edit']);
+        Route::get('incoming-letters/{incoming_letter}/download', [\App\Http\Controllers\IncomingLetterController::class, 'downloadAttachment'])->name('incoming-letters.download');
         Route::resource('documents', \App\Http\Controllers\DocumentController::class);
         Route::resource('files', \App\Http\Controllers\FileController::class)->except(['create', 'edit', 'update', 'show']);
         Route::get('files/{file}/download', [\App\Http\Controllers\FileController::class, 'download'])->name('files.download');

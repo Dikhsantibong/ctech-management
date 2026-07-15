@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Briefcase, ListTodo, Receipt, Mail, FileStack, Files, Users, Activity, Settings, Megaphone, Building2, Calendar, Newspaper, Bell, ClipboardList } from 'lucide-react';
+import { LayoutGrid, Briefcase, ListTodo, Receipt, Mail, MailOpen, FileStack, Files, Users, Activity, Settings, Megaphone, Building2, Calendar, Newspaper, Bell, ClipboardList } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -35,7 +35,8 @@ const financeNav: NavItem[] = [
 ];
 
 const administrationNav: NavItem[] = [
-    { title: 'Letters', href: '/letters', icon: Mail },
+    { title: 'Surat Keluar', href: '/letters', icon: Mail },
+    { title: 'Surat Masuk', href: '/incoming-letters', icon: MailOpen },
     { title: 'Documents', href: '/documents', icon: FileStack },
     { title: 'Files', href: '/files', icon: Files },
 ];
