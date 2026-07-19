@@ -30,7 +30,7 @@ export default function UsersIndex({ users }: { users: any[] }) {
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         name: '',
         email: '',
-        role: 'staff',
+        role: 'operation',
         password: '',
     });
 
@@ -87,8 +87,9 @@ export default function UsersIndex({ users }: { users: any[] }) {
     const roleBadgeColor = (role: string) => {
         switch (role) {
             case 'direktur_utama': return 'destructive';
-            case 'direktur_operasional': return 'default';
-            case 'admin_operasional': return 'secondary';
+            case 'operation': return 'default';
+            case 'marketing': return 'secondary';
+            case 'administrasi': return 'outline';
             default: return 'outline';
         }
     };
@@ -204,9 +205,9 @@ export default function UsersIndex({ users }: { users: any[] }) {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="direktur_utama">Direktur Utama</SelectItem>
-                                    <SelectItem value="direktur_operasional">Direktur Operasional</SelectItem>
-                                    <SelectItem value="admin_operasional">Admin Operasional</SelectItem>
-                                    <SelectItem value="staff">Staff</SelectItem>
+                                    <SelectItem value="operation">Operation</SelectItem>
+                                    <SelectItem value="marketing">Marketing</SelectItem>
+                                    <SelectItem value="administrasi">Administrasi</SelectItem>
                                 </SelectContent>
                             </Select>
                             {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
@@ -250,9 +251,9 @@ export default function UsersIndex({ users }: { users: any[] }) {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="direktur_utama">Direktur Utama</SelectItem>
-                                    <SelectItem value="direktur_operasional">Direktur Operasional</SelectItem>
-                                    <SelectItem value="admin_operasional">Admin Operasional</SelectItem>
-                                    <SelectItem value="staff">Staff</SelectItem>
+                                    <SelectItem value="operation">Operation</SelectItem>
+                                    <SelectItem value="marketing">Marketing</SelectItem>
+                                    <SelectItem value="administrasi">Administrasi</SelectItem>
                                 </SelectContent>
                             </Select>
                             {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}

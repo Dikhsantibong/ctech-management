@@ -1,0 +1,1 @@
+function e(){let e=document.cookie.match(RegExp(`(^|;\\s*)XSRF-TOKEN=([^;]*)`));return e?decodeURIComponent(e[2]):null}async function t(t,n={}){let r={Accept:`application/json`,"Content-Type":`application/json`,...n.headers||{}},i=e();return i&&![`GET`,`HEAD`,`OPTIONS`].includes(n.method?.toUpperCase()||`GET`)&&(r[`X-XSRF-TOKEN`]=i),fetch(t,{...n,headers:r})}export{t};

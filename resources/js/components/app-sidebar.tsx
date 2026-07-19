@@ -28,6 +28,7 @@ const operationsNav: NavItem[] = [
     { title: 'Projects', href: '/projects', icon: Briefcase },
     { title: 'Tasks', href: '/tasks', icon: ListTodo },
     { title: 'Work', href: '/works', icon: ClipboardList },
+    { title: 'Daily Reports', href: '/daily-reports', icon: FileStack },
 ];
 
 const financeNav: NavItem[] = [
@@ -55,15 +56,15 @@ const systemNav: NavItem[] = [
 
 export function AppSidebar() {
     const { auth } = usePage<any>().props;
-    const userRole = auth.user?.role || 'staff';
+    const userRole = auth.user?.role || 'operation';
 
-    const isStaff = userRole === 'staff';
-    const isAdminOp = userRole === 'admin_operasional';
-    const isDirekturOp = userRole === 'direktur_operasional';
-    const isAdmin = userRole === 'direktur_utama';
+    const isOperation = userRole === 'operation';
+    const isMarketing = userRole === 'marketing';
+    const isAdministrasi = userRole === 'administrasi';
+    const isDirekturUtama = userRole === 'direktur_utama';
 
     const currentOperationsNav = [...operationsNav];
-    if (isAdmin) {
+    if (isDirekturUtama || isMarketing || isOperation) {
         currentOperationsNav.push({ title: 'Clients', href: '/clients', icon: Building2 });
     }
 
@@ -84,19 +85,24 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain items={dashboardNav} label="Overview" />
                 <NavMain items={announcementsNav} label="Pengumuman" />
-                <NavMain items={currentOperationsNav} label="Operations" />
+                
+                {(isDirekturUtama || isOperation) && (
+                    <NavMain items={currentOperationsNav} label="Operations" />
+                )}
 
-                {(isAdmin || isDirekturOp || isAdminOp) && (
+                {(isDirekturUtama || isAdministrasi) && (
                     <NavMain items={financeNav} label="Finance" />
                 )}
 
-                <NavMain items={marketingNav} label="Marketing" />
+                {(isDirekturUtama || isMarketing) && (
+                    <NavMain items={marketingNav} label="Marketing" />
+                )}
 
-                {(isAdmin || isDirekturOp || isAdminOp) && (
+                {(isDirekturUtama || isAdministrasi) && (
                     <NavMain items={administrationNav} label="Administration" />
                 )}
 
-                {isAdmin && (
+                {isDirekturUtama && (
                     <NavMain items={systemNav} label="System" />
                 )}
             </SidebarContent>

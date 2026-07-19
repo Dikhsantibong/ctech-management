@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class ProjectMilestone extends Model
+{
+    protected $fillable = [
+        'project_id',
+        'pic_user_id',
+        'name',
+        'description',
+        'start_date',
+        'end_date',
+        'progress',
+        'status',
+        'notes',
+    ];
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
+
+    public function pic()
+    {
+        return $this->belongsTo(User::class, 'pic_user_id');
+    }
+
+    public function checklists()
+    {
+        return $this->hasMany(ProjectMilestoneChecklist::class);
+    }
+}

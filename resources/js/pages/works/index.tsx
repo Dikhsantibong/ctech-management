@@ -299,11 +299,11 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
                             ))}
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3 pt-1">
+                    <div className="space-y-3 pt-1">
                         <div className="space-y-1.5">
                             <Label className="text-xs">Client</Label>
                             <Select value={data.client_id || 'none'} onValueChange={val => setData('client_id', val === 'none' ? '' : val)}>
-                                <SelectTrigger className="h-9"><SelectValue placeholder="None" /></SelectTrigger>
+                                <SelectTrigger className="h-9 [&>span]:line-clamp-1"><SelectValue placeholder="None" /></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">None</SelectItem>
                                     {clients.map((c: any) => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}
@@ -313,7 +313,7 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
                         <div className="space-y-1.5">
                             <Label className="text-xs">Project</Label>
                             <Select value={data.project_id || 'none'} onValueChange={val => setData('project_id', val === 'none' ? '' : val)}>
-                                <SelectTrigger className="h-9"><SelectValue placeholder="None" /></SelectTrigger>
+                                <SelectTrigger className="h-9 [&>span]:line-clamp-1"><SelectValue placeholder="None" /></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">None</SelectItem>
                                     {projects.map((p: any) => <SelectItem key={p.id} value={p.id.toString()}>{p.project_name}</SelectItem>)}
@@ -651,7 +651,7 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
             </div>
 
             <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-                <DialogContent className="max-w-6xl">
+                <DialogContent className="sm:max-w-4xl">
                     <DialogHeader>
                         <DialogTitle>New Work</DialogTitle>
                         <DialogDescription>Create a new work item.</DialogDescription>
@@ -667,7 +667,7 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
             </Dialog>
 
             <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-                <DialogContent className="max-w-6xl">
+                <DialogContent className="sm:max-w-4xl">
                     <DialogHeader>
                         <DialogTitle>Edit Work</DialogTitle>
                         <DialogDescription>Update details for {selectedWork?.title}.</DialogDescription>

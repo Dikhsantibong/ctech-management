@@ -62,9 +62,10 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
-        $project->load('members', 'tasks');
+        $project->load('members', 'tasks', 'milestones.pic', 'milestones.checklists', 'revisions', 'feedbacks', 'meetings.participants', 'documents.uploader');
         return Inertia::render('projects/show', [
-            'project' => $project
+            'project' => $project,
+            'users' => User::all(), // Needed for assigning PIC to milestone
         ]);
     }
 
@@ -102,4 +103,88 @@ class ProjectController extends Controller
         $project->delete();
         return redirect()->back()->with('success', 'Project deleted successfully.');
     }
+
+    public function storeRevision(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'version_tag' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|string|max:255',
+        ]);
+
+        $project->revisions()->create([
+            'requested_by' => auth()->id(),
+            'version_tag' => $validated['version_tag'],
+            'title' => $validated['title'],
+            'category' => $validated['category'],
+            'description' => $validated['description'],
+            'status' => $validated['status'],
+        ]);
+
+        return redirect()->back();
+    }
+
+    public function storeFeedback(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string',
+            'priority' => 'required|string|max:255',
+            'status' => 'required|string|max:255',
+        ]);
+
+        $project->feedbacks()->create([
+            'subject' => $validated['subject'],
+            'message' => $validated['message'],
+            'priority' => $validated['priority'],
+            'status' => $validated['status'],
+        ]);
+
+        return redirect()->back();
+    }
+
+    public function convertFeedbackToTask(Request $request, Project $project, $feedbackId)
+    {
+        $feedback = \App\Models\ClientFeedback::findOrFail($feedbackId);
+        
+        $project->tasks()->create([
+            'title' => 'Feedback: ' . $feedback->subject,
+            'description' => $feedback->message,
+            'status' => 'Todo',
+            'priority' => $feedback->priority === 'Urgent' ? 'High' : ($feedback->priority === 'High' ? 'High' : 'Medium'),
+            'metadata' => [
+                'checklists' => [],
+                'attachments' => [],
+                'comments' => [
+                    ['id' => uniqid(), 'user' => 'System', 'text' => 'Task automatically generated from client feedback.', 'timestamp' => now()->format('Y-m-d H:i:s')]
+                ]
+            ]
+        ]);
+
+        $feedback->update(['status' => 'Development']);
+
+        return redirect()->back();
+    }
+
+
+    public function updateMetadata(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'tech_stack' => 'nullable|string',
+            'repo_link' => 'nullable|string',
+            'domain_link' => 'nullable|string',
+            'design_link' => 'nullable|string',
+            'structure_notes' => 'nullable|string',
+        ]);
+
+        $metadata = $project->metadata ?? [];
+        $project->update([
+            'metadata' => array_merge($metadata, $validated)
+        ]);
+
+        return redirect()->back();
+    }
+
 }
