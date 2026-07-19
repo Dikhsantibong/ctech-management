@@ -147,10 +147,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 // Chart Data
                 $data['project_status_chart'] = \App\Models\Project::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
                 
-                // Mock revenue trend since we don't have historical monthly revenue table easily queryable yet
+                // Real revenue trend (Paid invoices over the last 7 months)
+                $months = collect(range(6, 0))->map(function($i) {
+                    return now()->subMonths($i)->format('M');
+                })->values()->toArray();
+                
+                $revenueData = [];
+                for ($i = 6; $i >= 0; $i--) {
+                    $monthStart = now()->subMonths($i)->startOfMonth();
+                    $monthEnd = now()->subMonths($i)->endOfMonth();
+                    
+                    $sum = \App\Models\Invoice::where('status', 'Paid')
+                        ->whereBetween('created_at', [$monthStart, $monthEnd])
+                        ->sum('total');
+                    $revenueData[] = (float) $sum;
+                }
+                
                 $data['revenue_trend_chart'] = [
-                    'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-                    'data' => [120000000, 150000000, 180000000, 140000000, 210000000, 250000000, 280000000],
+                    'labels' => $months,
+                    'data' => $revenueData,
                 ];
             }
 
