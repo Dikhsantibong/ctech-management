@@ -11,9 +11,9 @@ class ProjectMilestoneController extends Controller
 {
     public function __construct()
     {
-        // Require authentication
-        $this->middleware(['auth', 'verified']);
-        
+        // Require authentication - use auth for session-based auth (Inertia)
+        $this->middleware('auth');
+
         // Developer can only update progress
         $this->middleware('role:direktur_utama,direktur_operasional,admin_operasional,staff')
              ->only(['index', 'store', 'update', 'destroy']);
@@ -36,8 +36,13 @@ class ProjectMilestoneController extends Controller
             'pic_user_id' => 'nullable|exists:users,id',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
-            'status' => 'in:Not Started,In Progress,Review,Completed,Delayed'
+            'status' => 'sometimes|in:Not Started,In Progress,Review,Completed,Delayed'
         ]);
+
+        // Set default status if not provided
+        if (!isset($validated['status'])) {
+            $validated['status'] = 'Not Started';
+        }
 
         $milestone = $project->milestones()->create($validated);
         return response()->json(['message' => 'Milestone created successfully', 'data' => $milestone], 201);

@@ -14,7 +14,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
+Route::middleware('auth')->prefix('v1')->group(function () {
     // Milestones
     Route::post('/projects/{project}/milestones', [ProjectMilestoneController::class, 'store']);
     Route::put('/milestones/{milestone}/progress', [ProjectMilestoneController::class, 'updateProgress']);
