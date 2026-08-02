@@ -1,69 +1,114 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatDistanceToNow } from 'date-fns';
-import { Activity, PlusCircle, Edit, Trash2, CheckCircle, FileText, Calendar, Upload } from 'lucide-react';
+import { id as localeId } from 'date-fns/locale';
+import { Activity, PlusCircle, Edit, Trash2, CheckCircle, Calendar, Upload, Loader2 } from 'lucide-react';
 import { apiFetch } from '@/lib/fetch';
+
+/** Aksi disimpan dalam bahasa Inggris di DB; tampilkan versi Indonesianya */
+const ACTION_META: Record<string, { label: string; icon: React.ElementType; tone: string }> = {
+    created: { label: 'menambahkan', icon: PlusCircle, tone: 'text-emerald-600 dark:text-emerald-400' },
+    updated: { label: 'memperbarui', icon: Edit, tone: 'text-blue-600 dark:text-blue-400' },
+    deleted: { label: 'menghapus', icon: Trash2, tone: 'text-rose-600 dark:text-rose-400' },
+    completed: { label: 'menyelesaikan', icon: CheckCircle, tone: 'text-emerald-600 dark:text-emerald-400' },
+    uploaded: { label: 'mengupload', icon: Upload, tone: 'text-violet-600 dark:text-violet-400' },
+    scheduled: { label: 'menjadwalkan', icon: Calendar, tone: 'text-amber-600 dark:text-amber-400' },
+};
 
 export default function ProjectActivity({ project }: { project: any }) {
     const [activities, setActivities] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
     useEffect(() => {
         const fetchActivities = async () => {
+            setLoading(true);
+            setError(false);
             try {
                 const res = await apiFetch(`/api/v1/projects/${project.id}/activities`);
+                if (!res.ok) throw new Error('request failed');
                 const data = await res.json();
-                setActivities(data);
-            } catch (e) {
-                console.error('Failed to fetch activities');
+                setActivities(Array.isArray(data) ? data : []);
+            } catch {
+                setError(true);
+                setActivities([]);
+            } finally {
+                setLoading(false);
             }
         };
         fetchActivities();
     }, [project.id]);
 
-    const getActionIcon = (action: string) => {
-        switch (action.toLowerCase()) {
-            case 'created': return <PlusCircle className="h-5 w-5 text-green-500" />;
-            case 'updated': return <Edit className="h-5 w-5 text-blue-500" />;
-            case 'deleted': return <Trash2 className="h-5 w-5 text-red-500" />;
-            case 'completed': return <CheckCircle className="h-5 w-5 text-green-600" />;
-            case 'uploaded': return <Upload className="h-5 w-5 text-purple-500" />;
-            case 'scheduled': return <Calendar className="h-5 w-5 text-yellow-500" />;
-            default: return <Activity className="h-5 w-5 text-gray-500" />;
+    const relativeTime = (value: string) => {
+        try {
+            return formatDistanceToNow(new Date(value), { addSuffix: true, locale: localeId });
+        } catch {
+            return '';
         }
     };
 
     return (
         <div className="space-y-6">
-            <h3 className="text-lg font-medium">Activity Timeline</h3>
-            
+            <div className="rounded-xl border bg-card p-4 shadow-sm">
+                <h3 className="flex items-center gap-2 text-lg font-semibold">
+                    <Activity className="h-5 w-5 text-muted-foreground" /> Linimasa Aktivitas
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                    Rekam jejak perubahan pada proyek ini — siapa melakukan apa dan kapan.
+                </p>
+            </div>
+
             <Card>
                 <CardContent className="p-6">
-                    {activities.length === 0 ? (
-                        <div className="text-center py-8 text-muted-foreground">
-                            <Activity className="h-10 w-10 mx-auto mb-2 opacity-20" />
-                            <p>No recent activity found for this project.</p>
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                            <Loader2 className="mb-2 h-8 w-8 animate-spin opacity-50" />
+                            <p className="text-sm">Memuat aktivitas…</p>
+                        </div>
+                    ) : error ? (
+                        <div className="py-12 text-center text-muted-foreground">
+                            <Activity className="mx-auto mb-2 h-10 w-10 opacity-20" />
+                            <p className="text-sm">Gagal memuat aktivitas. Coba muat ulang halaman.</p>
+                        </div>
+                    ) : activities.length === 0 ? (
+                        <div className="py-12 text-center text-muted-foreground">
+                            <Activity className="mx-auto mb-2 h-10 w-10 opacity-20" />
+                            <p className="font-medium">Belum ada aktivitas tercatat</p>
+                            <p className="text-sm">Perubahan pada milestone, dokumen, dan meeting akan muncul di sini.</p>
                         </div>
                     ) : (
-                        <div className="relative border-l border-muted ml-4 space-y-8 py-4">
-                            {activities.map((activity) => (
-                                <div key={activity.id} className="relative pl-6">
-                                    <div className="absolute -left-3 top-0 bg-background rounded-full border shadow-sm p-0.5">
-                                        {getActionIcon(activity.action)}
-                                    </div>
-                                    <div className="flex flex-col space-y-1">
-                                        <div className="flex items-center justify-between">
-                                            <p className="text-sm font-medium">
-                                                <span className="font-bold">{activity.user?.name || 'System'}</span>{' '}
-                                                {activity.action} a {activity.model_type}
-                                            </p>
-                                            <span className="text-xs text-muted-foreground whitespace-nowrap ml-4">
-                                                {formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}
-                                            </span>
+                        <div className="relative ml-4 space-y-6 border-l py-2">
+                            {activities.map((activity) => {
+                                const meta = ACTION_META[String(activity.action).toLowerCase()] ?? {
+                                    label: activity.action,
+                                    icon: Activity,
+                                    tone: 'text-muted-foreground',
+                                };
+                                const Icon = meta.icon;
+
+                                return (
+                                    <div key={activity.id} className="relative pl-6">
+                                        <div className="absolute -left-[13px] top-0 rounded-full border bg-background p-1 shadow-sm">
+                                            <Icon className={`h-3.5 w-3.5 ${meta.tone}`} />
                                         </div>
-                                        <p className="text-sm text-muted-foreground">{activity.description}</p>
+                                        <div className="space-y-0.5">
+                                            <div className="flex flex-wrap items-baseline justify-between gap-2">
+                                                <p className="text-sm">
+                                                    <span className="font-semibold">{activity.user?.name || 'Sistem'}</span>{' '}
+                                                    <span className={meta.tone}>{meta.label}</span>{' '}
+                                                    <span className="text-muted-foreground">{activity.model_type}</span>
+                                                </p>
+                                                <span className="whitespace-nowrap text-xs text-muted-foreground">
+                                                    {relativeTime(activity.created_at)}
+                                                </span>
+                                            </div>
+                                            {activity.description && (
+                                                <p className="text-sm text-muted-foreground">{activity.description}</p>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </CardContent>

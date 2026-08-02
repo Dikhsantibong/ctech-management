@@ -62,7 +62,17 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
-        $project->load('members', 'tasks', 'milestones.pic', 'milestones.checklists', 'revisions', 'feedbacks', 'meetings.participants', 'documents.uploader');
+        $project->load([
+            'members',
+            'tasks',
+            'milestones' => function($query) {
+                $query->with(['pic', 'checklists', 'tasks']);
+            },
+            'revisions.requester',
+            'feedbacks',
+            'meetings.participants',
+            'documents.uploader'
+        ]);
         return Inertia::render('projects/show', [
             'project' => $project,
             'users' => User::all(), // Needed for assigning PIC to milestone
@@ -141,6 +151,30 @@ class ProjectController extends Controller
             'priority' => $validated['priority'],
             'status' => $validated['status'],
         ]);
+
+        return redirect()->back();
+    }
+
+    public function updateRevisionStatus(Request $request, Project $project, $revisionId)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:Pending,In Progress,Completed',
+        ]);
+
+        $revision = $project->revisions()->findOrFail($revisionId);
+        $revision->update(['status' => $validated['status']]);
+
+        return redirect()->back();
+    }
+
+    public function updateFeedbackStatus(Request $request, Project $project, $feedbackId)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:Open,Review,Development,Testing,Completed',
+        ]);
+
+        $feedback = $project->feedbacks()->findOrFail($feedbackId);
+        $feedback->update(['status' => $validated['status']]);
 
         return redirect()->back();
     }

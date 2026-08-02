@@ -72,6 +72,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('api/v1')->group(function () {
 // Milestones
     Route::post('/projects/{project}/milestones', [ProjectMilestoneController::class, 'store']);
+    Route::put('/milestones/{milestone}', [ProjectMilestoneController::class, 'update']);
     Route::put('/milestones/{milestone}/progress', [ProjectMilestoneController::class, 'updateProgress']);
 
     // Documents
@@ -235,9 +236,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('projects', \App\Http\Controllers\ProjectController::class);
 
         Route::put('/projects/{project}/metadata', [\App\Http\Controllers\ProjectController::class, 'updateMetadata'])->name('projects.metadata.update');
-Route::post('/projects/{project}/revisions', [\App\Http\Controllers\ProjectController::class, 'storeRevision'])->name('projects.revisions.store');
-    Route::post('/projects/{project}/feedbacks', [\App\Http\Controllers\ProjectController::class, 'storeFeedback'])->name('projects.feedbacks.store');
-    Route::post('/projects/{project}/feedbacks/{feedback}/convert-to-task', [\App\Http\Controllers\ProjectController::class, 'convertFeedbackToTask'])->name('projects.feedbacks.convert');
+        Route::post('/projects/{project}/revisions', [\App\Http\Controllers\ProjectController::class, 'storeRevision'])->name('projects.revisions.store');
+        Route::put('/projects/{project}/revisions/{revision}/status', [\App\Http\Controllers\ProjectController::class, 'updateRevisionStatus'])->name('projects.revisions.status');
+        Route::post('/projects/{project}/feedbacks', [\App\Http\Controllers\ProjectController::class, 'storeFeedback'])->name('projects.feedbacks.store');
+        Route::put('/projects/{project}/feedbacks/{feedback}/status', [\App\Http\Controllers\ProjectController::class, 'updateFeedbackStatus'])->name('projects.feedbacks.status');
+        Route::post('/projects/{project}/feedbacks/{feedback}/convert-to-task', [\App\Http\Controllers\ProjectController::class, 'convertFeedbackToTask'])->name('projects.feedbacks.convert');
 
         Route::resource('tasks', \App\Http\Controllers\TaskController::class);
         Route::get('works/report', [\App\Http\Controllers\WorkController::class, 'report'])->name('works.report');
@@ -331,8 +334,31 @@ Route::post('/projects/{project}/revisions', [\App\Http\Controllers\ProjectContr
     })->name('daily-reports.index');
 
     // API-like endpoints for stateful fetch (with session auth)
+    // Semua endpoint /api/v1/* WAJIB di sini, bukan di routes/api.php:
+    // grup middleware "api" stateless sehingga session tidak terbaca dan request dibalas 401.
     Route::get('/api/v1/projects/{project}/activities', [\App\Http\Controllers\Api\V1\ProjectActivityController::class, 'index']);
-    
+
+    // Milestones
+    Route::post('/api/v1/projects/{project}/milestones', [\App\Http\Controllers\Api\V1\ProjectMilestoneController::class, 'store']);
+    Route::put('/api/v1/milestones/{milestone}', [\App\Http\Controllers\Api\V1\ProjectMilestoneController::class, 'update']);
+    Route::put('/api/v1/milestones/{milestone}/progress', [\App\Http\Controllers\Api\V1\ProjectMilestoneController::class, 'updateProgress']);
+    Route::post('/api/v1/milestones/{milestone}/calculate-progress', [\App\Http\Controllers\Api\V1\ProjectMilestoneController::class, 'calculateProgress']);
+    Route::delete('/api/v1/milestones/{milestone}', [\App\Http\Controllers\Api\V1\ProjectMilestoneController::class, 'destroy']);
+
+    // Project documents
+    Route::get('/api/v1/projects/{project}/documents', [\App\Http\Controllers\Api\V1\ProjectDocumentController::class, 'index']);
+    Route::post('/api/v1/projects/{project}/document-folders', [\App\Http\Controllers\Api\V1\ProjectDocumentController::class, 'storeFolder']);
+    Route::post('/api/v1/projects/{project}/documents', [\App\Http\Controllers\Api\V1\ProjectDocumentController::class, 'storeDocument']);
+    Route::get('/api/v1/documents/{document}/download', [\App\Http\Controllers\Api\V1\ProjectDocumentController::class, 'download']);
+    Route::delete('/api/v1/documents/{document}', [\App\Http\Controllers\Api\V1\ProjectDocumentController::class, 'destroy']);
+
+    // Meetings
+    Route::get('/api/v1/projects/{project}/meetings', [\App\Http\Controllers\Api\V1\ProjectMeetingController::class, 'index']);
+    Route::post('/api/v1/projects/{project}/meetings', [\App\Http\Controllers\Api\V1\ProjectMeetingController::class, 'store']);
+    Route::put('/api/v1/meetings/{meeting}/minutes', [\App\Http\Controllers\Api\V1\ProjectMeetingController::class, 'updateMinutes']);
+    Route::post('/api/v1/meetings/{meeting}/action-items', [\App\Http\Controllers\Api\V1\ProjectMeetingController::class, 'storeActionItem']);
+
+
     Route::get('/api/v1/daily-reports', [\App\Http\Controllers\Api\V1\DailyReportController::class, 'index']);
     Route::post('/api/v1/daily-reports', [\App\Http\Controllers\Api\V1\DailyReportController::class, 'store']);
     

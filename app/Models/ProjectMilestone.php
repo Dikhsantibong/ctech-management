@@ -32,4 +32,9 @@ class ProjectMilestone extends Model
     {
         return $this->hasMany(ProjectMilestoneChecklist::class);
     }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'project_milestone_id');
+    }
 }

@@ -13,10 +13,6 @@ class ProjectMilestoneController extends Controller
     {
         // Require authentication - use auth for session-based auth (Inertia)
         $this->middleware('auth');
-
-        // Developer can only update progress
-        $this->middleware('role:direktur_utama,direktur_operasional,admin_operasional,staff')
-             ->only(['index', 'store', 'update', 'destroy']);
     }
 
     public function index($projectId)
@@ -51,14 +47,14 @@ class ProjectMilestoneController extends Controller
     public function update(Request $request, $id)
     {
         $milestone = ProjectMilestone::findOrFail($id);
-        
+
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'pic_user_id' => 'nullable|exists:users,id',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
-            'status' => 'in:Not Started,In Progress,Review,Completed,Delayed'
+            'status' => 'sometimes|in:Not Started,In Progress,Review,Completed,Delayed'
         ]);
 
         $milestone->update($validated);
@@ -74,6 +70,22 @@ class ProjectMilestoneController extends Controller
         ]);
 
         $milestone->update(['progress' => $validated['progress']]);
+
+        return response()->json(['message' => 'Progress updated successfully', 'data' => $milestone]);
+    }
+
+    public function calculateProgress($id)
+    {
+        $milestone = ProjectMilestone::with('tasks')->findOrFail($id);
+        
+        // Calculate progress based on tasks
+        $tasks = $milestone->tasks;
+        if ($tasks->count() > 0) {
+            // Enum status task adalah Todo/Progress/Review/Done — bukan "Completed"
+            $completedTasks = $tasks->where('status', 'Done')->count();
+            $progress = ($completedTasks / $tasks->count()) * 100;
+            $milestone->update(['progress' => (int) $progress]);
+        }
         
         // Update project total progress
         $project = $milestone->project;
@@ -83,7 +95,7 @@ class ProjectMilestoneController extends Controller
             $project->update(['progress' => (int) $avgProgress]);
         }
 
-        return response()->json(['message' => 'Progress updated successfully', 'data' => $milestone]);
+        return response()->json(['message' => 'Progress calculated successfully', 'data' => $milestone]);
     }
 
     public function destroy($id)

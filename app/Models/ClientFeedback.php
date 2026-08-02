@@ -9,7 +9,7 @@ class ClientFeedback extends Model
 {
     protected $table = 'client_feedbacks';
 
-    protected $fillable = ['project_id', 'client_id', 'subject', 'message', 'attachment_path', 'status'];
+    protected $fillable = ['project_id', 'client_id', 'subject', 'message', 'attachment_path', 'priority', 'status'];
 
     public function project(): BelongsTo
     {

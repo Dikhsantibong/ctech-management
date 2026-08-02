@@ -413,7 +413,7 @@ export default function ProjectsIndex({ projects, users, filters }: { projects: 
                                                 </Badge>
                                             </td>
                                             <td className="p-4 align-middle text-muted-foreground">
-                                                {new Date(project.deadline).toLocaleDateString()}
+                                                {new Date(project.deadline).toLocaleDateString('id-ID')}
                                             </td>
                                             <td className="p-4 align-middle">
                                                 <div className="flex -space-x-2 overflow-hidden">

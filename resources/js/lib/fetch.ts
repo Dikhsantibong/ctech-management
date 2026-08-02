@@ -4,11 +4,19 @@ export function getCsrfToken() {
 }
 
 export async function apiFetch(url: string, options: RequestInit = {}) {
+    // FormData harus dibiarkan tanpa Content-Type agar browser menulis boundary
+    // multipart-nya sendiri; memaksa application/json membuat upload file gagal diparse.
+    const isFormData = options.body instanceof FormData;
+
     const headers: Record<string, string> = {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...((options.headers as Record<string, string>) || {})
     };
+
+    if (isFormData) {
+        delete headers['Content-Type'];
+    }
 
     const csrfToken = getCsrfToken();
     if (csrfToken && !['GET', 'HEAD', 'OPTIONS'].includes(options.method?.toUpperCase() || 'GET')) {

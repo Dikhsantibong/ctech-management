@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProjectRevision extends Model
 {
-    protected $fillable = ['project_id', 'requested_by', 'version_tag', 'title', 'description', 'status'];
+    protected $fillable = ['project_id', 'requested_by', 'version_tag', 'title', 'description', 'category', 'status'];
 
     public function project(): BelongsTo
     {
