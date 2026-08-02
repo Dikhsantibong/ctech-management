@@ -1,545 +1,643 @@
 import { Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Clock, CheckSquare, Users, DollarSign, Calendar as CalendarIcon, ArrowRight, Megaphone } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import {
+    ChevronLeft, ChevronRight, Clock, Briefcase, Users, Receipt, Megaphone, ListTodo,
+    MapPin, AlertTriangle, CheckCircle2, CalendarDays, ExternalLink, CircleDot,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 
-interface Event {
+type EventType = 'project' | 'task' | 'meeting' | 'invoice' | 'content_plan';
+
+type CalendarEvent = {
     id: string;
+    type: EventType;
     title: string;
-    date: Date;
-    type: 'project' | 'task' | 'meeting' | 'invoice' | 'content_plan';
-    description?: string;
+    date: string; // YYYY-MM-DD
     time?: string;
-    location?: string;
-    priority?: 'high' | 'medium' | 'low';
-    daysUntil?: number;
-    platform?: string;
-    content_type?: string;
-}
-
-const getEventIcon = (type: string) => {
-    switch (type) {
-        case 'project':
-            return <CheckSquare className="h-4 w-4" />;
-        case 'task':
-            return <Clock className="h-4 w-4" />;
-        case 'meeting':
-            return <Users className="h-4 w-4" />;
-        case 'invoice':
-            return <DollarSign className="h-4 w-4" />;
-        case 'content_plan':
-            return <Megaphone className="h-4 w-4" />;
-        default:
-            return <CalendarIcon className="h-4 w-4" />;
-    }
+    description?: string | null;
+    status?: string;
+    priority?: string;
+    location?: string | null;
+    duration?: number;
+    amount?: number;
+    context?: string | null;
+    url?: string | null;
+    is_done?: boolean;
 };
 
-const getEventColor = (type: string) => {
-    switch (type) {
-        case 'project':
-            return 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800';
-        case 'task':
-            return 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
-        case 'meeting':
-            return 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800';
-        case 'invoice':
-            return 'bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
-        case 'content_plan':
-            return 'bg-pink-100 text-pink-800 border-pink-300 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800';
-        default:
-            return 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700';
-    }
+const TYPE_META: Record<EventType, { label: string; icon: any; dot: string; bar: string; chip: string; soft: string }> = {
+    project: {
+        label: 'Deadline Project',
+        icon: Briefcase,
+        dot: 'bg-indigo-500',
+        bar: 'border-l-indigo-500',
+        chip: 'border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950/50 dark:text-indigo-300',
+        soft: 'bg-indigo-50/70 dark:bg-indigo-950/30',
+    },
+    task: {
+        label: 'Task',
+        icon: ListTodo,
+        dot: 'bg-emerald-500',
+        bar: 'border-l-emerald-500',
+        chip: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-300',
+        soft: 'bg-emerald-50/70 dark:bg-emerald-950/30',
+    },
+    meeting: {
+        label: 'Meeting',
+        icon: Users,
+        dot: 'bg-violet-500',
+        bar: 'border-l-violet-500',
+        chip: 'border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-900 dark:bg-violet-950/50 dark:text-violet-300',
+        soft: 'bg-violet-50/70 dark:bg-violet-950/30',
+    },
+    invoice: {
+        label: 'Jatuh Tempo Invoice',
+        icon: Receipt,
+        dot: 'bg-amber-500',
+        bar: 'border-l-amber-500',
+        chip: 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-300',
+        soft: 'bg-amber-50/70 dark:bg-amber-950/30',
+    },
+    content_plan: {
+        label: 'Konten',
+        icon: Megaphone,
+        dot: 'bg-pink-500',
+        bar: 'border-l-pink-500',
+        chip: 'border-pink-200 bg-pink-50 text-pink-700 dark:border-pink-900 dark:bg-pink-950/50 dark:text-pink-300',
+        soft: 'bg-pink-50/70 dark:bg-pink-950/30',
+    },
 };
 
-const getEventBadgeColor = (type: string) => {
-    switch (type) {
-        case 'project':
-            return 'bg-blue-500';
-        case 'task':
-            return 'bg-green-500';
-        case 'meeting':
-            return 'bg-purple-500';
-        case 'invoice':
-            return 'bg-orange-500';
-        case 'content_plan':
-            return 'bg-pink-500';
-        default:
-            return 'bg-gray-500';
-    }
+const TYPES = Object.keys(TYPE_META) as EventType[];
+
+// Minggu dimulai Senin, sesuai kebiasaan penanggalan Indonesia
+const DAY_NAMES = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+const MONTH_NAMES = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+];
+
+const toKey = (date: Date) =>
+    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+const startOfToday = () => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
 };
 
-export default function CalendarIndex({ events: initialEvents }: { events: any[] }) {
-    const [viewMode, setViewMode] = useState<'monthly' | 'weekly' | 'agenda'>('monthly');
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const [selectedEvents, setSelectedEvents] = useState<Event[]>([]);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+const formatRupiah = (value: number) =>
+    new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
 
-    // Convert backend events to frontend format
-    const events: Event[] = initialEvents.map((event) => ({
-        ...event,
-        date: new Date(event.date),
-    }));
+export default function CalendarIndex({ events: initialEvents }: { events: CalendarEvent[] }) {
+    const [viewMode, setViewMode] = useState<'bulan' | 'minggu' | 'agenda'>('bulan');
+    const [cursor, setCursor] = useState(() => startOfToday());
+    const [selectedKey, setSelectedKey] = useState<string>(() => toKey(startOfToday()));
+    const [hiddenTypes, setHiddenTypes] = useState<EventType[]>([]);
 
-    const getDaysInMonth = (date: Date) => {
-        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-    };
+    const today = startOfToday();
+    const todayKey = toKey(today);
 
-    const getFirstDayOfMonth = (date: Date) => {
-        return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-    };
+    const events = useMemo(() => initialEvents ?? [], [initialEvents]);
 
-    const getEventsForDate = (date: Date) => {
-        return events.filter(
-            (event) =>
-                event.date.getDate() === date.getDate() &&
-                event.date.getMonth() === date.getMonth() &&
-                event.date.getFullYear() === date.getFullYear()
-        );
-    };
+    const visibleEvents = useMemo(
+        () => events.filter((e) => !hiddenTypes.includes(e.type)),
+        [events, hiddenTypes],
+    );
 
-    const handleDateClick = (date: Date) => {
-        const dateEvents = getEventsForDate(date);
-        if (dateEvents.length > 0) {
-            setSelectedDate(date);
-            setSelectedEvents(dateEvents);
-            setIsDialogOpen(true);
+    /** Pengelompokan per tanggal supaya pencarian per hari tidak O(n) berulang. */
+    const byDate = useMemo(() => {
+        const map: Record<string, CalendarEvent[]> = {};
+        for (const event of visibleEvents) {
+            (map[event.date] ??= []).push(event);
         }
-    };
+        for (const key of Object.keys(map)) {
+            map[key].sort((a, b) => (a.time ?? '99:99').localeCompare(b.time ?? '99:99'));
+        }
+        return map;
+    }, [visibleEvents]);
 
-    const getWeekStart = (date: Date) => {
-        const d = new Date(date);
-        const day = d.getDay();
-        const diff = d.getDate() - day;
-        return new Date(d.setDate(diff));
-    };
+    const typeCounts = useMemo(() => {
+        const counts = {} as Record<EventType, number>;
+        for (const type of TYPES) counts[type] = 0;
+        for (const event of events) counts[event.type]++;
+        return counts;
+    }, [events]);
 
-    const getWeekDays = () => {
-        const start = getWeekStart(currentDate);
-        return Array.from({ length: 7 }, (_, i) => {
+    const isOverdue = (event: CalendarEvent) => !event.is_done && event.date < todayKey;
+
+    const stats = useMemo(() => {
+        const weekEnd = new Date(today);
+        weekEnd.setDate(weekEnd.getDate() + 7);
+        const weekEndKey = toKey(weekEnd);
+
+        return {
+            today: visibleEvents.filter((e) => e.date === todayKey).length,
+            week: visibleEvents.filter((e) => e.date >= todayKey && e.date < weekEndKey).length,
+            overdue: visibleEvents.filter(isOverdue).length,
+            total: visibleEvents.length,
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [visibleEvents, todayKey]);
+
+    /** 6 baris penuh termasuk tanggal bulan sebelum/sesudah — layout kalender standar. */
+    const monthGrid = useMemo(() => {
+        const first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
+        const offset = (first.getDay() + 6) % 7; // Senin = 0
+        const start = new Date(first);
+        start.setDate(start.getDate() - offset);
+
+        return Array.from({ length: 42 }, (_, i) => {
             const date = new Date(start);
-            date.setDate(date.getDate() + i);
+            date.setDate(start.getDate() + i);
             return date;
         });
+    }, [cursor]);
+
+    const weekDays = useMemo(() => {
+        const offset = (cursor.getDay() + 6) % 7;
+        const start = new Date(cursor);
+        start.setDate(start.getDate() - offset);
+
+        return Array.from({ length: 7 }, (_, i) => {
+            const date = new Date(start);
+            date.setDate(start.getDate() + i);
+            return date;
+        });
+    }, [cursor]);
+
+    const selectedEvents = byDate[selectedKey] ?? [];
+
+    const shift = (direction: -1 | 1) => {
+        const next = new Date(cursor);
+        if (viewMode === 'bulan') next.setMonth(next.getMonth() + direction);
+        else next.setDate(next.getDate() + direction * 7);
+        setCursor(next);
     };
 
-    const getUpcomingEvents = () => {
-        return events.sort((a, b) => a.date.getTime() - b.date.getTime());
+    const toggleType = (type: EventType) => {
+        setHiddenTypes((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]));
     };
 
-    const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December',
-    ];
-
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-    const renderMonthlyView = () => {
-        const daysInMonth = getDaysInMonth(currentDate);
-        const firstDay = getFirstDayOfMonth(currentDate);
-        const days = [];
-
-        // Empty cells
-        for (let i = 0; i < firstDay; i++) {
-            days.push(
-                <div key={`empty-${i}`} className="aspect-square bg-muted/30"></div>
-            );
+    const periodLabel = () => {
+        if (viewMode === 'bulan') return `${MONTH_NAMES[cursor.getMonth()]} ${cursor.getFullYear()}`;
+        if (viewMode === 'minggu') {
+            const a = weekDays[0];
+            const b = weekDays[6];
+            const sameMonth = a.getMonth() === b.getMonth();
+            return sameMonth
+                ? `${a.getDate()}–${b.getDate()} ${MONTH_NAMES[a.getMonth()]} ${a.getFullYear()}`
+                : `${a.getDate()} ${MONTH_NAMES[a.getMonth()]} – ${b.getDate()} ${MONTH_NAMES[b.getMonth()]} ${b.getFullYear()}`;
         }
+        return 'Agenda Mendatang';
+    };
 
-        // Days
-        for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-            const events = getEventsForDate(date);
-            const isToday = new Date().toDateString() === date.toDateString();
-
-            days.push(
-                <div
-                    key={day}
-                    title={date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                    className={`aspect-square border rounded-lg p-2 overflow-hidden cursor-pointer hover:shadow-md transition-shadow group relative ${
-                        isToday ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-border'
-                    }`}
-                    onClick={() => handleDateClick(date)}
-                >
-                    <div className={`text-sm font-semibold mb-1 ${isToday ? 'text-blue-600 dark:text-blue-400' : 'text-foreground'}`}>
-                        {day}
-                    </div>
-                    <div className="space-y-1">
-                        {events.map((event) => (
-                            <div
-                                key={event.id}
-                                className={`text-xs px-2 py-1 rounded border ${getEventColor(event.type)}`}
-                                title={event.title}
-                            >
-                                <div className="truncate font-medium">{event.title}</div>
-                            </div>
-                        ))}
-                    </div>
-                    {events.length > 0 && (
-                        <div className="text-xs text-muted-foreground mt-2 pt-1 border-t border-border">
-                            {events.length} event{events.length > 1 ? 's' : ''}
-                        </div>
-                    )}
-                </div>
-            );
-        }
+    /** Baris kecil di dalam sel kalender. */
+    const EventChip = ({ event }: { event: CalendarEvent }) => {
+        const meta = TYPE_META[event.type];
+        const overdue = isOverdue(event);
 
         return (
-            <div className="grid grid-cols-7 gap-1 bg-card text-card-foreground rounded-lg border p-4">
-                {dayNames.map((day) => (
-                    <div key={day} className="text-center font-semibold text-muted-foreground py-2">
-                        {day}
-                    </div>
-                ))}
-                {days}
+            <div
+                className={`flex items-center gap-1 rounded px-1 py-0.5 text-[11px] leading-tight ${meta.soft} ${
+                    event.is_done ? 'opacity-55' : ''
+                }`}
+                title={`${meta.label}: ${event.title}`}
+            >
+                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${overdue ? 'bg-rose-500' : meta.dot}`} />
+                {event.time && <span className="shrink-0 font-medium tabular-nums">{event.time}</span>}
+                <span className={`truncate ${event.is_done ? 'line-through' : ''}`}>{event.title}</span>
             </div>
         );
     };
 
-    const renderWeeklyView = () => {
-        const weekDays = getWeekDays();
-        const startDate = weekDays[0];
-        const endDate = weekDays[6];
+    /** Kartu rincian di panel kanan / agenda. */
+    const EventCard = ({ event }: { event: CalendarEvent }) => {
+        const meta = TYPE_META[event.type];
+        const Icon = meta.icon;
+        const overdue = isOverdue(event);
 
-        return (
-            <div className="bg-card text-card-foreground rounded-lg border p-4">
-                <div className="text-sm text-muted-foreground mb-4 flex items-center justify-between">
-                    <div>
-                        <div className="font-semibold text-foreground">
-                            {startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} - {endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                            {startDate.toLocaleDateString('en-US', { weekday: 'short' })} to {endDate.toLocaleDateString('en-US', { weekday: 'short' })}
-                        </div>
-                    </div>
+        const body = (
+            <div
+                className={`rounded-lg border border-l-[3px] bg-card p-3 transition-shadow hover:shadow-sm ${meta.bar} ${
+                    event.is_done ? 'opacity-70' : ''
+                }`}
+            >
+                <div className="mb-1 flex items-start justify-between gap-2">
+                    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${meta.chip}`}>
+                        <Icon className="h-3 w-3" />
+                        {meta.label}
+                    </span>
+                    {overdue ? (
+                        <span className="inline-flex shrink-0 items-center gap-1 text-[11px] font-medium text-rose-600 dark:text-rose-400">
+                            <AlertTriangle className="h-3 w-3" /> Lewat
+                        </span>
+                    ) : event.is_done ? (
+                        <span className="inline-flex shrink-0 items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400">
+                            <CheckCircle2 className="h-3 w-3" /> Selesai
+                        </span>
+                    ) : null}
                 </div>
-                <div className="grid grid-cols-7 gap-2">
-                    {weekDays.map((date, index) => {
-                        const events = getEventsForDate(date);
-                        const isToday = new Date().toDateString() === date.toDateString();
 
-                        return (
-                            <div
-                                key={index}
-                                className={`rounded-lg border p-3 min-h-[300px] overflow-y-auto ${
-                                    isToday ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-border'
-                                }`}
-                            >
-                                <div className="text-sm font-semibold mb-1 text-foreground">
-                                    {dayNames[date.getDay()]}
-                                </div>
-                                <div className="text-lg font-bold text-foreground mb-1">
-                                    {date.getDate()}
-                                </div>
-                                <div className="text-xs text-muted-foreground mb-3">
-                                    {date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })}
-                                </div>
-                                <div className="space-y-2">
-                                    {events.map((event) => (
-                                        <div
-                                            key={event.id}
-                                            className={`text-xs p-2 rounded-md border-l-4 ${getEventColor(event.type)}`}
-                                        >
-                                            <div className="font-medium mb-1">{event.title}</div>
-                                            {event.description && (
-                                                <div className="text-xs opacity-75">{event.description}</div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-        );
-    };
+                <p className={`text-sm font-semibold leading-snug ${event.is_done ? 'line-through' : ''}`}>{event.title}</p>
 
-    const renderAgendaView = () => {
-        const upcomingEvents = getUpcomingEvents();
+                {event.context && <p className="mt-0.5 truncate text-xs text-muted-foreground">{event.context}</p>}
 
-        return (
-            <div className="bg-card text-card-foreground rounded-lg border p-4 space-y-3">
-                {upcomingEvents.length === 0 ? (
-                    <div className="text-center text-muted-foreground py-8">
-                        No upcoming events scheduled
-                    </div>
-                ) : (
-                    upcomingEvents.map((event) => (
-                        <div
-                            key={event.id}
-                            className={`flex items-start gap-4 p-4 rounded-lg border-l-4 ${getEventColor(event.type)} cursor-pointer hover:shadow-md transition-shadow`}
-                        >
-                            <div className="flex-shrink-0 mt-1">
-                                {getEventIcon(event.type)}
-                            </div>
-                            <div className="flex-grow">
-                                <div className="font-semibold text-foreground mb-1">{event.title}</div>
-                                {event.description && (
-                                    <div className="text-sm text-muted-foreground mb-2">{event.description}</div>
-                                )}
-                                <div className="space-y-1 text-sm text-muted-foreground">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-xs font-semibold text-muted-foreground">DATE:</span>
-                                        <span>
-                                            {event.date.toLocaleDateString('en-US', {
-                                                weekday: 'short',
-                                                month: 'short',
-                                                day: 'numeric',
-                                                year: 'numeric',
-                                            })}
-                                        </span>
-                                    </div>
-                                    {event.time && (
-                                        <div className="flex items-center gap-2">
-                                            <Clock className="h-3 w-3 text-muted-foreground" />
-                                            <span className="text-xs">{event.time}</span>
-                                        </div>
-                                    )}
-                                    {event.location && (
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xs font-semibold text-muted-foreground">LOCATION:</span>
-                                            <span className="text-xs">{event.location}</span>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="flex-shrink-0 flex flex-col gap-2 items-end">
-                                <Badge variant="outline">{event.type}</Badge>
-                                {event.priority && (
-                                    <Badge variant={event.priority === 'high' ? 'destructive' : event.priority === 'medium' ? 'default' : 'secondary'}>
-                                        {event.priority}
-                                    </Badge>
-                                )}
-                            </div>
-                        </div>
-                    ))
+                {event.description && (
+                    <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{event.description}</p>
                 )}
+
+                <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
+                    {event.time && (
+                        <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {event.time}
+                            {event.duration ? ` · ${event.duration} menit` : ''}
+                        </span>
+                    )}
+                    {event.location && (
+                        <span className="flex min-w-0 items-center gap-1">
+                            <MapPin className="h-3 w-3 shrink-0" />
+                            <span className="truncate">{event.location.replace(/^https?:\/\//, '')}</span>
+                        </span>
+                    )}
+                    {typeof event.amount === 'number' && (
+                        <span className="font-medium text-foreground">{formatRupiah(event.amount)}</span>
+                    )}
+                    {event.priority && (
+                        <span className="flex items-center gap-1">
+                            <CircleDot className="h-3 w-3" />
+                            {event.priority}
+                        </span>
+                    )}
+                    {event.status && <span className="rounded bg-muted px-1.5 py-0.5">{event.status}</span>}
+                </div>
             </div>
+        );
+
+        return event.url ? (
+            <Link href={event.url} className="block">
+                <div className="group relative">
+                    {body}
+                    <ExternalLink className="absolute right-3 top-9 h-3.5 w-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                </div>
+            </Link>
+        ) : (
+            body
         );
     };
 
     return (
         <>
-            <Head title="Calendar" />
-            <div className="flex flex-1 flex-col gap-6 p-6">
-                <div className="flex items-center justify-between">
+            <Head title="Kalender" />
+            <div className="flex flex-1 flex-col gap-4 p-6">
+                {/* Header */}
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Calendar</h2>
-                        <p className="text-muted-foreground">Manage your deadlines, meetings, and tasks.</p>
+                        <h2 className="text-2xl font-bold tracking-tight">Kalender</h2>
+                        <p className="text-sm text-muted-foreground">
+                            Semua tenggat project, task, meeting, jadwal konten, dan jatuh tempo invoice dalam satu tampilan.
+                        </p>
                     </div>
                 </div>
 
-                {/* Controls */}
-                <div className="flex items-center justify-between bg-card text-card-foreground rounded-lg border p-4">
-                    <div className="flex items-center gap-4">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                                const newDate = new Date(currentDate);
-                                if (viewMode === 'monthly') {
-                                    newDate.setMonth(newDate.getMonth() - 1);
-                                } else if (viewMode === 'weekly') {
-                                    newDate.setDate(newDate.getDate() - 7);
-                                }
-                                setCurrentDate(newDate);
-                            }}
-                        >
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <div className="text-lg font-semibold min-w-[300px]">
-                            {viewMode === 'monthly' && (
-                                <div>
-                                    <div>{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</div>
-                                    <div className="text-xs text-muted-foreground mt-1">
-                                        {events.filter(e => e.date.getMonth() === currentDate.getMonth() && e.date.getFullYear() === currentDate.getFullYear()).length} events this month
-                                    </div>
-                                </div>
-                            )}
-                            {viewMode === 'weekly' && (
-                                <div>
-                                    <div>Week of {getWeekStart(currentDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(getWeekStart(currentDate).getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-                                    <div className="text-xs text-muted-foreground mt-1">
-                                        {events.filter(e => {
-                                            const eDate = e.date.getTime();
-                                            const weekStart = getWeekStart(currentDate).getTime();
-                                            const weekEnd = weekStart + 7 * 24 * 60 * 60 * 1000;
-                                            return eDate >= weekStart && eDate < weekEnd;
-                                        }).length} events this week
-                                    </div>
-                                </div>
-                            )}
-                            {viewMode === 'agenda' && (
-                                <div>
-                                    <div>Upcoming Events</div>
-                                    <div className="text-xs text-muted-foreground mt-1">
-                                        {events.length} total events scheduled
-                                    </div>
-                                </div>
-                            )}
+                {/* Ringkasan */}
+                <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                    {[
+                        { label: 'Hari Ini', value: stats.today, icon: CalendarDays, tone: 'text-foreground' },
+                        { label: '7 Hari ke Depan', value: stats.week, icon: Clock, tone: 'text-foreground' },
+                        {
+                            label: 'Lewat Tenggat',
+                            value: stats.overdue,
+                            icon: AlertTriangle,
+                            tone: stats.overdue > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-foreground',
+                        },
+                        { label: 'Total Agenda', value: stats.total, icon: CircleDot, tone: 'text-foreground' },
+                    ].map((stat) => (
+                        <div key={stat.label} className="rounded-xl border bg-card p-3.5 shadow-sm">
+                            <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                <stat.icon className="h-3.5 w-3.5" />
+                                {stat.label}
+                            </p>
+                            <p className={`mt-1 text-2xl font-bold leading-none ${stat.tone}`}>{stat.value}</p>
                         </div>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                                const newDate = new Date(currentDate);
-                                if (viewMode === 'monthly') {
-                                    newDate.setMonth(newDate.getMonth() + 1);
-                                } else if (viewMode === 'weekly') {
-                                    newDate.setDate(newDate.getDate() + 7);
-                                }
-                                setCurrentDate(newDate);
-                            }}
-                        >
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setCurrentDate(new Date())}
-                        >
-                            Today
-                        </Button>
-                    </div>
-
-                    <Select value={viewMode} onValueChange={(value: any) => setViewMode(value)}>
-                        <SelectTrigger className="w-40">
-                            <SelectValue placeholder="Select view" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="monthly">Monthly</SelectItem>
-                            <SelectItem value="weekly">Weekly</SelectItem>
-                            <SelectItem value="agenda">Agenda</SelectItem>
-                        </SelectContent>
-                    </Select>
+                    ))}
                 </div>
 
-                {/* Legend */}
-                <div className="flex flex-wrap gap-4 bg-card text-card-foreground rounded-lg border p-4">
-                    <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded bg-blue-500"></div>
-                        <span className="text-sm">Project Deadline</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded bg-green-500"></div>
-                        <span className="text-sm">Task</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded bg-purple-500"></div>
-                        <span className="text-sm">Meeting</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded bg-orange-500"></div>
-                        <span className="text-sm">Invoice Due</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded bg-pink-500"></div>
-                        <span className="text-sm">Content Plan</span>
-                    </div>
-                </div>
+                {/* Kontrol + filter jenis (sekaligus legenda) */}
+                <div className="space-y-3 rounded-xl border bg-card p-3 shadow-sm">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-2">
+                            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => shift(-1)} disabled={viewMode === 'agenda'}>
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => shift(1)} disabled={viewMode === 'agenda'}>
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8"
+                                onClick={() => {
+                                    setCursor(startOfToday());
+                                    setSelectedKey(todayKey);
+                                }}
+                            >
+                                Hari Ini
+                            </Button>
+                            <h3 className="ml-1 text-base font-semibold">{periodLabel()}</h3>
+                        </div>
 
-                {/* Calendar View */}
-                <div>
-                    {viewMode === 'monthly' && renderMonthlyView()}
-                    {viewMode === 'weekly' && renderWeeklyView()}
-                    {viewMode === 'agenda' && renderAgendaView()}
-                </div>
-
-                {/* Event Details Dialog */}
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>
-                                {selectedDate?.toLocaleDateString('en-US', {
-                                    weekday: 'long',
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                })}
-                            </DialogTitle>
-                            <DialogDescription>
-                                {selectedEvents.length} event{selectedEvents.length > 1 ? 's' : ''} scheduled
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-3 mt-4">
-                            {selectedEvents.map((event) => (
-                                <div
-                                    key={event.id}
-                                    className={`p-4 rounded-lg border-l-4 ${getEventColor(event.type)}`}
+                        {/* Pemilih tampilan bergaya segmented control */}
+                        <div className="inline-flex rounded-lg border bg-muted/40 p-0.5">
+                            {(['bulan', 'minggu', 'agenda'] as const).map((mode) => (
+                                <button
+                                    key={mode}
+                                    type="button"
+                                    onClick={() => setViewMode(mode)}
+                                    className={`rounded-md px-3 py-1 text-sm font-medium capitalize transition-colors ${
+                                        viewMode === mode ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                                    }`}
                                 >
-                                    <div className="flex items-start gap-3">
-                                        <div className="flex-shrink-0 mt-1">
-                                            {getEventIcon(event.type)}
-                                        </div>
-                                        <div className="flex-grow">
-                                            <div className="font-semibold text-foreground mb-1">
-                                                {event.title}
-                                            </div>
-                                            {event.description && (
-                                                <div className="text-sm text-muted-foreground mb-2">
-                                                    {event.description}
-                                                </div>
-                                            )}
-                                            <div className="space-y-1 text-sm text-muted-foreground">
-                                                {event.time && (
-                                                    <div className="flex items-center gap-2">
-                                                        <Clock className="h-3 w-3" />
-                                                        <span>{event.time}</span>
-                                                    </div>
-                                                )}
-                                                {event.location && (
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-xs font-semibold">LOCATION:</span>
-                                                        <span className="text-xs">{event.location}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="flex-shrink-0">
-                                            <Badge variant="outline">{event.type}</Badge>
-                                        </div>
-                                    </div>
-                                </div>
+                                    {mode}
+                                </button>
                             ))}
                         </div>
-                        <div className="mt-6 pt-4 border-t flex gap-4">
-                            <Link href="/tasks" className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-                                Lihat Semua Tasks
-                                <ArrowRight className="h-4 w-4" />
-                            </Link>
-                            <Link href="/content-plans" className="inline-flex items-center gap-2 text-sm font-semibold text-pink-600 hover:text-pink-700 transition-colors">
-                                Lihat Semua Content Plans
-                                <ArrowRight className="h-4 w-4" />
-                            </Link>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5 border-t pt-3">
+                        {TYPES.map((type) => {
+                            const meta = TYPE_META[type];
+                            const active = !hiddenTypes.includes(type);
+
+                            return (
+                                <button
+                                    key={type}
+                                    type="button"
+                                    onClick={() => toggleType(type)}
+                                    className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-all ${
+                                        active ? meta.chip : 'border-border bg-transparent text-muted-foreground opacity-60'
+                                    }`}
+                                    title={active ? 'Klik untuk menyembunyikan' : 'Klik untuk menampilkan'}
+                                >
+                                    <span className={`h-2 w-2 rounded-full ${active ? meta.dot : 'bg-muted-foreground/40'}`} />
+                                    {meta.label}
+                                    <span className="opacity-60">{typeCounts[type]}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Isi kalender */}
+                {viewMode === 'agenda' ? (
+                    <AgendaView events={visibleEvents} todayKey={todayKey} EventCard={EventCard} />
+                ) : (
+                    <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
+                        <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+                            {/* Nama hari */}
+                            <div className="grid grid-cols-7 border-b bg-muted/30">
+                                {DAY_NAMES.map((day, i) => (
+                                    <div
+                                        key={day}
+                                        className={`py-2 text-center text-xs font-semibold ${
+                                            i >= 5 ? 'text-muted-foreground/70' : 'text-muted-foreground'
+                                        }`}
+                                    >
+                                        {day}
+                                    </div>
+                                ))}
+                            </div>
+
+                            {viewMode === 'bulan' ? (
+                                <div className="grid grid-cols-7">
+                                    {monthGrid.map((date, index) => {
+                                        const key = toKey(date);
+                                        const dayEvents = byDate[key] ?? [];
+                                        const isCurrentMonth = date.getMonth() === cursor.getMonth();
+                                        const isToday = key === todayKey;
+                                        const isSelected = key === selectedKey;
+                                        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                                        const shown = dayEvents.slice(0, 3);
+
+                                        return (
+                                            <button
+                                                key={key}
+                                                type="button"
+                                                onClick={() => setSelectedKey(key)}
+                                                className={`min-h-[104px] border-b border-r p-1.5 text-left align-top transition-colors last:border-r-0 ${
+                                                    index % 7 === 6 ? 'border-r-0' : ''
+                                                } ${!isCurrentMonth ? 'bg-muted/20' : isWeekend ? 'bg-muted/10' : ''} ${
+                                                    isSelected ? 'ring-2 ring-inset ring-primary' : 'hover:bg-muted/40'
+                                                }`}
+                                            >
+                                                <div className="mb-1 flex items-center justify-between">
+                                                    <span
+                                                        className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
+                                                            isToday
+                                                                ? 'bg-primary text-primary-foreground'
+                                                                : isCurrentMonth
+                                                                    ? 'text-foreground'
+                                                                    : 'text-muted-foreground/50'
+                                                        }`}
+                                                    >
+                                                        {date.getDate()}
+                                                    </span>
+                                                    {dayEvents.length > 0 && (
+                                                        <span className="text-[10px] font-medium text-muted-foreground">
+                                                            {dayEvents.length}
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                <div className="space-y-0.5">
+                                                    {shown.map((event) => (
+                                                        <EventChip key={event.id} event={event} />
+                                                    ))}
+                                                    {dayEvents.length > 3 && (
+                                                        <p className="px-1 text-[10px] font-medium text-muted-foreground">
+                                                            +{dayEvents.length - 3} lainnya
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-7">
+                                    {weekDays.map((date, index) => {
+                                        const key = toKey(date);
+                                        const dayEvents = byDate[key] ?? [];
+                                        const isToday = key === todayKey;
+                                        const isSelected = key === selectedKey;
+
+                                        return (
+                                            <button
+                                                key={key}
+                                                type="button"
+                                                onClick={() => setSelectedKey(key)}
+                                                className={`min-h-[420px] border-b border-r p-2 text-left align-top transition-colors ${
+                                                    index === 6 ? 'border-r-0' : ''
+                                                } ${isSelected ? 'ring-2 ring-inset ring-primary' : 'hover:bg-muted/30'}`}
+                                            >
+                                                <div className="mb-2 flex items-center gap-1.5">
+                                                    <span
+                                                        className={`flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold ${
+                                                            isToday ? 'bg-primary text-primary-foreground' : 'text-foreground'
+                                                        }`}
+                                                    >
+                                                        {date.getDate()}
+                                                    </span>
+                                                    <span className="text-[11px] text-muted-foreground">
+                                                        {MONTH_NAMES[date.getMonth()].slice(0, 3)}
+                                                    </span>
+                                                </div>
+
+                                                <div className="space-y-1">
+                                                    {dayEvents.map((event) => (
+                                                        <EventChip key={event.id} event={event} />
+                                                    ))}
+                                                    {dayEvents.length === 0 && (
+                                                        <p className="text-[11px] italic text-muted-foreground/60">Kosong</p>
+                                                    )}
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
-                    </DialogContent>
-                </Dialog>
+
+                        {/* Panel rincian hari terpilih */}
+                        <aside className="flex flex-col rounded-xl border bg-card shadow-sm">
+                            <div className="border-b p-4">
+                                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                    {selectedKey === todayKey ? 'Hari Ini' : 'Tanggal Terpilih'}
+                                </p>
+                                <p className="mt-0.5 font-semibold">
+                                    {new Date(`${selectedKey}T00:00:00`).toLocaleDateString('id-ID', {
+                                        weekday: 'long',
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric',
+                                    })}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                    {selectedEvents.length > 0 ? `${selectedEvents.length} agenda` : 'Tidak ada agenda'}
+                                </p>
+                            </div>
+
+                            <div className="max-h-[560px] flex-1 space-y-2 overflow-y-auto p-3">
+                                {selectedEvents.length > 0 ? (
+                                    selectedEvents.map((event) => <EventCard key={event.id} event={event} />)
+                                ) : (
+                                    <div className="py-12 text-center">
+                                        <CalendarDays className="mx-auto mb-2 h-9 w-9 text-muted-foreground/25" />
+                                        <p className="text-sm text-muted-foreground">Tidak ada agenda pada tanggal ini.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </aside>
+                    </div>
+                )}
             </div>
         </>
     );
 }
 
+/** Agenda: dikelompokkan per tanggal, mendatang lebih dulu. */
+function AgendaView({
+    events,
+    todayKey,
+    EventCard,
+}: {
+    events: CalendarEvent[];
+    todayKey: string;
+    EventCard: (props: { event: CalendarEvent }) => React.ReactElement;
+}) {
+    const [showPast, setShowPast] = useState(false);
+
+    const upcoming = events.filter((e) => e.date >= todayKey).sort((a, b) => a.date.localeCompare(b.date));
+    const past = events.filter((e) => e.date < todayKey).sort((a, b) => b.date.localeCompare(a.date));
+    const list = showPast ? past : upcoming;
+
+    const grouped = useMemo(() => {
+        const map: Record<string, CalendarEvent[]> = {};
+        for (const event of list) (map[event.date] ??= []).push(event);
+        return Object.entries(map);
+    }, [list]);
+
+    return (
+        <div className="rounded-xl border bg-card shadow-sm">
+            <div className="flex items-center justify-between border-b p-3">
+                <div className="inline-flex rounded-lg border bg-muted/40 p-0.5">
+                    <button
+                        type="button"
+                        onClick={() => setShowPast(false)}
+                        className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
+                            !showPast ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                    >
+                        Mendatang ({upcoming.length})
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setShowPast(true)}
+                        className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
+                            showPast ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                    >
+                        Sudah Lewat ({past.length})
+                    </button>
+                </div>
+            </div>
+
+            <div className="divide-y">
+                {grouped.length === 0 && (
+                    <div className="py-16 text-center">
+                        <CalendarDays className="mx-auto mb-3 h-10 w-10 text-muted-foreground/25" />
+                        <p className="font-medium">{showPast ? 'Belum ada agenda yang lewat' : 'Tidak ada agenda mendatang'}</p>
+                        <p className="text-sm text-muted-foreground">Agenda akan muncul otomatis dari project, task, dan meeting.</p>
+                    </div>
+                )}
+
+                {grouped.map(([date, dayEvents]) => {
+                    const parsed = new Date(`${date}T00:00:00`);
+                    const isToday = date === todayKey;
+
+                    return (
+                        <div key={date} className="flex gap-4 p-4">
+                            {/* Kolom tanggal */}
+                            <div className="w-16 shrink-0 text-center">
+                                <p className="text-[11px] uppercase text-muted-foreground">
+                                    {parsed.toLocaleDateString('id-ID', { weekday: 'short' })}
+                                </p>
+                                <p
+                                    className={`mx-auto mt-0.5 flex h-9 w-9 items-center justify-center rounded-full text-lg font-bold ${
+                                        isToday ? 'bg-primary text-primary-foreground' : ''
+                                    }`}
+                                >
+                                    {parsed.getDate()}
+                                </p>
+                                <p className="text-[11px] text-muted-foreground">
+                                    {parsed.toLocaleDateString('id-ID', { month: 'short' })}
+                                </p>
+                            </div>
+
+                            <div className="min-w-0 flex-1 space-y-2">
+                                {dayEvents.map((event) => (
+                                    <EventCard key={event.id} event={event} />
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 CalendarIndex.layout = {
-    breadcrumbs: [
-        {
-            title: 'Calendar',
-            href: '/calendar',
-        },
-    ],
+    breadcrumbs: [{ title: 'Kalender', href: '/calendar' }],
 };

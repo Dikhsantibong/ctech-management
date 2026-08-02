@@ -262,60 +262,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('works/report', [\App\Http\Controllers\WorkController::class, 'report'])->middleware('menu:works')->name('works.report');
         Route::resource('works', \App\Http\Controllers\WorkController::class)->middleware('menu:works');
         Route::get('content-plans/report', [\App\Http\Controllers\ContentPlanController::class, 'report'])->middleware('menu:content-plans')->name('content-plans.report');
+        Route::put('content-plans/{content_plan}/status', [\App\Http\Controllers\ContentPlanController::class, 'updateStatus'])->middleware('menu:content-plans')->name('content-plans.status');
         Route::resource('content-plans', \App\Http\Controllers\ContentPlanController::class)->except(['create', 'edit', 'show'])->middleware('menu:content-plans');
         Route::resource('news', \App\Http\Controllers\NewsController::class)->except(['create', 'edit', 'show'])->middleware('menu:news');
         Route::resource('portfolios', \App\Http\Controllers\PortfolioController::class)->except(['create', 'edit', 'show'])->middleware('menu:portfolios');
-        Route::middleware('menu:calendar')->get('calendar', function () {
-            $events = collect();
-
-            // Get projects with deadlines
-            $projects = \App\Models\Project::whereNotNull('deadline')->get();
-            foreach ($projects as $project) {
-                $deadline = is_string($project->deadline) ? \Carbon\Carbon::parse($project->deadline) : $project->deadline;
-                $events->push([
-                    'id' => "project-{$project->id}",
-                    'title' => "Project: {$project->name}",
-                    'date' => $deadline->format('Y-m-d'),
-                    'type' => 'project',
-                    'description' => $project->description ?? '',
-                    'priority' => 'high',
-                ]);
-            }
-
-            // Get tasks with deadlines
-            $tasks = \App\Models\Task::whereNotNull('deadline')->where('status', '!=', 'Done')->get();
-            foreach ($tasks as $task) {
-                $deadline = is_string($task->deadline) ? \Carbon\Carbon::parse($task->deadline) : $task->deadline;
-                $events->push([
-                    'id' => "task-{$task->id}",
-                    'title' => "Task: {$task->title}",
-                    'date' => $deadline->format('Y-m-d'),
-                    'type' => 'task',
-                    'description' => $task->description ?? '',
-                    'priority' => $task->priority ?? 'medium',
-                ]);
-            }
-
-            // Get content plans with scheduled dates
-            $contentPlans = \App\Models\ContentPlan::whereNotNull('scheduled_date')->where('status', '!=', 'Cancelled')->get();
-            foreach ($contentPlans as $contentPlan) {
-                $scheduledDate = is_string($contentPlan->scheduled_date) ? \Carbon\Carbon::parse($contentPlan->scheduled_date) : $contentPlan->scheduled_date;
-                $events->push([
-                    'id' => "content-plan-{$contentPlan->id}",
-                    'title' => "Content: {$contentPlan->title}",
-                    'date' => $scheduledDate->format('Y-m-d'),
-                    'type' => 'content_plan',
-                    'description' => $contentPlan->description ?? '',
-                    'platform' => $contentPlan->platform,
-                    'content_type' => $contentPlan->content_type,
-                    'priority' => 'medium',
-                ]);
-            }
-
-            return inertia('calendar/index', [
-                'events' => $events->sortBy('date')->values(),
-            ]);
-        })->name('calendar.index');
+        Route::get('calendar', [\App\Http\Controllers\CalendarController::class, 'index'])->middleware('menu:calendar')->name('calendar.index');
     });
 
     // Akses ditentukan hak akses menu (diatur direktur utama), bukan daftar role tetap
