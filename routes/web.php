@@ -247,7 +247,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return inertia('dashboard', $data);
         })->name('dashboard');
 
-        Route::resource('projects', \App\Http\Controllers\ProjectController::class);
+        Route::middleware('menu:projects')->group(function () {
+            Route::resource('projects', \App\Http\Controllers\ProjectController::class);
 
         Route::put('/projects/{project}/metadata', [\App\Http\Controllers\ProjectController::class, 'updateMetadata'])->name('projects.metadata.update');
         Route::post('/projects/{project}/revisions', [\App\Http\Controllers\ProjectController::class, 'storeRevision'])->name('projects.revisions.store');
@@ -255,15 +256,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/projects/{project}/feedbacks', [\App\Http\Controllers\ProjectController::class, 'storeFeedback'])->name('projects.feedbacks.store');
         Route::put('/projects/{project}/feedbacks/{feedback}/status', [\App\Http\Controllers\ProjectController::class, 'updateFeedbackStatus'])->name('projects.feedbacks.status');
         Route::post('/projects/{project}/feedbacks/{feedback}/convert-to-task', [\App\Http\Controllers\ProjectController::class, 'convertFeedbackToTask'])->name('projects.feedbacks.convert');
+        });
 
-        Route::resource('tasks', \App\Http\Controllers\TaskController::class);
-        Route::get('works/report', [\App\Http\Controllers\WorkController::class, 'report'])->name('works.report');
-        Route::resource('works', \App\Http\Controllers\WorkController::class);
-        Route::get('content-plans/report', [\App\Http\Controllers\ContentPlanController::class, 'report'])->name('content-plans.report');
-        Route::resource('content-plans', \App\Http\Controllers\ContentPlanController::class)->except(['create', 'edit', 'show']);
-        Route::resource('news', \App\Http\Controllers\NewsController::class)->except(['create', 'edit', 'show']);
-        Route::resource('portfolios', \App\Http\Controllers\PortfolioController::class)->except(['create', 'edit', 'show']);
-        Route::get('calendar', function () {
+        Route::resource('tasks', \App\Http\Controllers\TaskController::class)->middleware('menu:tasks');
+        Route::get('works/report', [\App\Http\Controllers\WorkController::class, 'report'])->middleware('menu:works')->name('works.report');
+        Route::resource('works', \App\Http\Controllers\WorkController::class)->middleware('menu:works');
+        Route::get('content-plans/report', [\App\Http\Controllers\ContentPlanController::class, 'report'])->middleware('menu:content-plans')->name('content-plans.report');
+        Route::resource('content-plans', \App\Http\Controllers\ContentPlanController::class)->except(['create', 'edit', 'show'])->middleware('menu:content-plans');
+        Route::resource('news', \App\Http\Controllers\NewsController::class)->except(['create', 'edit', 'show'])->middleware('menu:news');
+        Route::resource('portfolios', \App\Http\Controllers\PortfolioController::class)->except(['create', 'edit', 'show'])->middleware('menu:portfolios');
+        Route::middleware('menu:calendar')->get('calendar', function () {
             $events = collect();
 
             // Get projects with deadlines
@@ -316,32 +318,48 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('calendar.index');
     });
 
-    // Accessible by Admin Operasional, Direktur Operasional, and Direktur Utama
-    Route::middleware('role:direktur_utama,operation,administrasi')->group(function () {
+    // Akses ditentukan hak akses menu (diatur direktur utama), bukan daftar role tetap
+    Route::middleware('menu:invoices')->group(function () {
         Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
         Route::put('invoices/{invoice}/status', [\App\Http\Controllers\InvoiceController::class, 'updateStatus'])->name('invoices.status');
         Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
+    });
+
+    Route::middleware('menu:letters')->group(function () {
         Route::resource('letters', \App\Http\Controllers\LetterController::class);
         Route::get('letters/{letter}/preview', [\App\Http\Controllers\LetterController::class, 'previewPdf'])->name('letters.preview');
         Route::get('letters/{letter}/pdf', [\App\Http\Controllers\LetterController::class, 'downloadPdf'])->name('letters.pdf');
+    });
+
+    Route::middleware('menu:incoming-letters')->group(function () {
         Route::resource('incoming-letters', \App\Http\Controllers\IncomingLetterController::class)->except(['create', 'edit']);
         Route::get('incoming-letters/{incoming_letter}/download', [\App\Http\Controllers\IncomingLetterController::class, 'downloadAttachment'])->name('incoming-letters.download');
-        Route::resource('documents', \App\Http\Controllers\DocumentController::class);
+    });
+
+    Route::resource('documents', \App\Http\Controllers\DocumentController::class)->middleware('menu:documents');
+
+    Route::middleware('menu:files')->group(function () {
         Route::resource('files', \App\Http\Controllers\FileController::class)->except(['create', 'edit', 'update', 'show']);
         Route::get('files/{file}/download', [\App\Http\Controllers\FileController::class, 'download'])->name('files.download');
         Route::get('files/{file}/preview', [\App\Http\Controllers\FileController::class, 'preview'])->name('files.preview');
     });
 
-    // Accessible only by Direktur Utama
-    Route::middleware('role:direktur_utama')->group(function () {
-        // Monitoring KPI seluruh role
+    // Monitoring KPI seluruh role
+    Route::middleware('menu:kpi')->group(function () {
         Route::get('kpi', [\App\Http\Controllers\KpiController::class, 'index'])->name('kpi.index');
         Route::put('kpi/target', [\App\Http\Controllers\KpiController::class, 'updateTarget'])->name('kpi.target.update');
         Route::delete('kpi/target', [\App\Http\Controllers\KpiController::class, 'resetTarget'])->name('kpi.target.reset');
+    });
 
-        Route::resource('users', \App\Http\Controllers\UserController::class);
-        Route::resource('clients', \App\Http\Controllers\ClientController::class);
-        Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    Route::resource('users', \App\Http\Controllers\UserController::class)->middleware('menu:users');
+    // Sebelumnya hanya direktur utama, padahal sidebar menampilkannya ke operation & marketing
+    Route::resource('clients', \App\Http\Controllers\ClientController::class)->middleware('menu:clients');
+    Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->middleware('menu:activity-logs')->name('activity-logs.index');
+
+    // Pengaturan hak akses menu — hanya direktur utama, agar tidak bisa dialihkan ke role lain
+    Route::middleware('role:' . \App\Support\MenuRegistry::SUPER_ROLE)->group(function () {
+        Route::get('role-permissions', [\App\Http\Controllers\RolePermissionController::class, 'index'])->name('role-permissions.index');
+        Route::put('role-permissions', [\App\Http\Controllers\RolePermissionController::class, 'update'])->name('role-permissions.update');
     });
 
     // Daily Reports UI
@@ -350,7 +368,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'users' => \App\Models\User::all(),
             'projects' => \App\Models\Project::where('status', '!=', 'Completed')->get()
         ]);
-    })->name('daily-reports.index');
+    })->middleware('menu:daily-reports')->name('daily-reports.index');
 
     // API-like endpoints for stateful fetch (with session auth)
     // Semua endpoint /api/v1/* WAJIB di sini, bukan di routes/api.php:

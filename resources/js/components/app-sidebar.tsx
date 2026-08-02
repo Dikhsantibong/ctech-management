@@ -1,5 +1,8 @@
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Briefcase, ListTodo, Receipt, Mail, MailOpen, FileStack, Files, Users, Activity, Settings, Megaphone, Building2, Calendar, Newspaper, Bell, ClipboardList, Gauge } from 'lucide-react';
+import {
+    LayoutGrid, Briefcase, ListTodo, Receipt, Mail, MailOpen, FileStack, Files, Users, Activity,
+    Settings, Megaphone, Building2, Calendar, Newspaper, Bell, ClipboardList, Gauge, ShieldCheck, Circle,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -15,6 +18,13 @@ import {
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
+/** Nama ikon dikirim server sebagai string; dipetakan ke komponennya di sini. */
+const ICONS: Record<string, any> = {
+    LayoutGrid, Briefcase, ListTodo, Receipt, Mail, MailOpen, FileStack, Files, Users, Activity,
+    Settings, Megaphone, Building2, Calendar, Newspaper, Bell, ClipboardList, Gauge, ShieldCheck,
+};
+
+/** Menu yang selalu tersedia untuk semua orang. */
 const dashboardNav: NavItem[] = [
     { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
 ];
@@ -23,51 +33,17 @@ const announcementsNav: NavItem[] = [
     { title: 'Pengumuman', href: '/announcements', icon: Bell },
 ];
 
-const operationsNav: NavItem[] = [
-    { title: 'Calendar', href: '/calendar', icon: Calendar },
-    { title: 'Projects', href: '/projects', icon: Briefcase },
-    { title: 'Tasks', href: '/tasks', icon: ListTodo },
-    { title: 'Work', href: '/works', icon: ClipboardList },
-    { title: 'Daily Reports', href: '/daily-reports', icon: FileStack },
-];
-
-const financeNav: NavItem[] = [
-    { title: 'Invoices', href: '/invoices', icon: Receipt },
-];
-
-const administrationNav: NavItem[] = [
-    { title: 'Surat Keluar', href: '/letters', icon: Mail },
-    { title: 'Surat Masuk', href: '/incoming-letters', icon: MailOpen },
-    { title: 'Documents', href: '/documents', icon: FileStack },
-    { title: 'Files', href: '/files', icon: Files },
-];
-
-const marketingNav: NavItem[] = [
-    { title: 'Berita', href: '/news', icon: Newspaper },
-    { title: 'Portfolio', href: '/portfolios', icon: Briefcase },
-    { title: 'Content Planning', href: '/content-plans', icon: Megaphone },
-];
-
-const systemNav: NavItem[] = [
-    { title: 'Monitoring KPI', href: '/kpi', icon: Gauge },
-    { title: 'Team', href: '/users', icon: Users },
-    { title: 'Activity Logs', href: '/activity-logs', icon: Activity },
-    { title: 'Settings', href: '/settings', icon: Settings },
-];
+type SharedMenuGroup = {
+    group: string;
+    items: { key: string; title: string; href: string; icon: string }[];
+};
 
 export function AppSidebar() {
-    const { auth } = usePage<any>().props;
-    const userRole = auth.user?.role || 'operation';
+    const { navMenus } = usePage<any>().props;
 
-    const isOperation = userRole === 'operation';
-    const isMarketing = userRole === 'marketing';
-    const isAdministrasi = userRole === 'administrasi';
-    const isDirekturUtama = userRole === 'direktur_utama';
-
-    const currentOperationsNav = [...operationsNav];
-    if (isDirekturUtama || isMarketing || isOperation) {
-        currentOperationsNav.push({ title: 'Clients', href: '/clients', icon: Building2 });
-    }
+    // Hak akses ditentukan server (tabel role_menu_permissions), bukan pengecekan
+    // role di frontend — jadi perubahan langsung berlaku tanpa build ulang.
+    const groups: SharedMenuGroup[] = Array.isArray(navMenus) ? navMenus : [];
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -86,26 +62,18 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain items={dashboardNav} label="Overview" />
                 <NavMain items={announcementsNav} label="Pengumuman" />
-                
-                {(isDirekturUtama || isOperation) && (
-                    <NavMain items={currentOperationsNav} label="Operations" />
-                )}
 
-                {(isDirekturUtama || isAdministrasi) && (
-                    <NavMain items={financeNav} label="Finance" />
-                )}
-
-                {(isDirekturUtama || isMarketing) && (
-                    <NavMain items={marketingNav} label="Marketing" />
-                )}
-
-                {(isDirekturUtama || isAdministrasi) && (
-                    <NavMain items={administrationNav} label="Administration" />
-                )}
-
-                {isDirekturUtama && (
-                    <NavMain items={systemNav} label="System" />
-                )}
+                {groups.map((group) => (
+                    <NavMain
+                        key={group.group}
+                        label={group.group}
+                        items={(group.items ?? []).map((item) => ({
+                            title: item.title,
+                            href: item.href,
+                            icon: ICONS[item.icon] ?? Circle,
+                        }))}
+                    />
+                ))}
             </SidebarContent>
 
             <SidebarFooter>

@@ -41,6 +41,14 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            // Sidebar dirender dari sini, bukan dari daftar role yang di-hardcode,
+            // sehingga perubahan hak akses langsung terlihat tanpa deploy ulang.
+            //
+            // Namanya sengaja spesifik: prop halaman menimpa prop global di Inertia,
+            // dan nama seumum "menus" pernah ditimpa halaman Hak Akses Menu.
+            'navMenus' => $request->user()
+                ? app(\App\Services\MenuAccess::class)->sidebarFor($request->user())
+                : [],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
