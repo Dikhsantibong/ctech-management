@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Briefcase, ListTodo, Users, Bell, AlertTriangle, CheckCircle, Megaphone, FolderOpen, CreditCard, Building2, Newspaper, Clock, Activity, History, MailOpen, Mail } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Line, Pie, Doughnut, Bar } from 'react-chartjs-2';
+import { Link } from '@inertiajs/react';
+import KpiPanel from '@/components/kpi-panel';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -37,9 +39,10 @@ interface ActivityLog {
     };
 }
 
-export default function Dashboard({ 
-    user_role, 
-    stats, 
+export default function Dashboard({
+    user_role,
+    kpi,
+    stats,
     financials, 
     my_tasks, 
     milestones_progress, 
@@ -106,6 +109,21 @@ export default function Dashboard({
                                 <p className="text-xs text-muted-foreground line-clamp-2">{announcement.content}</p>
                             </div>
                         ))}
+                    </div>
+                )}
+
+                {/* --- KPI ROLE INI --- */}
+                {kpi && kpi.metrics?.length > 0 && (
+                    <div className="space-y-2">
+                        <KpiPanel kpi={kpi} compact />
+                        {user_role === 'direktur_utama' && (
+                            <Link
+                                href="/kpi"
+                                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                            >
+                                Lihat KPI seluruh role &rarr;
+                            </Link>
+                        )}
                     </div>
                 )}
 

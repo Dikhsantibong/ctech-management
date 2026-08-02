@@ -81,6 +81,9 @@ class TaskController extends Controller
 
         $validated['metadata'] = $metadata;
 
+        // Dicatat saat task benar-benar selesai — dipakai KPI ketepatan waktu
+        $validated['completed_at'] = $validated['status'] === 'Done' ? now() : null;
+
         $task = Task::create($validated);
 
         $this->logActivity('created', 'Task', $task->id, "Membuat task baru: {$task->title}");
@@ -122,6 +125,14 @@ class TaskController extends Controller
         }
 
         $validated['metadata'] = $metadata;
+
+        // Set saat berpindah ke Done, dikosongkan lagi bila dikembalikan ke status lain.
+        // Tanggal penyelesaian yang sudah ada dipertahankan agar KPI bulan lalu tidak bergeser.
+        if ($validated['status'] === 'Done') {
+            $validated['completed_at'] = $task->completed_at ?? now();
+        } else {
+            $validated['completed_at'] = null;
+        }
 
         $task->update($validated);
 

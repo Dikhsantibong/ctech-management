@@ -57,6 +57,14 @@ class ProjectMilestoneController extends Controller
             'status' => 'sometimes|in:Not Started,In Progress,Review,Completed,Delayed'
         ]);
 
+        // Tanggal penyelesaian dipakai KPI; nilai lama dipertahankan agar capaian
+        // bulan sebelumnya tidak berpindah saat milestone diedit ulang.
+        if (array_key_exists('status', $validated)) {
+            $validated['completed_at'] = $validated['status'] === 'Completed'
+                ? ($milestone->completed_at ?? now())
+                : null;
+        }
+
         $milestone->update($validated);
         return response()->json(['message' => 'Milestone updated successfully', 'data' => $milestone]);
     }

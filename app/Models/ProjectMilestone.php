@@ -15,8 +15,16 @@ class ProjectMilestone extends Model
         'end_date',
         'progress',
         'status',
+        'completed_at',
         'notes',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'completed_at' => 'datetime',
+        ];
+    }
 
     public function project()
     {

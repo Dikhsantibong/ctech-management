@@ -19,6 +19,7 @@ class Task extends Model
         'priority',
         'start_date',
         'deadline',
+        'completed_at',
         'metadata',
     ];
 
@@ -26,6 +27,7 @@ class Task extends Model
     {
         return [
             'metadata' => 'array',
+            'completed_at' => 'datetime',
         ];
     }
 

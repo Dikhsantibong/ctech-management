@@ -241,6 +241,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ];
             }
 
+            // Setiap role melihat capaian KPI-nya sendiri di dashboard
+            $data['kpi'] = app(\App\Services\KpiService::class)->forRole($role);
+
             return inertia('dashboard', $data);
         })->name('dashboard');
 
@@ -331,6 +334,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Accessible only by Direktur Utama
     Route::middleware('role:direktur_utama')->group(function () {
+        // Monitoring KPI seluruh role
+        Route::get('kpi', [\App\Http\Controllers\KpiController::class, 'index'])->name('kpi.index');
+        Route::put('kpi/target', [\App\Http\Controllers\KpiController::class, 'updateTarget'])->name('kpi.target.update');
+        Route::delete('kpi/target', [\App\Http\Controllers\KpiController::class, 'resetTarget'])->name('kpi.target.reset');
+
         Route::resource('users', \App\Http\Controllers\UserController::class);
         Route::resource('clients', \App\Http\Controllers\ClientController::class);
         Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');
