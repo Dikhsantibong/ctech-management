@@ -122,7 +122,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     'team_members' => \App\Models\User::count(),
                     'project_health' => $project_health, // percentage
                     'active_clients' => \App\Models\Client::count(),
-                    'unpaid_invoices' => \App\Models\Invoice::where('status', 'Unpaid')->sum('total'),
+                    // "Unpaid" bukan status yang valid (Draft/Sent/Paid/Overdue), jadi nilainya selalu 0
+                    'unpaid_invoices' => \App\Models\Invoice::where('status', '!=', 'Paid')->sum('total'),
                     'paid_invoices' => \App\Models\Invoice::where('status', 'Paid')->sum('total'),
                 ];
                 
@@ -201,7 +202,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     'content_plans' => \App\Models\ContentPlan::where('status', 'Scheduled')->count(),
                     'total_clients' => \App\Models\Client::count(),
                 ];
-                $data['recent_contents'] = \App\Models\ContentPlan::orderBy('scheduled_at', 'desc')->take(5)->get();
+                // Kolomnya bernama scheduled_date; scheduled_at milik tabel meetings
+                $data['recent_contents'] = \App\Models\ContentPlan::orderBy('scheduled_date', 'desc')->take(5)->get();
                 $data['recent_clients'] = \App\Models\Client::latest()->take(5)->get();
 
                 // Chart Data
@@ -211,21 +213,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             // administrasi
             if ($role === 'administrasi') {
+                // Surat masuk = IncomingLetter, surat keluar = Letter.
+                // Model SuratMasuk/SuratKeluar tidak pernah ada sehingga dashboard role ini selalu fatal.
+                $suratMasuk = \App\Models\IncomingLetter::count();
+                $suratKeluar = \App\Models\Letter::count();
+
                 $data['stats'] = [
-                    'surat_masuk' => \App\Models\SuratMasuk::count(),
-                    'surat_keluar' => \App\Models\SuratKeluar::count(),
-                    'invoices_pending' => \App\Models\Invoice::where('status', 'Unpaid')->count(),
+                    'surat_masuk' => $suratMasuk,
+                    'surat_keluar' => $suratKeluar,
+                    // Status invoice yang valid: Draft, Sent, Paid, Overdue — tidak ada "Unpaid"
+                    'invoices_pending' => \App\Models\Invoice::where('status', '!=', 'Paid')->count(),
                     'total_documents' => \App\Models\Document::count(),
                 ];
-                $data['recent_invoices'] = \App\Models\Invoice::with('project')->where('status', 'Unpaid')->latest()->take(5)->get();
+
+                // Invoice tidak punya relasi project (hanya menyimpan client_name)
+                $data['recent_invoices'] = \App\Models\Invoice::where('status', '!=', 'Paid')
+                    ->latest()->take(5)->get();
 
                 // Chart Data
                 $data['invoice_status_chart'] = \App\Models\Invoice::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
-                
+
                 // Manual build of document categories since there's no single column for type
                 $data['document_category_chart'] = [
-                    'Surat Masuk' => \App\Models\SuratMasuk::count(),
-                    'Surat Keluar' => \App\Models\SuratKeluar::count(),
+                    'Surat Masuk' => $suratMasuk,
+                    'Surat Keluar' => $suratKeluar,
                     'Dokumen Internal' => \App\Models\Document::count(),
                 ];
             }
