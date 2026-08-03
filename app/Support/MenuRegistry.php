@@ -73,6 +73,10 @@ class MenuRegistry
                 'label' => 'Content Planning', 'href' => '/content-plans', 'group' => 'Marketing', 'icon' => 'Megaphone',
                 'defaults' => ['marketing'],
             ],
+            'social-accounts' => [
+                'label' => 'Akun Media Sosial', 'href' => '/social-accounts', 'group' => 'Marketing', 'icon' => 'Share2',
+                'defaults' => ['marketing'], 'sensitive' => true,
+            ],
 
             // ===== Administration =====
             'letters' => [

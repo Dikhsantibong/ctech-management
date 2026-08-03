@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\ContentPlan;
 use App\Models\User;
+use App\Services\Social\SocialPublishingService;
 use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ContentPlanController extends Controller
@@ -59,15 +61,58 @@ class ContentPlanController extends Controller
             'keywords' => 'nullable|string|max:255',
             'tujuan_konten' => 'nullable|in:ctechagency,officialperusahaan,ctechpaylo,ctechbooth',
             'assigned_to' => 'nullable|exists:users,id',
+            // Posting otomatis ke media sosial
+            'media' => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov|max:51200', // 50MB
+            'remove_media' => 'nullable|boolean',
+            'auto_publish' => 'nullable|boolean',
+            'publish_targets' => 'nullable|array',
+            'publish_targets.*' => 'string|in:' . implode(',', array_keys(config('social.platforms', []))),
         ];
+    }
+
+    /** Simpan/ganti/hapus berkas media. Disimpan di disk publik agar bisa dibaca API media sosial. */
+    private function handleMedia(Request $request, array $data, ?ContentPlan $existing = null): array
+    {
+        unset($data['media'], $data['remove_media']);
+
+        if ($request->boolean('remove_media') && $existing?->media_path) {
+            Storage::disk('public')->delete($existing->media_path);
+            $data['media_path'] = null;
+            $data['media_mime'] = null;
+
+            return $data;
+        }
+
+        if ($request->hasFile('media')) {
+            if ($existing?->media_path) {
+                Storage::disk('public')->delete($existing->media_path);
+            }
+
+            $file = $request->file('media');
+            $data['media_path'] = $file->store('content-media', 'public');
+            $data['media_mime'] = $file->getClientMimeType();
+        }
+
+        return $data;
     }
 
     public function index()
     {
         $user = Auth::user();
 
+        $social = app(SocialPublishingService::class);
+
         return Inertia::render('content-plans/index', [
-            'contentPlans' => $this->visibleTo($user)->latest()->get(),
+            'contentPlans' => $this->visibleTo($user)->with('socialPosts')->latest()->get(),
+            'social' => [
+                'enabled' => $social->isEnabled(),
+                'simulation' => $social->simulateGlobally(),
+                'platforms' => collect($social->platforms())
+                    ->map(fn ($config, $key) => ['platform' => $key, 'label' => $config['label'], 'media' => $config['media']])
+                    ->values()
+                    ->all(),
+                'ready' => $social->readyAccounts()->pluck('platform')->all(),
+            ],
             // Semua pengguna bisa ditugaskan — daftar lama menyaring direktur sehingga
             // konten tidak pernah bisa ditugaskan kepada mereka.
             'staffUsers' => User::orderBy('name')->get(['id', 'name', 'role']),
@@ -87,11 +132,14 @@ class ContentPlanController extends Controller
         }
 
         $validated = $this->syncPublishedDate($validated);
+        $validated = $this->handleMedia($request, $validated);
         $validated['created_by'] = $user->id;
 
         $contentPlan = ContentPlan::create($validated);
 
         $this->logActivity('created', 'ContentPlan', $contentPlan->id, "Membuat content plan baru: {$contentPlan->title}");
+
+        $this->maybeAutoPublish($contentPlan, null);
 
         return redirect()->back()->with('success', 'Content plan created successfully.');
     }
@@ -110,10 +158,14 @@ class ContentPlanController extends Controller
         }
 
         $validated = $this->syncPublishedDate($validated, $contentPlan);
+        $validated = $this->handleMedia($request, $validated, $contentPlan);
 
+        $previousStatus = $contentPlan->status;
         $contentPlan->update($validated);
 
         $this->logActivity('updated', 'ContentPlan', $contentPlan->id, "Mengupdate content plan: {$contentPlan->title}");
+
+        $this->maybeAutoPublish($contentPlan, $previousStatus);
 
         return redirect()->back()->with('success', 'Content plan updated successfully.');
     }
@@ -190,6 +242,53 @@ class ContentPlanController extends Controller
             'contentPlans' => $contentPlans,
             'metrics' => $metrics,
         ]);
+    }
+
+    /**
+     * Kirim ke media sosial hanya bila diminta secara eksplisit dan status baru
+     * saja berubah menjadi Published — supaya menyunting konten yang sudah tayang
+     * tidak memposting ulang.
+     */
+    private function maybeAutoPublish(ContentPlan $plan, ?string $previousStatus): void
+    {
+        if (! $plan->auto_publish || $plan->status !== 'Published' || $previousStatus === 'Published') {
+            return;
+        }
+
+        $result = app(SocialPublishingService::class)->dispatchFor($plan);
+
+        if ($result['queued'] > 0) {
+            Inertia::flash('toast', [
+                'type' => 'success',
+                'message' => "Konten dikirim ke {$result['queued']} platform media sosial.",
+            ]);
+        } elseif ($result['skipped'] !== []) {
+            Inertia::flash('toast', [
+                'type' => 'warning',
+                'message' => 'Tidak ada platform yang dikirimi: ' . implode(' ', $result['skipped']),
+            ]);
+        }
+    }
+
+    /** Kirim ulang secara manual dari halaman Content Planning. */
+    public function publishNow(Request $request, ContentPlan $contentPlan)
+    {
+        abort_unless($this->canEdit(Auth::user(), $contentPlan), 403);
+
+        $validated = $request->validate([
+            'platforms' => 'nullable|array',
+            'platforms.*' => 'string|in:' . implode(',', array_keys(config('social.platforms', []))),
+        ]);
+
+        $result = app(SocialPublishingService::class)->dispatchFor($contentPlan, $validated['platforms'] ?? null);
+
+        $this->logActivity('updated', 'ContentPlan', $contentPlan->id, "Mengirim konten {$contentPlan->title} ke media sosial");
+
+        Inertia::flash('toast', $result['queued'] > 0
+            ? ['type' => 'success', 'message' => "Dikirim ke {$result['queued']} platform."]
+            : ['type' => 'warning', 'message' => implode(' ', $result['skipped']) ?: 'Tidak ada platform aktif.']);
+
+        return redirect()->back();
     }
 
     private function canEdit(?User $user, ContentPlan $contentPlan): bool

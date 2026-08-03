@@ -1,7 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     LayoutGrid, Briefcase, ListTodo, Receipt, Mail, MailOpen, FileStack, Files, Users, Activity,
-    Settings, Megaphone, Building2, Calendar, Newspaper, Bell, ClipboardList, Gauge, ShieldCheck, Circle,
+    Settings, Megaphone, Building2, Calendar, Newspaper, Bell, ClipboardList, Gauge, ShieldCheck, Share2, Circle,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -21,7 +21,7 @@ import type { NavItem } from '@/types';
 /** Nama ikon dikirim server sebagai string; dipetakan ke komponennya di sini. */
 const ICONS: Record<string, any> = {
     LayoutGrid, Briefcase, ListTodo, Receipt, Mail, MailOpen, FileStack, Files, Users, Activity,
-    Settings, Megaphone, Building2, Calendar, Newspaper, Bell, ClipboardList, Gauge, ShieldCheck,
+    Settings, Megaphone, Building2, Calendar, Newspaper, Bell, ClipboardList, Gauge, ShieldCheck, Share2,
 };
 
 /** Menu yang selalu tersedia untuk semua orang. */

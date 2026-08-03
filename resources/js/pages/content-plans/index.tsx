@@ -2,7 +2,7 @@ import { Head, useForm, router, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import {
     Plus, MoreVertical, Edit2, Trash2, LayoutGrid, List, BarChart3, Search, X, CalendarClock,
-    AlertTriangle, CheckCircle2, User as UserIcon, Megaphone, Target, Link2,
+    AlertTriangle, CheckCircle2, User as UserIcon, Megaphone, Target, Link2, Share2, Send, ImageIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { avatarColor } from '@/lib/project-colors';
 
@@ -78,6 +79,10 @@ const formatDate = (value?: string | null) =>
 const initials = (name?: string) => (name ? name.trim().charAt(0).toUpperCase() : '?');
 
 const emptyForm = {
+    media: null as File | null,
+    remove_media: false as boolean,
+    auto_publish: false as boolean,
+    publish_targets: [] as string[],
     title: '',
     description: '',
     platform: 'Instagram',
@@ -97,15 +102,24 @@ const emptyForm = {
     assigned_to: '',
 };
 
+type SocialConfig = {
+    enabled: boolean;
+    simulation: boolean;
+    platforms: { platform: string; label: string; media: string }[];
+    ready: string[];
+};
+
 export default function ContentPlansIndex({
     contentPlans,
     staffUsers,
     canAssign,
+    social,
 }: {
     contentPlans: any[];
     staffUsers: any[];
     userRole: string;
     canAssign: boolean;
+    social: SocialConfig;
 }) {
     const [viewMode, setViewMode] = useState<'kanban' | 'tabel'>('kanban');
     const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -151,18 +165,39 @@ export default function ContentPlansIndex({
             keywords: plan.keywords ?? '',
             tujuan_konten: plan.tujuan_konten ?? '',
             assigned_to: assigneeOf(plan)?.id ? String(assigneeOf(plan).id) : '',
+            media: null,
+            remove_media: false,
+            auto_publish: Boolean(plan.auto_publish),
+            publish_targets: plan.publish_targets ?? [],
         });
         setIsEditOpen(true);
     };
 
     const submitCreate = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/content-plans', { onSuccess: () => { setIsCreateOpen(false); reset(); } });
+        post('/content-plans', { forceFormData: true, onSuccess: () => { setIsCreateOpen(false); reset(); } });
     };
 
     const submitEdit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/content-plans/${selectedPlan?.id}`, { onSuccess: () => { setIsEditOpen(false); reset(); } });
+        // Inertia tidak mendukung PUT dengan FormData, jadi disamarkan lewat POST + _method
+        router.post(
+            `/content-plans/${selectedPlan?.id}`,
+            { _method: 'put', ...data } as any,
+            { forceFormData: true, onSuccess: () => { setIsEditOpen(false); reset(); } },
+        );
+    };
+
+    const publishNow = (plan: any) => {
+        router.post(`/content-plans/${plan.id}/publish`, {}, { preserveScroll: true });
+    };
+
+    const togglePublishTarget = (platform: string) => {
+        const current = data.publish_targets ?? [];
+        setData(
+            'publish_targets',
+            current.includes(platform) ? current.filter((p: string) => p !== platform) : [...current, platform],
+        );
     };
 
     const submitDelete = (e: React.FormEvent) => {
@@ -332,6 +367,80 @@ export default function ContentPlansIndex({
                         </Select>
                     </div>
                 )}
+
+                {/* Media untuk diposting */}
+                <div className="space-y-1.5">
+                    <Label>Gambar / Video</Label>
+                    <Input
+                        type="file"
+                        accept="image/jpeg,image/png,video/mp4,video/quicktime"
+                        onChange={(e) => setData('media', e.target.files?.[0] ?? null)}
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                        JPG, PNG, MP4, atau MOV — maksimal 50MB. Wajib bila ingin posting ke Instagram atau TikTok.
+                    </p>
+                    {errors.media && <p className="text-xs text-destructive">{errors.media}</p>}
+
+                    {selectedPlan?.media_path && !data.media && (
+                        <label className="flex cursor-pointer items-center gap-2 text-[11px] text-muted-foreground">
+                            <input
+                                type="checkbox"
+                                checked={data.remove_media}
+                                onChange={(e) => setData('remove_media', e.target.checked)}
+                                className="rounded border-input"
+                            />
+                            Hapus media yang tersimpan
+                        </label>
+                    )}
+                </div>
+
+                {/* Posting otomatis */}
+                {social?.enabled && (
+                    <div className="space-y-2 rounded-lg border p-3">
+                        <label className="flex items-start justify-between gap-3">
+                            <span>
+                                <span className="text-sm font-medium">Posting otomatis ke media sosial</span>
+                                <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                                    Dikirim saat status berubah menjadi Tayang.
+                                    {social.simulation && ' Mode simulasi aktif — belum ada yang benar-benar terkirim.'}
+                                </span>
+                            </span>
+                            <Switch
+                                checked={data.auto_publish}
+                                onCheckedChange={(checked) => setData('auto_publish', checked)}
+                            />
+                        </label>
+
+                        {data.auto_publish && (
+                            <div className="flex flex-wrap gap-1.5 border-t pt-2">
+                                {social.platforms.map((p) => {
+                                    const active = (data.publish_targets ?? []).includes(p.platform);
+                                    const ready = social.ready.includes(p.platform);
+
+                                    return (
+                                        <button
+                                            key={p.platform}
+                                            type="button"
+                                            onClick={() => togglePublishTarget(p.platform)}
+                                            className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
+                                                active
+                                                    ? 'border-primary bg-primary text-primary-foreground'
+                                                    : 'border-border bg-muted/40 text-muted-foreground hover:bg-muted'
+                                            }`}
+                                            title={ready ? p.label : `${p.label} — akun belum aktif/kredensial belum lengkap`}
+                                        >
+                                            {p.label}
+                                            {!ready && ' ⚠'}
+                                        </button>
+                                    );
+                                })}
+                                <p className="w-full text-[11px] text-muted-foreground">
+                                    Tanpa memilih platform, konten dikirim ke semua akun yang aktif.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             <div className="space-y-4">
@@ -453,6 +562,11 @@ export default function ContentPlansIndex({
                             <DropdownMenuItem onClick={() => openEdit(plan)}>
                                 <Edit2 className="mr-2 h-4 w-4" /> Edit
                             </DropdownMenuItem>
+                            {social?.enabled && (
+                                <DropdownMenuItem onClick={() => publishNow(plan)}>
+                                    <Send className="mr-2 h-4 w-4" /> Kirim ke media sosial
+                                </DropdownMenuItem>
+                            )}
                             {STATUSES.filter((s) => s !== plan.status).map((s) => (
                                 <DropdownMenuItem key={s} onClick={() => changeStatus(plan, s)}>
                                     <span className={`mr-2 h-2 w-2 rounded-full ${STATUS_META[s].dot}`} />
@@ -486,11 +600,48 @@ export default function ContentPlansIndex({
                     <p className="mb-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{plan.description}</p>
                 )}
 
-                {plan.tujuan_konten && (
-                    <span className="mb-2 inline-flex items-center gap-1 rounded border bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                        <Target className="h-3 w-3" />
-                        {GOALS[plan.tujuan_konten] ?? plan.tujuan_konten}
-                    </span>
+                <div className="mb-2 flex flex-wrap gap-1">
+                    {plan.tujuan_konten && (
+                        <span className="inline-flex items-center gap-1 rounded border bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                            <Target className="h-3 w-3" />
+                            {GOALS[plan.tujuan_konten] ?? plan.tujuan_konten}
+                        </span>
+                    )}
+                    {plan.media_path && (
+                        <span className="inline-flex items-center gap-1 rounded border bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                            <ImageIcon className="h-3 w-3" /> Media siap
+                        </span>
+                    )}
+                    {plan.auto_publish && (
+                        <span className="inline-flex items-center gap-1 rounded border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                            <Share2 className="h-3 w-3" /> Auto-post
+                        </span>
+                    )}
+                </div>
+
+                {/* Status pengiriman per platform */}
+                {plan.social_posts?.length > 0 && (
+                    <div className="mb-2 flex flex-wrap gap-1">
+                        {plan.social_posts.map((sp: any) => {
+                            const tone =
+                                sp.status === 'published'
+                                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300'
+                                    : sp.status === 'failed'
+                                        ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300'
+                                        : 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300';
+
+                            return (
+                                <span
+                                    key={sp.id}
+                                    className={`rounded-full border px-1.5 py-0.5 text-[10px] font-medium ${tone}`}
+                                    title={sp.message ?? sp.status}
+                                >
+                                    {sp.platform}
+                                    {sp.simulated ? ' (sim)' : ''}
+                                </span>
+                            );
+                        })}
+                    </div>
                 )}
 
                 <div className="flex items-center justify-between gap-2 border-t pt-2">

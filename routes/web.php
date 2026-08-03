@@ -263,6 +263,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('works', \App\Http\Controllers\WorkController::class)->middleware('menu:works');
         Route::get('content-plans/report', [\App\Http\Controllers\ContentPlanController::class, 'report'])->middleware('menu:content-plans')->name('content-plans.report');
         Route::put('content-plans/{content_plan}/status', [\App\Http\Controllers\ContentPlanController::class, 'updateStatus'])->middleware('menu:content-plans')->name('content-plans.status');
+        Route::post('content-plans/{content_plan}/publish', [\App\Http\Controllers\ContentPlanController::class, 'publishNow'])->middleware('menu:content-plans')->name('content-plans.publish');
         Route::resource('content-plans', \App\Http\Controllers\ContentPlanController::class)->except(['create', 'edit', 'show'])->middleware('menu:content-plans');
         Route::resource('news', \App\Http\Controllers\NewsController::class)->except(['create', 'edit', 'show'])->middleware('menu:news');
         Route::resource('portfolios', \App\Http\Controllers\PortfolioController::class)->except(['create', 'edit', 'show'])->middleware('menu:portfolios');
@@ -300,6 +301,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('kpi', [\App\Http\Controllers\KpiController::class, 'index'])->name('kpi.index');
         Route::put('kpi/target', [\App\Http\Controllers\KpiController::class, 'updateTarget'])->name('kpi.target.update');
         Route::delete('kpi/target', [\App\Http\Controllers\KpiController::class, 'resetTarget'])->name('kpi.target.reset');
+    });
+
+    // Pengaturan akun media sosial untuk posting otomatis
+    Route::middleware('menu:social-accounts')->group(function () {
+        Route::get('social-accounts', [\App\Http\Controllers\SocialAccountController::class, 'index'])->name('social-accounts.index');
+        Route::put('social-accounts/{platform}', [\App\Http\Controllers\SocialAccountController::class, 'update'])->name('social-accounts.update');
+        Route::delete('social-accounts/{platform}', [\App\Http\Controllers\SocialAccountController::class, 'disconnect'])->name('social-accounts.disconnect');
     });
 
     Route::resource('users', \App\Http\Controllers\UserController::class)->middleware('menu:users');

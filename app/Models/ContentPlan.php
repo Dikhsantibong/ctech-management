@@ -4,10 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ContentPlan extends Model
 {
     protected $fillable = [
+        'media_path',
+        'media_mime',
+        'publish_targets',
+        'auto_publish',
         'title',
         'description',
         'platform',
@@ -34,7 +39,14 @@ class ContentPlan extends Model
         return [
             'scheduled_date' => 'date',
             'published_date' => 'date',
+            'publish_targets' => 'array',
+            'auto_publish' => 'boolean',
         ];
+    }
+
+    public function socialPosts(): HasMany
+    {
+        return $this->hasMany(SocialPost::class);
     }
 
     public function creator(): BelongsTo
