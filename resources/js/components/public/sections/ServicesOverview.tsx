@@ -1,101 +1,90 @@
 import { motion } from "framer-motion";
 import { Link } from "@inertiajs/react";
-import { ArrowUpRight, Maximize2, Zap, Layout } from "lucide-react";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
+/**
+ * Layanan dijabarkan dalam bentuk keluaran yang bisa diperiksa, bukan kata sifat.
+ * "Antarmuka memukau" tidak bisa diverifikasi; "dokumen serah terima" bisa.
+ */
 const SERVICES = [
     {
-        icon: Maximize2,
-        title: "Software Enterprise",
-        desc: "Membangun ERP, CRM, dan sistem manajemen inti khusus untuk perusahaan Anda dengan arsitektur cloud terkini.",
+        title: "Sistem Informasi Manajemen",
+        summary:
+            "Aplikasi internal untuk mengelola proyek, dokumen, keuangan, dan pelaporan — menggantikan pencatatan yang masih tersebar di berkas terpisah.",
+        deliverables: ["Analisis proses berjalan", "Basis data terstruktur", "Hak akses per jabatan", "Pelatihan pengguna"],
     },
     {
-        icon: Zap,
-        title: "Aplikasi Web",
-        desc: "Aplikasi web berkinerja tinggi, responsif, dan interaktif menggunakan ekosistem modern seperti React, Next.js, dan Laravel.",
+        title: "Aplikasi Web & Portal",
+        summary:
+            "Situs korporat, portal layanan, dan aplikasi berbasis web yang berjalan di peramban tanpa pemasangan di perangkat pengguna.",
+        deliverables: ["Rancangan antarmuka", "Pengembangan front-end & back-end", "Uji terima pengguna", "Panduan operasional"],
     },
     {
-        icon: Layout,
-        title: "Desain UI/UX",
-        desc: "Merancang antarmuka memukau yang tidak hanya mengedepankan estetika, namun sangat berfokus pada pengalaman pengguna.",
+        title: "Integrasi & Migrasi Data",
+        summary:
+            "Menyambungkan sistem yang sudah berjalan dan memindahkan data lama ke sistem baru tanpa menghentikan operasional.",
+        deliverables: ["Pemetaan data", "Skrip migrasi terverifikasi", "Uji paralel", "Berita acara migrasi"],
     },
 ];
 
 export function ServicesOverview() {
     return (
-        <section id="services" className="py-24 md:py-32 bg-white text-[#0d0d0d]">
-            <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+        <section id="services" className="border-t border-gray-200 bg-[#f7f8f9] py-24 text-[#0f1115] md:py-32">
+            <div className="mx-auto max-w-[1400px] px-6 md:px-12">
                 <motion.div
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8"
+                    viewport={{ once: true, margin: "-80px" }}
+                    transition={{ duration: 0.6, ease: EASE }}
+                    className="flex flex-col justify-between gap-6 border-b border-gray-300 pb-10 md:flex-row md:items-end"
                 >
                     <div>
-                        <span className="font-body text-xs uppercase tracking-[0.25em] text-[var(--premium-gold)] mb-6 block">
-                            Keahlian Kami
-                        </span>
-                        <h2 className="font-display text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
-                            Solusi digital<br />yang skalabel.
+                        <p className="font-body text-[11px] uppercase tracking-[0.28em] text-gray-400">Lingkup Layanan</p>
+                        <h2 className="mt-5 max-w-2xl font-display text-3xl font-semibold leading-[1.15] tracking-tight md:text-[2.75rem]">
+                            Tiga lini pekerjaan yang kami tangani secara penuh.
                         </h2>
                     </div>
                     <Link
                         href="/layanan"
-                        className="group inline-flex items-center gap-2 font-body text-sm uppercase tracking-widest text-[#0d0d0d]/60 hover:text-[#0d0d0d] transition-colors border-b border-[#0d0d0d]/20 hover:border-[#0d0d0d] pb-1 self-start md:self-auto"
+                        className="shrink-0 self-start border-b border-gray-400 pb-1 font-body text-sm uppercase tracking-[0.12em] text-gray-600 transition-colors hover:border-[#0f1115] hover:text-[#0f1115] md:self-auto"
                     >
-                        Semua Layanan
-                        <ArrowUpRight className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        Rincian Layanan
                     </Link>
                 </motion.div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-gray-200 border border-gray-200">
+                <div className="grid grid-cols-1 lg:grid-cols-3">
                     {SERVICES.map((service, i) => (
-                        <motion.div
+                        <motion.article
                             key={service.title}
-                            initial={{ opacity: 0, y: 30 }}
+                            initial={{ opacity: 0, y: 16 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, margin: "-80px" }}
-                            transition={{ duration: 0.8, delay: i * 0.15, ease: EASE }}
-                            className="bg-white p-10 md:p-12 flex flex-col gap-8 group hover:bg-[#0d0d0d] transition-colors duration-700"
+                            viewport={{ once: true, margin: "-60px" }}
+                            transition={{ duration: 0.6, delay: i * 0.08, ease: EASE }}
+                            className={`border-b border-gray-300 py-10 lg:border-b-0 lg:py-12 ${
+                                i > 0 ? "lg:border-l lg:border-gray-300 lg:pl-10" : "lg:pr-10"
+                            } ${i === 1 ? "lg:px-10" : ""}`}
                         >
-                            <service.icon className="w-8 h-8 text-[var(--premium-gold)]" strokeWidth={1.5} />
-                            <div>
-                                <span className="font-body text-xs uppercase tracking-[0.2em] text-gray-400 mb-3 block">
-                                    0{i + 1}
-                                </span>
-                                <h3 className="font-display text-2xl font-semibold mb-4 group-hover:text-white transition-colors duration-700">
-                                    {service.title}
-                                </h3>
-                                <p className="font-body text-sm text-gray-500 group-hover:text-white/60 leading-relaxed transition-colors duration-700">
-                                    {service.desc}
-                                </p>
-                            </div>
-                        </motion.div>
-                    ))}
+                            <span className="font-body text-[11px] tabular-nums tracking-[0.2em] text-gray-400">
+                                {String(i + 1).padStart(2, "0")}
+                            </span>
 
-                    {/* Kartu CTA */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-80px" }}
-                        transition={{ duration: 0.8, delay: 0.45, ease: EASE }}
-                        className="bg-[var(--premium-gold)] p-10 md:p-12 flex flex-col justify-between gap-8 group"
-                    >
-                        <ArrowUpRight className="w-8 h-8 text-white transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1" strokeWidth={1.5} />
-                        <div>
-                            <h3 className="font-display text-2xl font-semibold text-white mb-4">
-                                Punya kebutuhan khusus?
-                            </h3>
-                            <Link
-                                href="/kontak"
-                                className="font-body text-sm uppercase tracking-widest text-white border-b border-white/40 hover:border-white pb-1 inline-block transition-colors"
-                            >
-                                Konsultasi Gratis
-                            </Link>
-                        </div>
-                    </motion.div>
+                            <h3 className="mt-4 font-display text-xl font-semibold leading-snug">{service.title}</h3>
+
+                            <p className="mt-4 font-body text-sm leading-relaxed text-gray-600">{service.summary}</p>
+
+                            <p className="mt-7 font-body text-[10px] uppercase tracking-[0.24em] text-gray-400">
+                                Keluaran Pekerjaan
+                            </p>
+                            <ul className="mt-3 divide-y divide-gray-200 border-t border-gray-200">
+                                {service.deliverables.map((item) => (
+                                    <li key={item} className="py-2.5 font-body text-sm text-gray-700">
+                                        {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        </motion.article>
+                    ))}
                 </div>
             </div>
         </section>

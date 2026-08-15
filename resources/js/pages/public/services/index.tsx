@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { Maximize2, Zap, Layout, ArrowUpRight } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import { PremiumNavbar } from '@/components/ui/PremiumNavbar';
 import { Footer } from '@/components/public/sections/Footer';
@@ -10,99 +9,166 @@ import { SEO } from '@/components/SEO';
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
+type Company = { legal_name?: string | null };
+
+/**
+ * Rincian layanan.
+ *
+ * Tiap lini dijabarkan ke dalam cakupan pekerjaan, keluaran yang diserahkan,
+ * dan batasan — sehingga calon klien bisa menilai kesesuaian sebelum menghubungi,
+ * bukan sekadar membaca kata sifat.
+ */
 const SERVICES = [
     {
-        icon: Maximize2,
-        title: 'Software Enterprise',
-        desc: 'Membangun ERP, CRM, dan sistem manajemen inti khusus untuk perusahaan Anda dengan arsitektur cloud terkini.',
+        title: 'Sistem Informasi Manajemen',
+        summary:
+            'Aplikasi internal untuk mengelola proyek, dokumen, keuangan, kepegawaian, dan pelaporan dalam satu basis data terpadu.',
+        scope: [
+            'Pemetaan proses kerja yang berjalan saat ini',
+            'Perancangan basis data dan hak akses per jabatan',
+            'Modul pencatatan, persetujuan, dan pelaporan',
+            'Migrasi data dari berkas atau sistem lama',
+        ],
+        deliverables: ['Dokumen kebutuhan', 'Aplikasi terpasang di server klien', 'Panduan pengguna', 'Pelatihan staf'],
+        note: 'Cocok bila pencatatan masih tersebar di banyak berkas terpisah dan sulit direkap.',
     },
     {
-        icon: Zap,
-        title: 'Aplikasi Web',
-        desc: 'Aplikasi web berkinerja tinggi, responsif, dan interaktif menggunakan ekosistem modern seperti React, Next.js, dan Laravel.',
+        title: 'Aplikasi Web & Portal Layanan',
+        summary:
+            'Situs korporat, portal layanan publik, dan aplikasi berbasis web yang berjalan di peramban tanpa pemasangan di perangkat pengguna.',
+        scope: [
+            'Perancangan struktur informasi dan alur pengguna',
+            'Pengembangan antarmuka dan sisi server',
+            'Penyesuaian tampilan untuk perangkat bergerak',
+            'Pengaturan dasar optimasi mesin pencari',
+        ],
+        deliverables: ['Rancangan antarmuka', 'Kode sumber lengkap', 'Uji terima pengguna', 'Panduan operasional'],
+        note: 'Termasuk pengelolaan konten mandiri agar tim klien dapat memperbarui isi tanpa bantuan pengembang.',
     },
     {
-        icon: Layout,
-        title: 'Desain UI/UX',
-        desc: 'Merancang antarmuka memukau yang tidak hanya mengedepankan estetika, namun sangat berfokus pada pengalaman pengguna yang tak terlupakan.',
+        title: 'Integrasi & Migrasi Data',
+        summary:
+            'Menyambungkan sistem yang sudah berjalan dan memindahkan data lama ke sistem baru tanpa menghentikan kegiatan operasional.',
+        scope: [
+            'Penelusuran dan pemetaan sumber data',
+            'Penyusunan skrip migrasi yang dapat diulang',
+            'Uji paralel antara sistem lama dan baru',
+            'Penyusunan berita acara migrasi',
+        ],
+        deliverables: ['Peta data', 'Skrip migrasi terverifikasi', 'Laporan hasil uji', 'Berita acara'],
+        note: 'Data asli tidak pernah diubah selama proses; migrasi dijalankan pada salinan hingga hasilnya disetujui.',
     },
 ];
 
-export default function ServicesIndex() {
+export default function ServicesIndex({ company }: { company?: Company }) {
     useLenis();
 
+    const legalName = company?.legal_name ?? 'PT Kreatif Teknologi Maju Bersama';
+
     return (
-        <div className="bg-white text-[var(--premium-text)] selection:bg-[var(--premium-gold)] selection:text-white font-body">
+        <div className="bg-white font-body text-[#0f1115]">
             <SEO
-                title="Layanan | CTECH Creative"
-                description="Layanan utama CTECH Creative meliputi pengembangan Software Enterprise (ERP, CRM), Aplikasi Web berkinerja tinggi, dan Desain UI/UX yang memukau."
+                title={`Layanan | ${legalName}`}
+                description="Lingkup layanan: sistem informasi manajemen, aplikasi web dan portal layanan, serta integrasi dan migrasi data — lengkap dengan keluaran pekerjaan pada setiap lini."
                 url="/layanan"
             />
 
             <PremiumNavbar />
 
-            <main className="w-full overflow-hidden">
+            <main className="w-full">
                 <PageHeader
-                    eyebrow="Keahlian Kami"
-                    title="Solusi Skalabel."
-                    description="Software enterprise, aplikasi web berkinerja tinggi, dan desain UI/UX yang memukau — dirancang presisi untuk pertumbuhan bisnis Anda."
+                    eyebrow="Lingkup Layanan"
+                    title="Tiga lini pekerjaan yang kami tangani secara penuh."
+                    description="Setiap lini disertai cakupan pekerjaan dan daftar keluaran yang diserahkan, agar lingkup dapat dinilai sebelum penawaran disusun."
+                    meta={[
+                        { label: 'Model Kerja', value: 'Kontrak proyek dengan lingkup dan tenggat tertulis' },
+                        { label: 'Termin', value: 'Pembayaran mengikuti penyelesaian tahap' },
+                        { label: 'Setelah Serah Terima', value: 'Masa pendampingan disepakati di muka' },
+                    ]}
                 />
 
-                {/* Kartu layanan */}
-                <section className="py-24 md:py-32 bg-white">
-                    <div className="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-3 gap-px bg-gray-200 border border-gray-200">
-                        {SERVICES.map((service, i) => (
-                            <motion.div
-                                key={service.title}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: '-80px' }}
-                                transition={{ duration: 0.8, delay: i * 0.15, ease: EASE }}
-                                className="bg-white p-10 md:p-14 flex flex-col gap-10 group hover:bg-[#0d0d0d] transition-colors duration-700"
-                            >
-                                <service.icon className="w-9 h-9 text-[var(--premium-gold)]" strokeWidth={1.5} />
-                                <div>
-                                    <span className="font-body text-xs uppercase tracking-[0.2em] text-gray-400 mb-3 block">
-                                        0{i + 1}
+                {/* Rincian tiap lini */}
+                <section className="border-b border-gray-200">
+                    {SERVICES.map((service, i) => (
+                        <motion.article
+                            key={service.title}
+                            initial={{ opacity: 0, y: 16 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: '-60px' }}
+                            transition={{ duration: 0.6, ease: EASE }}
+                            className="border-b border-gray-200 py-16 last:border-b-0 md:py-20"
+                        >
+                            <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-10 px-6 md:px-12 lg:grid-cols-12 lg:gap-16">
+                                <div className="lg:col-span-5">
+                                    <span className="font-body text-[11px] tabular-nums tracking-[0.2em] text-gray-400">
+                                        {String(i + 1).padStart(2, '0')}
                                     </span>
-                                    <h3 className="font-display text-2xl md:text-3xl font-semibold mb-5 text-[#0d0d0d] group-hover:text-white transition-colors duration-700">
+                                    <h2 className="mt-4 font-display text-2xl font-semibold leading-snug tracking-tight md:text-3xl">
                                         {service.title}
-                                    </h3>
-                                    <p className="font-body text-sm md:text-base text-gray-500 group-hover:text-white/60 leading-relaxed transition-colors duration-700">
-                                        {service.desc}
+                                    </h2>
+                                    <p className="mt-5 max-w-md font-body text-base leading-relaxed text-gray-600">
+                                        {service.summary}
+                                    </p>
+                                    <p className="mt-6 max-w-md border-l-2 border-gray-300 pl-4 font-body text-sm leading-relaxed text-gray-500">
+                                        {service.note}
                                     </p>
                                 </div>
-                            </motion.div>
-                        ))}
-                    </div>
+
+                                <div className="lg:col-span-4">
+                                    <p className="font-body text-[10px] uppercase tracking-[0.24em] text-gray-400">
+                                        Cakupan Pekerjaan
+                                    </p>
+                                    <ul className="mt-4 divide-y divide-gray-200 border-y border-gray-200">
+                                        {service.scope.map((item) => (
+                                            <li key={item} className="py-3 font-body text-sm leading-relaxed text-gray-700">
+                                                {item}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div className="lg:col-span-3">
+                                    <p className="font-body text-[10px] uppercase tracking-[0.24em] text-gray-400">
+                                        Yang Diserahkan
+                                    </p>
+                                    <ul className="mt-4 divide-y divide-gray-200 border-y border-gray-200">
+                                        {service.deliverables.map((item) => (
+                                            <li key={item} className="py-3 font-body text-sm text-gray-700">
+                                                {item}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </motion.article>
+                    ))}
                 </section>
 
                 <Process />
 
-                {/* CTA */}
-                <section className="py-24 md:py-32 bg-white text-center">
-                    <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, margin: '-100px' }}
-                            transition={{ duration: 0.8, ease: 'easeOut' }}
-                        >
-                            <h2 className="font-display text-3xl md:text-5xl font-semibold tracking-tight text-[#0d0d0d] mb-10">
-                                Siap membangun bersama kami?
+                {/* Penutup */}
+                <section className="border-t border-gray-200 py-20 md:py-24">
+                    <div className="mx-auto flex max-w-[1400px] flex-col justify-between gap-8 px-6 md:flex-row md:items-end md:px-12">
+                        <div>
+                            <h2 className="max-w-2xl font-display text-2xl font-semibold leading-[1.2] tracking-tight md:text-[2.25rem]">
+                                Sampaikan kebutuhan Anda, kami balas dengan lingkup dan estimasi.
                             </h2>
-                            <Link
-                                href="/kontak"
-                                className="inline-flex items-center gap-3 rounded-full bg-[#0d0d0d] text-white px-8 py-4 font-body text-sm font-semibold uppercase tracking-widest hover:bg-[var(--premium-gold)] transition-colors duration-500"
-                            >
-                                Mulai Diskusi <ArrowUpRight className="w-4 h-4" />
-                            </Link>
-                        </motion.div>
+                            <p className="mt-4 max-w-xl font-body text-base leading-relaxed text-gray-600">
+                                Peninjauan dilakukan pada hari kerja. Bila diperlukan, kami jadwalkan
+                                pertemuan untuk memperjelas lingkup sebelum penawaran disusun.
+                            </p>
+                        </div>
+                        <Link
+                            href="/kontak"
+                            className="shrink-0 self-start bg-[#0f1115] px-8 py-4 font-body text-sm font-semibold uppercase tracking-[0.12em] text-white transition-colors duration-300 hover:bg-[#2c3140] md:self-auto"
+                        >
+                            Ajukan Kebutuhan
+                        </Link>
                     </div>
                 </section>
             </main>
 
-            <Footer />
+            <Footer company={company} />
         </div>
     );
 }

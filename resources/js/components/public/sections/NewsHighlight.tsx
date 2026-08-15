@@ -25,7 +25,7 @@ export function NewsHighlight({ news = [] }: { news?: any[] }) {
                     className="mb-16 md:mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8"
                 >
                     <div>
-                        <span className="font-body text-xs uppercase tracking-[0.25em] text-[var(--premium-gold)] mb-6 block">
+                        <span className="font-body text-xs uppercase tracking-[0.25em] text-gray-400 mb-6 block">
                             Wawasan
                         </span>
                         <h2 className="font-display text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
@@ -51,7 +51,7 @@ export function NewsHighlight({ news = [] }: { news?: any[] }) {
                             transition={{ duration: 0.8, delay: i * 0.15, ease: EASE }}
                         >
                             <Link href={`/berita/${item.slug}`} className="group flex flex-col h-full">
-                                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-gray-100 mb-6">
+                                <div className="relative aspect-[4/3] overflow-hidden rounded-none bg-gray-100 mb-6">
                                     {item.image ? (
                                         <img
                                             src={item.image.startsWith("http") ? item.image : `/storage/${item.image}`}
@@ -64,7 +64,7 @@ export function NewsHighlight({ news = [] }: { news?: any[] }) {
                                             Tanpa Gambar
                                         </div>
                                     )}
-                                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-[#0d0d0d] text-xs font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-[#0d0d0d] text-xs font-semibold uppercase tracking-wider px-3 py-1.5 rounded-none">
                                         {item.category || "Berita"}
                                     </div>
                                 </div>
@@ -76,13 +76,13 @@ export function NewsHighlight({ news = [] }: { news?: any[] }) {
                                             year: "numeric",
                                         })}
                                     </span>
-                                    <h3 className="font-display text-xl md:text-2xl font-semibold tracking-tight mb-3 leading-snug group-hover:text-[var(--premium-gold)] transition-colors line-clamp-2">
+                                    <h3 className="font-display text-xl md:text-2xl font-semibold tracking-tight mb-3 leading-snug group-hover:text-gray-400 transition-colors line-clamp-2">
                                         {item.title}
                                     </h3>
                                     <p className="font-body text-sm text-gray-500 leading-relaxed line-clamp-3 mb-5 flex-grow">
                                         {stripHtml(item.content)}
                                     </p>
-                                    <span className="inline-flex items-center gap-1.5 font-body text-xs uppercase tracking-[0.15em] font-semibold text-[#0d0d0d] mt-auto group-hover:gap-3 group-hover:text-[var(--premium-gold)] transition-all">
+                                    <span className="inline-flex items-center gap-1.5 font-body text-xs uppercase tracking-[0.15em] font-semibold text-[#0d0d0d] mt-auto group-hover:gap-3 group-hover:text-gray-400 transition-all">
                                         Baca Selengkapnya &rarr;
                                     </span>
                                 </div>

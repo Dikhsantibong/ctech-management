@@ -244,7 +244,7 @@ export default function Process() {
                                         <span className="bg-surface-container px-2 py-1 rounded text-label-md text-slate-900 font-label-md">Kubernetes</span>
                                         <span className="bg-surface-container px-2 py-1 rounded text-label-md text-slate-900 font-label-md">Rust</span>
                                         <span className="bg-surface-container px-2 py-1 rounded text-label-md text-slate-900 font-label-md">Go</span>
-                                        <span class="bg-surface-container px-2 py-1 rounded text-label-md text-slate-900 font-label-md">TypeScript</span>
+                                        <span className="bg-surface-container px-2 py-1 rounded text-label-md text-slate-900 font-label-md">TypeScript</span>
                                         <span className="bg-surface-container px-2 py-1 rounded text-label-md text-slate-900 font-label-md">PostgreSQL</span>
                                         <span className="bg-surface-container px-2 py-1 rounded text-label-md text-slate-900 font-label-md">React</span>
                                         <span className="bg-surface-container px-2 py-1 rounded text-label-md text-slate-900 font-label-md">Laravel</span>

@@ -1,135 +1,133 @@
-import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Sparkle } from "lucide-react";
+import { motion } from "framer-motion";
 import { Link } from "@inertiajs/react";
-import { HeroShaderCanvas } from "@/components/public/HeroShaderCanvas";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-export function Hero() {
-    const { scrollY } = useScroll();
-    // Konten bergerak lebih lambat dari halaman (parallax)
-    const y = useTransform(scrollY, [0, 1000], [0, 400]);
-    const opacity = useTransform(scrollY, [0, 700], [1, 0]);
+const fadeUp = {
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0 },
+};
+
+type Company = {
+    legal_name?: string | null;
+    address?: string | null;
+};
+
+/**
+ * Hero korporat.
+ *
+ * Disederhanakan secara sengaja: tanpa gradient, tanpa lencana berputar, dan
+ * tanpa ikon dekoratif. Ruang yang tadinya dipakai ornamen kini diisi keterangan
+ * yang bisa diverifikasi — badan hukum, domisili, dan bidang penanganan.
+ */
+export function Hero({ company, metrics = [] }: { company?: Company; metrics?: { value: number; label: string }[] }) {
+    const legalName = company?.legal_name ?? "PT Kreatif Teknologi Maju Bersama";
+    const headline = metrics.slice(0, 3);
 
     return (
-        <section className="relative h-screen min-h-[640px] w-full flex items-center overflow-hidden bg-[#0d0d0d] text-white">
-            {/* Background WebGL liquid streaks */}
-            <div className="absolute inset-0 z-0">
-                <HeroShaderCanvas />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#0d0d0d]/40 via-transparent to-[#0d0d0d]"></div>
+        <section className="relative w-full bg-[#0f1115] text-white">
+            <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-16 px-6 pb-16 pt-36 md:px-12 md:pb-20 md:pt-44 lg:grid-cols-12 lg:gap-20">
+                {/* Kolom utama */}
+                <div className="lg:col-span-8">
+                    <motion.p
+                        {...fadeUp}
+                        transition={{ duration: 0.6, ease: EASE }}
+                        className="font-body text-[11px] uppercase tracking-[0.28em] text-white/45"
+                    >
+                        {legalName}
+                    </motion.p>
+
+                    <motion.h1
+                        {...fadeUp}
+                        transition={{ duration: 0.7, delay: 0.08, ease: EASE }}
+                        className="mt-8 max-w-4xl font-display text-[2.6rem] font-semibold leading-[1.12] tracking-tight md:text-[4.2rem]"
+                    >
+                        Perangkat lunak korporat yang dirancang untuk dipakai bertahun-tahun.
+                    </motion.h1>
+
+                    <motion.p
+                        {...fadeUp}
+                        transition={{ duration: 0.7, delay: 0.16, ease: EASE }}
+                        className="mt-8 max-w-2xl font-body text-base leading-relaxed text-white/60 md:text-lg"
+                    >
+                        Kami membangun sistem informasi, aplikasi web, dan perangkat operasional untuk
+                        instansi dan perusahaan — dari perumusan kebutuhan, pengembangan, hingga
+                        pendampingan setelah serah terima.
+                    </motion.p>
+
+                    <motion.div
+                        {...fadeUp}
+                        transition={{ duration: 0.7, delay: 0.24, ease: EASE }}
+                        className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4"
+                    >
+                        <Link
+                            href="/kontak"
+                            className="inline-flex items-center bg-white px-8 py-4 font-body text-sm font-semibold uppercase tracking-[0.12em] text-[#0f1115] transition-colors duration-300 hover:bg-white/85"
+                        >
+                            Ajukan Kebutuhan
+                        </Link>
+                        <Link
+                            href="/portfolio"
+                            className="border-b border-white/25 pb-1 font-body text-sm uppercase tracking-[0.12em] text-white/70 transition-colors hover:border-white hover:text-white"
+                        >
+                            Rekam Jejak Pekerjaan
+                        </Link>
+                    </motion.div>
+                </div>
+
+                {/* Kolom keterangan — mengganti ornamen dengan data */}
+                <motion.aside
+                    {...fadeUp}
+                    transition={{ duration: 0.7, delay: 0.3, ease: EASE }}
+                    className="lg:col-span-4 lg:border-l lg:border-white/10 lg:pl-12"
+                >
+                    <dl className="divide-y divide-white/10 border-y border-white/10">
+                        {company?.address && (
+                            <div className="py-5">
+                                <dt className="font-body text-[10px] uppercase tracking-[0.24em] text-white/40">Domisili</dt>
+                                <dd className="mt-2 font-body text-sm leading-relaxed text-white/75">{company.address}</dd>
+                            </div>
+                        )}
+                        <div className="py-5">
+                            <dt className="font-body text-[10px] uppercase tracking-[0.24em] text-white/40">Bidang Penanganan</dt>
+                            <dd className="mt-2 font-body text-sm leading-relaxed text-white/75">
+                                Sistem informasi manajemen · Aplikasi web · Integrasi data · Antarmuka &amp; pengalaman pengguna
+                            </dd>
+                        </div>
+                        <div className="py-5">
+                            <dt className="font-body text-[10px] uppercase tracking-[0.24em] text-white/40">Model Kerja</dt>
+                            <dd className="mt-2 font-body text-sm leading-relaxed text-white/75">
+                                Kontrak proyek dengan lingkup, jadwal, dan serah terima yang tertulis.
+                            </dd>
+                        </div>
+                    </dl>
+                </motion.aside>
             </div>
 
-            <motion.div style={{ y, opacity }} className="relative z-10 w-full max-w-[1400px] mx-auto px-6 md:px-12">
-                <motion.span
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                    className="font-body text-xs md:text-sm uppercase tracking-[0.3em] text-white/60 mb-8 block"
-                >
-                    CTECH Creative — Agensi Digital
-                </motion.span>
-
-                <h1 className="font-display font-semibold text-5xl md:text-[100px] leading-[1.1] tracking-tight max-w-6xl">
-                    <span className="block overflow-hidden">
-                        <motion.span
-                            initial={{ y: "110%" }}
-                            animate={{ y: 0 }}
-                            transition={{ duration: 1, delay: 0.3, ease: EASE }}
-                            className="block"
-                        >
-                            Rekayasa
-                        </motion.span>
-                    </span>
-                    <span className="block overflow-hidden">
-                        <motion.span
-                            initial={{ y: "110%" }}
-                            animate={{ y: 0 }}
-                            transition={{ duration: 1, delay: 0.45, ease: EASE }}
-                            className="flex items-center flex-wrap gap-x-5"
-                        >
-                            <span>
-                                Keanggunan{" "}
-                                <span className="text-white/90">Digital</span>
-                            </span>
-                            {/* Garis micro-interaction memanjang dari huruf terakhir */}
-                            <motion.span
-                                initial={{ scaleX: 0 }}
-                                animate={{ scaleX: 1 }}
-                                transition={{ duration: 1.5, delay: 0.9, ease: EASE }}
-                                className="inline-block w-[100px] md:w-[450px] h-2.5 bg-white rounded-r-full origin-left"
-                            ></motion.span>
-                        </motion.span>
-                    </span>
-                </h1>
-
-                <motion.p
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
-                    className="mt-10 md:mt-14 max-w-xl font-body text-base md:text-lg text-white/60 leading-relaxed font-light"
-                >
-                    Kami merancang pengalaman digital berkelas yang menggabungkan presisi teknis
-                    tingkat tinggi dengan desain antarmuka avant-garde.
-                </motion.p>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
-                    className="mt-10 flex items-center gap-6"
-                >
-                    <Link
-                        href="/kontak"
-                        className="group inline-flex items-center gap-3 rounded-full bg-white text-[#0d0d0d] px-8 py-4 font-body text-sm font-semibold uppercase tracking-widest hover:bg-[var(--premium-gold)] hover:text-white transition-colors duration-500"
-                    >
-                        Mulai Proyek
-                        <ArrowRight className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" />
-                    </Link>
-                    <Link
-                        href="/portfolio"
-                        className="hidden sm:inline-flex items-center gap-2 font-body text-sm uppercase tracking-widest text-white/70 hover:text-white transition-colors border-b border-white/20 hover:border-white pb-1"
-                    >
-                        Lihat Karya
-                    </Link>
-                </motion.div>
-            </motion.div>
-
-            {/* Badge lingkaran berputar — kanan bawah */}
-            <motion.div
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 1, delay: 1.4, ease: EASE }}
-                className="absolute bottom-10 right-6 md:bottom-14 md:right-14 z-10 hidden sm:block"
-            >
-                <Link href="/kontak" aria-label="Mulai sebuah proyek" className="relative block w-28 h-28 md:w-36 md:h-36 group">
-                    <motion.svg
-                        viewBox="0 0 100 100"
-                        animate={{ rotate: 360 }}
-                        transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
-                        className="w-full h-full"
-                    >
-                        <defs>
-                            <path id="hero-circle-path" d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" />
-                        </defs>
-                        <text className="fill-white/80 uppercase" style={{ fontSize: "10px", letterSpacing: "2.5px", fontFamily: "Inter, sans-serif" }}>
-                            <textPath href="#hero-circle-path">MULAI PROYEK • MULAI PROYEK •</textPath>
-                        </text>
-                    </motion.svg>
-                    <span className="absolute inset-0 flex items-center justify-center">
-                        <Sparkle className="w-6 h-6 md:w-8 md:h-8 text-white group-hover:text-[var(--premium-gold)] group-hover:rotate-90 transition-all duration-700" />
-                    </span>
-                </Link>
-            </motion.div>
-
-            {/* Indikator scroll — kiri bawah */}
-            <div className="absolute bottom-10 left-6 md:left-12 z-10 flex items-center gap-4 font-body text-[10px] md:text-xs uppercase tracking-[0.3em] text-white/40">
-                <span>Gulir ke bawah</span>
-                <motion.div
-                    animate={{ y: [0, 10, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                    className="w-px h-10 bg-white/30"
-                ></motion.div>
-            </div>
+            {/* Baris angka — hanya tampil bila datanya benar-benar ada */}
+            {headline.length > 0 && (
+                <div className="border-t border-white/10">
+                    <div className="mx-auto grid max-w-[1400px] grid-cols-1 divide-y divide-white/10 px-6 md:grid-cols-3 md:divide-x md:divide-y-0 md:px-12">
+                        {headline.map((metric, i) => (
+                            <motion.div
+                                key={metric.label}
+                                {...fadeUp}
+                                whileInView="animate"
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.6, delay: 0.05 * i, ease: EASE }}
+                                className={`py-8 ${i > 0 ? "md:pl-10" : ""} ${i < headline.length - 1 ? "md:pr-10" : ""}`}
+                            >
+                                <span className="font-display text-4xl font-semibold tracking-tight md:text-5xl">
+                                    {metric.value}
+                                </span>
+                                <span className="mt-2 block font-body text-[11px] uppercase tracking-[0.22em] text-white/45">
+                                    {metric.label}
+                                </span>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </section>
     );
 }

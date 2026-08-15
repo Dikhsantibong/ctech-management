@@ -12,22 +12,18 @@ use App\Http\Controllers\Api\V1\ClientFeedbackController;
 
 use Illuminate\Support\Facades\DB;
 
-Route::get('/', function () {
-    $news = \App\Models\News::where('status', 'Published')->latest()->take(3)->get();
-    $portfolios = \App\Models\Portfolio::latest()->take(6)->get();
-    return inertia('welcome', ['news' => $news, 'portfolios' => $portfolios]);
-})->name('home');
+Route::get('/', [\App\Http\Controllers\PublicController::class, 'home'])->name('home');
 
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 
 Route::get('/berita', [\App\Http\Controllers\PublicController::class, 'newsIndex'])->name('public.news.index');
 Route::get('/berita/{slug}', [\App\Http\Controllers\PublicController::class, 'newsShow'])->name('public.news.show');
 
-Route::get('/tentang', function () { return inertia('public/about/index'); })->name('public.about');
+Route::get('/tentang', [\App\Http\Controllers\PublicController::class, 'about'])->name('public.about');
 
-Route::get('/layanan', function () { return inertia('public/services/index'); })->name('public.services');
+Route::get('/layanan', [\App\Http\Controllers\PublicController::class, 'services'])->name('public.services');
 
-Route::get('/kontak', function () { return inertia('public/contact/index'); })->name('public.contact');
+Route::get('/kontak', [\App\Http\Controllers\PublicController::class, 'contact'])->name('public.contact');
 
 Route::prefix('solusi')->group(function () {
     Route::get('/photobooth', function () { return inertia('public/solutions/photobooth'); })->name('public.solutions.photobooth');

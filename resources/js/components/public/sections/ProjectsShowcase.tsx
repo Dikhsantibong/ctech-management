@@ -44,7 +44,7 @@ export function ProjectsShowcase({ portfolios = [] }: { portfolios?: any }) {
                     className="mb-16 md:mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8"
                 >
                     <div>
-                        <span className="font-body text-xs uppercase tracking-[0.25em] text-[var(--premium-gold)] mb-6 block">
+                        <span className="font-body text-xs uppercase tracking-[0.25em] text-gray-400 mb-6 block">
                             Karya Pilihan
                         </span>
                         <h2 className="font-display text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
@@ -64,14 +64,14 @@ export function ProjectsShowcase({ portfolios = [] }: { portfolios?: any }) {
                                 <button
                                     onClick={prev}
                                     aria-label="Proyek sebelumnya"
-                                    className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-[#0d0d0d] hover:text-white hover:border-[#0d0d0d] transition-colors duration-500"
+                                    className="w-12 h-12 rounded-none border border-gray-200 flex items-center justify-center hover:bg-[#0d0d0d] hover:text-white hover:border-[#0d0d0d] transition-colors duration-500"
                                 >
                                     <ChevronLeft className="w-5 h-5" />
                                 </button>
                                 <button
                                     onClick={next}
                                     aria-label="Proyek berikutnya"
-                                    className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-[#0d0d0d] hover:text-white hover:border-[#0d0d0d] transition-colors duration-500"
+                                    className="w-12 h-12 rounded-none border border-gray-200 flex items-center justify-center hover:bg-[#0d0d0d] hover:text-white hover:border-[#0d0d0d] transition-colors duration-500"
                                 >
                                     <ChevronRight className="w-5 h-5" />
                                 </button>
@@ -81,7 +81,7 @@ export function ProjectsShowcase({ portfolios = [] }: { portfolios?: any }) {
                 </motion.div>
 
                 {count === 0 ? (
-                    <div className="text-center py-20 text-gray-400 font-body tracking-[0.2em] uppercase text-sm border border-dashed border-gray-200 rounded-3xl">
+                    <div className="text-center py-20 text-gray-400 font-body tracking-[0.2em] uppercase text-sm border border-dashed border-gray-200 rounded-none">
                         Belum ada portfolio yang ditambahkan.
                     </div>
                 ) : (
@@ -110,7 +110,7 @@ export function ProjectsShowcase({ portfolios = [] }: { portfolios?: any }) {
                                         dragElastic={0.25}
                                         onDragEnd={isFront ? handleDragEnd : undefined}
                                         onClick={() => !isFront && visible && setActive(i)}
-                                        className={`absolute inset-0 rounded-3xl border border-gray-200/80 shadow-[0_20px_60px_-30px_rgba(13,13,13,0.25)] overflow-hidden ${
+                                        className={`absolute inset-0 rounded-none border border-gray-200/80 shadow-none overflow-hidden ${
                                             isFront ? "cursor-grab active:cursor-grabbing" : visible ? "cursor-pointer" : "pointer-events-none"
                                         }`}
                                         aria-hidden={!visible}
@@ -118,7 +118,7 @@ export function ProjectsShowcase({ portfolios = [] }: { portfolios?: any }) {
                                         <div className="grid grid-rows-[220px_1fr] md:grid-rows-1 md:grid-cols-2 h-full">
                                             {/* Gambar */}
                                             <div className="relative md:order-2 p-4 md:p-8 flex">
-                                                <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-200">
+                                                <div className="relative w-full h-full rounded-none overflow-hidden bg-gray-200">
                                                     {img ? (
                                                         <img
                                                             src={img}
@@ -132,10 +132,6 @@ export function ProjectsShowcase({ portfolios = [] }: { portfolios?: any }) {
                                                             Tanpa Gambar
                                                         </div>
                                                     )}
-                                                    {/* Bentuk glassmorphism dekoratif */}
-                                                    <div className="absolute top-6 right-6 w-16 h-16 rounded-xl backdrop-blur-sm bg-white/90 mix-blend-overlay hidden md:block"></div>
-                                                    <div className="absolute bottom-10 left-8 w-12 h-12 rounded-full backdrop-blur-sm bg-white/90 mix-blend-overlay hidden md:block"></div>
-                                                    <div className="absolute bottom-24 right-12 w-7 h-7 rounded-full backdrop-blur-sm bg-white/90 mix-blend-overlay hidden md:block"></div>
                                                 </div>
                                             </div>
 
@@ -143,10 +139,10 @@ export function ProjectsShowcase({ portfolios = [] }: { portfolios?: any }) {
                                             <div className="md:order-1 p-6 md:p-14 flex flex-col justify-between min-h-0">
                                                 <div>
                                                     <div className="flex items-center gap-4 mb-6 md:mb-10">
-                                                        <span className="w-11 h-11 rounded-full border border-[#0d0d0d]/15 flex items-center justify-center font-body text-xs font-semibold">
+                                                        <span className="w-11 h-11 rounded-none border border-[#0d0d0d]/15 flex items-center justify-center font-body text-xs font-semibold">
                                                             {String(i + 1).padStart(2, "0")}
                                                         </span>
-                                                        <span className="font-body text-xs uppercase tracking-[0.2em] text-[var(--premium-gold)] font-medium">
+                                                        <span className="font-body text-xs uppercase tracking-[0.2em] text-gray-400 font-medium">
                                                             {[year, project.category || "Proyek"].filter(Boolean).join(" • ")}
                                                         </span>
                                                     </div>
@@ -161,7 +157,7 @@ export function ProjectsShowcase({ portfolios = [] }: { portfolios?: any }) {
                                                 </div>
                                                 <Link
                                                     href={`/portfolio/${project.id}`}
-                                                    className="mt-6 self-start inline-flex items-center gap-2 rounded-full bg-[#0d0d0d] text-white px-6 py-3 font-body text-xs md:text-sm font-semibold uppercase tracking-widest hover:bg-[var(--premium-gold)] transition-colors duration-500"
+                                                    className="mt-6 self-start inline-flex items-center gap-2 rounded-none bg-[#0d0d0d] text-white px-6 py-3 font-body text-xs md:text-sm font-semibold uppercase tracking-widest hover:bg-[#2c3140] transition-colors duration-500"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
                                                     Lihat Studi Kasus <ArrowUpRight className="w-4 h-4" />
@@ -181,7 +177,7 @@ export function ProjectsShowcase({ portfolios = [] }: { portfolios?: any }) {
                                         key={i}
                                         onClick={() => setActive(i)}
                                         aria-label={`Ke proyek ${i + 1}`}
-                                        className={`h-1.5 rounded-full transition-all duration-500 ${
+                                        className={`h-1.5 rounded-none transition-all duration-500 ${
                                             i === active ? "w-8 bg-[#0d0d0d]" : "w-3 bg-gray-300 hover:bg-gray-400"
                                         }`}
                                     />

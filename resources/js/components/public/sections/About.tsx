@@ -1,89 +1,124 @@
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 
-export function About() {
-    const gridRef = useRef(null);
-    const { scrollYProgress } = useScroll({
-        target: gridRef,
-        offset: ["start end", "end start"],
-    });
-    const y1 = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
-    const y2 = useTransform(scrollYProgress, [0, 1], ["0%", "-10%"]);
-    const y3 = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+const PRINCIPLES = [
+    {
+        title: "Lingkup tertulis sebelum pengerjaan",
+        body: "Setiap proyek dimulai dari dokumen kebutuhan yang disepakati kedua pihak — apa yang dikerjakan, apa yang tidak, dan bagaimana perubahan lingkup ditangani.",
+    },
+    {
+        title: "Serah terima disertai dokumentasi",
+        body: "Kode sumber, basis data, dan petunjuk operasional diserahkan lengkap. Klien tidak terkunci pada satu vendor untuk melanjutkan sistemnya.",
+    },
+    {
+        title: "Pendampingan setelah peluncuran",
+        body: "Masa pendampingan disepakati di muka, mencakup perbaikan kesalahan dan pendampingan pengguna pada periode awal pemakaian.",
+    },
+];
+
+type Company = {
+    legal_name?: string | null;
+    address?: string | null;
+};
+
+/**
+ * Profil perusahaan.
+ *
+ * Versi sebelumnya menampilkan tiga foto stok Unsplash dengan keterangan
+ * "Kolaborasi tim CTECH" dan "Ruang kerja studio" — foto pihak lain yang
+ * disajikan seolah milik perusahaan. Bagian itu diganti keterangan tertulis
+ * yang memang bisa dipertanggungjawabkan.
+ */
+export function About({ company, capabilities = [] }: { company?: Company; capabilities?: string[] }) {
+    const legalName = company?.legal_name ?? "PT Kreatif Teknologi Maju Bersama";
 
     return (
-        <section id="about" className="py-24 md:py-32 bg-[#f9fafb] text-[#0d0d0d] overflow-hidden">
-            <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-                <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
-                    {/* Teks sticky di kiri */}
-                    <div className="lg:w-5/12">
-                        <div className="lg:sticky lg:top-32">
-                            <motion.span
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-100px" }}
-                                transition={{ duration: 0.8, ease: "easeOut" }}
-                                className="font-body text-xs uppercase tracking-[0.25em] text-[var(--premium-gold)] mb-8 block"
-                            >
-                                Visi & Misi Kami
-                            </motion.span>
-                            <motion.h2
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-100px" }}
-                                transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                                className="font-display text-4xl md:text-6xl font-semibold leading-[1.08] tracking-tight mb-10"
-                            >
-                                Kami tidak sekadar membuat software. Kami merancang warisan digital.
-                            </motion.h2>
-                            <motion.div
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-100px" }}
-                                transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-                                className="flex flex-col gap-6"
-                            >
-                                <p className="font-body text-lg md:text-xl font-light leading-relaxed text-gray-700">
-                                    Didirikan di atas prinsip arsitektur yang tangguh dan desain editorial,
-                                    studio kami menggabungkan rekayasa berkinerja tinggi dengan estetika yang memukau.
-                                </p>
-                                <p className="font-body text-base text-gray-500 font-light leading-relaxed">
-                                    Setiap proyek adalah peluang untuk mendobrak batasan inovasi di dunia web.
-                                    Kami adalah kumpulan arsitek senior, desainer pemenang penghargaan, dan ahli
-                                    animasi yang percaya bahwa dunia digital layak mendapatkan keahlian kerajinan
-                                    tangan yang sama seperti produk fisik mewah.
-                                </p>
-                            </motion.div>
-                        </div>
+        <section id="about" className="border-t border-gray-200 bg-white py-24 text-[#0f1115] md:py-32">
+            <div className="mx-auto max-w-[1400px] px-6 md:px-12">
+                <div className="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:gap-20">
+                    <div className="lg:col-span-5">
+                        <motion.p
+                            initial={{ opacity: 0, y: 16 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-80px" }}
+                            transition={{ duration: 0.6, ease: EASE }}
+                            className="font-body text-[11px] uppercase tracking-[0.28em] text-gray-400"
+                        >
+                            Profil Perusahaan
+                        </motion.p>
+
+                        <motion.h2
+                            initial={{ opacity: 0, y: 16 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-80px" }}
+                            transition={{ duration: 0.7, delay: 0.06, ease: EASE }}
+                            className="mt-6 font-display text-3xl font-semibold leading-[1.15] tracking-tight md:text-[2.75rem]"
+                        >
+                            Badan usaha berbadan hukum, dengan cara kerja yang bisa diaudit.
+                        </motion.h2>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 16 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-80px" }}
+                            transition={{ duration: 0.7, delay: 0.12, ease: EASE }}
+                            className="mt-8 space-y-5 font-body text-base leading-relaxed text-gray-600"
+                        >
+                            <p>
+                                {legalName} menangani pembangunan perangkat lunak untuk kebutuhan
+                                operasional perusahaan dan instansi. Pekerjaan dijalankan berbasis kontrak
+                                dengan lingkup, tenggat, dan mekanisme serah terima yang tertulis.
+                            </p>
+                            <p>
+                                Kami bekerja pada skala yang bisa kami pertanggungjawabkan. Bila suatu
+                                kebutuhan berada di luar kompetensi kami, hal itu kami sampaikan sejak
+                                awal ketimbang dipaksakan.
+                            </p>
+                        </motion.div>
                     </div>
 
-                    {/* Masonry parallax di kanan */}
-                    <div ref={gridRef} className="lg:w-7/12 grid grid-cols-2 gap-4 md:gap-6 items-start">
-                        <motion.div style={{ y: y1 }} className="col-span-1 row-span-2">
-                            <img
-                                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop"
-                                alt="Kolaborasi tim CTECH"
-                                loading="lazy"
-                                className="w-full aspect-[3/4] object-cover rounded-2xl"
-                            />
-                        </motion.div>
-                        <motion.div style={{ y: y2 }} className="col-span-1 mt-12 md:mt-20">
-                            <img
-                                src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=2070&auto=format&fit=crop"
-                                alt="Diskusi strategi digital"
-                                loading="lazy"
-                                className="w-full aspect-square object-cover rounded-2xl"
-                            />
-                        </motion.div>
-                        <motion.div style={{ y: y3 }} className="col-span-1">
-                            <img
-                                src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop"
-                                alt="Ruang kerja studio"
-                                loading="lazy"
-                                className="w-full aspect-[4/3] object-cover rounded-2xl"
-                            />
-                        </motion.div>
-                    </div>
+                    {/* Prinsip kerja — daftar bernomor bergaya dokumen */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-80px" }}
+                        transition={{ duration: 0.7, delay: 0.16, ease: EASE }}
+                        className="lg:col-span-7"
+                    >
+                        <dl className="divide-y divide-gray-200 border-y border-gray-200">
+                            {PRINCIPLES.map((item, i) => (
+                                <div key={item.title} className="grid grid-cols-12 gap-6 py-7">
+                                    <dt className="col-span-12 sm:col-span-5">
+                                        <span className="font-body text-[11px] tabular-nums tracking-[0.2em] text-gray-400">
+                                            {String(i + 1).padStart(2, "0")}
+                                        </span>
+                                        <span className="mt-2 block font-display text-lg font-semibold leading-snug">
+                                            {item.title}
+                                        </span>
+                                    </dt>
+                                    <dd className="col-span-12 font-body text-sm leading-relaxed text-gray-600 sm:col-span-7">
+                                        {item.body}
+                                    </dd>
+                                </div>
+                            ))}
+                        </dl>
+
+                        {capabilities.length > 0 && (
+                            <div className="mt-10">
+                                <p className="font-body text-[11px] uppercase tracking-[0.24em] text-gray-400">
+                                    Bidang Pekerjaan Terdokumentasi
+                                </p>
+                                <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+                                    {capabilities.map((item) => (
+                                        <li key={item} className="font-body text-sm text-gray-700">
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </motion.div>
                 </div>
             </div>
         </section>

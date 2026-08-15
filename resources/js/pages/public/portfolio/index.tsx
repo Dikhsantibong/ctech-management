@@ -5,29 +5,56 @@ import { PortfolioGallery } from '@/components/public/sections/PortfolioGallery'
 import { useLenis } from '@/hooks/use-lenis';
 import { SEO } from '@/components/SEO';
 
-export default function PortfolioIndex({ portfolios }: { portfolios?: any }) {
+type Company = {
+    legal_name?: string | null;
+    address?: string | null;
+    phone?: string | null;
+    email?: string | null;
+    website?: string | null;
+};
+
+export default function PortfolioIndex({
+    portfolios,
+    categories = [],
+    company,
+}: {
+    portfolios?: any;
+    categories?: string[];
+    company?: Company;
+}) {
     useLenis();
 
+    const legalName = company?.legal_name ?? 'PT Kreatif Teknologi Maju Bersama';
+    const total = portfolios?.total ?? portfolios?.data?.length ?? 0;
+
+    const meta = [
+        ...(total ? [{ label: 'Pekerjaan Terdokumentasi', value: String(total) }] : []),
+        ...(categories.length ? [{ label: 'Bidang', value: categories.join(' · ') }] : []),
+        { label: 'Keterangan', value: 'Ditampilkan atas persetujuan pemilik pekerjaan' },
+    ];
+
     return (
-        <div className="bg-white text-[var(--premium-text)] selection:bg-[var(--premium-gold)] selection:text-white font-body">
+        <div className="bg-white font-body text-[#0f1115]">
             <SEO
-                title="Karya Pilihan | CTECH Creative"
-                description="Jelajahi karya pilihan kami, mulai dari arsitektur e-commerce yang kompleks hingga dasbor fintech modern. Bukti nyata keahlian digital kami."
+                title={`Rekam Jejak Pekerjaan | ${legalName}`}
+                description="Daftar pekerjaan yang telah kami tangani beserta bidangnya — dasar penilaian atas pengalaman dan cakupan kemampuan perusahaan."
                 url="/portfolio"
             />
 
             <PremiumNavbar />
 
-            <main className="w-full overflow-hidden">
+            <main className="w-full">
                 <PageHeader
-                    eyebrow="Karya Pilihan"
-                    title="Portfolio Imersif."
-                    description="Bukti nyata keahlian digital kami — dari arsitektur e-commerce yang kompleks hingga dasbor fintech modern."
+                    eyebrow="Rekam Jejak"
+                    title="Pekerjaan yang telah kami tangani."
+                    description="Daftar ini menjadi dasar penilaian atas pengalaman dan cakupan kemampuan kami. Rincian teknis tiap pekerjaan dapat kami sampaikan atas permintaan."
+                    meta={meta}
                 />
+
                 <PortfolioGallery portfolios={portfolios} />
             </main>
 
-            <Footer />
+            <Footer company={company} />
         </div>
     );
 }

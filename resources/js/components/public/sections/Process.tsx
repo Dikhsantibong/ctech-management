@@ -1,74 +1,94 @@
-import { motion, useScroll } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-const PROCESS_STEPS = [
-    { num: "01", title: "Riset & Strategi", desc: "Kami menyelami logika bisnis Anda, memahami inti masalah sebelum menulis satu baris kode pun." },
-    { num: "02", title: "Arsitektur & Desain", desc: "Merancang cetak biru. Kami membangun sistem yang skalabel sekaligus antarmuka yang elegan secara bersamaan." },
-    { num: "03", title: "Pengembangan", desc: "Siklus kerja gesit (Agile) yang berfokus pada eksekusi tinggi, menggunakan teknologi web mutakhir." },
-    { num: "04", title: "Peluncuran & Skala", desc: "Peluncuran tanpa cacat dan integrasi berkelanjutan. Kami memastikan sistem Anda siap untuk pertumbuhan yang pesat." },
+/**
+ * Tahapan kerja disajikan sebagai tabel: setiap fase disertai keluaran dan
+ * pihak yang terlibat, sehingga klien tahu persis apa yang mereka terima dan
+ * kapan keputusan mereka dibutuhkan.
+ */
+const PHASES = [
+    {
+        phase: "Perumusan Kebutuhan",
+        output: "Dokumen lingkup pekerjaan, estimasi jadwal, dan estimasi biaya",
+        involvement: "Wawancara pengguna dan pemilik proses",
+    },
+    {
+        phase: "Perancangan",
+        output: "Rancangan basis data, alur proses, dan purwarupa antarmuka",
+        involvement: "Persetujuan tertulis sebelum pengembangan dimulai",
+    },
+    {
+        phase: "Pengembangan",
+        output: "Modul berjalan yang ditinjau berkala pada lingkungan uji",
+        involvement: "Peninjauan berkala bersama penanggung jawab klien",
+    },
+    {
+        phase: "Uji Terima",
+        output: "Catatan pengujian, perbaikan temuan, dan berita acara",
+        involvement: "Pengujian dilakukan oleh calon pengguna sistem",
+    },
+    {
+        phase: "Serah Terima & Pendampingan",
+        output: "Kode sumber, dokumentasi, pelatihan, dan masa pendampingan",
+        involvement: "Penandatanganan berita acara serah terima",
+    },
 ];
 
 export function Process() {
-    const containerRef = useRef(null);
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start center", "end center"],
-    });
-
     return (
-        <section id="process" ref={containerRef} className="py-24 md:py-32 bg-[#0d0d0d] text-white relative overflow-hidden">
-            <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+        <section id="process" className="bg-[#0f1115] py-24 text-white md:py-32">
+            <div className="mx-auto max-w-[1400px] px-6 md:px-12">
                 <motion.div
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="mb-16 md:mb-24 md:w-1/2"
+                    viewport={{ once: true, margin: "-80px" }}
+                    transition={{ duration: 0.6, ease: EASE }}
+                    className="max-w-3xl"
                 >
-                    <span className="font-body text-xs uppercase tracking-[0.25em] text-[var(--premium-gold)] mb-6 block">
-                        Metodologi Kami
-                    </span>
-                    <h2 className="font-display text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
-                        Presisi dalam setiap fase.
+                    <p className="font-body text-[11px] uppercase tracking-[0.28em] text-white/40">Tahapan Pekerjaan</p>
+                    <h2 className="mt-5 font-display text-3xl font-semibold leading-[1.15] tracking-tight md:text-[2.75rem]">
+                        Lima tahap, masing-masing dengan keluaran yang disepakati.
                     </h2>
+                    <p className="mt-6 font-body text-base leading-relaxed text-white/55">
+                        Pembayaran dikaitkan dengan penyelesaian tahap, bukan waktu berjalan. Klien
+                        mengetahui apa yang diterima pada setiap termin.
+                    </p>
                 </motion.div>
 
-                <div className="relative">
-                    {/* Garis vertikal progres */}
-                    <div className="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-white/10 md:-translate-x-1/2 hidden md:block">
+                {/* Tabel tahapan */}
+                <div className="mt-14 border-t border-white/15">
+                    {/* Kepala tabel hanya di layar lebar */}
+                    <div className="hidden grid-cols-12 gap-6 border-b border-white/15 py-4 md:grid">
+                        <span className="col-span-1 font-body text-[10px] uppercase tracking-[0.24em] text-white/35">Tahap</span>
+                        <span className="col-span-3 font-body text-[10px] uppercase tracking-[0.24em] text-white/35">Fase</span>
+                        <span className="col-span-5 font-body text-[10px] uppercase tracking-[0.24em] text-white/35">Keluaran</span>
+                        <span className="col-span-3 font-body text-[10px] uppercase tracking-[0.24em] text-white/35">Keterlibatan Klien</span>
+                    </div>
+
+                    {PHASES.map((item, i) => (
                         <motion.div
-                            style={{ scaleY: scrollYProgress, transformOrigin: "top" }}
-                            className="w-full h-full bg-[var(--premium-gold)]"
-                        />
-                    </div>
-
-                    <div className="flex flex-col gap-8 md:gap-20">
-                        {PROCESS_STEPS.map((step, index) => {
-                            const isEven = index % 2 === 0;
-                            return (
-                                <div key={step.num} className={`relative flex flex-col md:flex-row items-center w-full ${isEven ? "md:flex-row-reverse" : ""}`}>
-                                    <div className="absolute left-1/2 w-3 h-3 bg-[var(--premium-gold)] rounded-full -translate-x-1/2 z-10 hidden md:block"></div>
-
-                                    <div className="w-full md:w-1/2 md:px-14">
-                                        <motion.div
-                                            initial={{ opacity: 0, x: isEven ? 50 : -50 }}
-                                            whileInView={{ opacity: 1, x: 0 }}
-                                            transition={{ duration: 0.8, ease: EASE }}
-                                            viewport={{ once: true, margin: "-100px" }}
-                                            className="bg-[#1a1a1a] p-8 md:p-10 rounded-3xl border border-white/[0.08] hover:border-[var(--premium-gold)]/40 transition-colors duration-700"
-                                        >
-                                            <div className="font-display text-4xl font-medium text-[var(--premium-gold)]/60 mb-6">{step.num}</div>
-                                            <h3 className="font-display text-2xl font-semibold mb-4">{step.title}</h3>
-                                            <p className="font-body text-sm md:text-base text-white/50 leading-relaxed font-light">{step.desc}</p>
-                                        </motion.div>
-                                    </div>
-                                    <div className="hidden md:block w-1/2"></div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                            key={item.phase}
+                            initial={{ opacity: 0, y: 12 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-40px" }}
+                            transition={{ duration: 0.5, delay: i * 0.05, ease: EASE }}
+                            className="grid grid-cols-12 gap-x-6 gap-y-2 border-b border-white/10 py-6 transition-colors hover:bg-white/[0.03]"
+                        >
+                            <span className="col-span-12 font-body text-[11px] tabular-nums tracking-[0.2em] text-white/35 md:col-span-1">
+                                {String(i + 1).padStart(2, "0")}
+                            </span>
+                            <h3 className="col-span-12 font-display text-lg font-semibold leading-snug md:col-span-3 md:text-base">
+                                {item.phase}
+                            </h3>
+                            <p className="col-span-12 font-body text-sm leading-relaxed text-white/65 md:col-span-5">
+                                {item.output}
+                            </p>
+                            <p className="col-span-12 font-body text-sm leading-relaxed text-white/45 md:col-span-3">
+                                {item.involvement}
+                            </p>
+                        </motion.div>
+                    ))}
                 </div>
             </div>
         </section>

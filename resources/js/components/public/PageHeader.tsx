@@ -7,51 +7,66 @@ interface PageHeaderProps {
     eyebrow: string;
     title: string;
     description?: string;
+    /** Keterangan ringkas bergaya dokumen, mis. { "Badan Usaha": "PT ..." } */
+    meta?: { label: string; value: string }[];
     children?: ReactNode;
 }
 
 /**
- * Header gelap standar untuk sub-halaman public.
- * Menjamin navbar (teks putih) selalu terbaca di bagian atas halaman.
+ * Kepala halaman untuk sub-halaman publik.
+ *
+ * Tekstur titik dekoratif dan aksen emas dihilangkan; ruangnya dipakai untuk
+ * keterangan yang berguna agar halaman terbaca sebagai dokumen resmi.
  */
-export function PageHeader({ eyebrow, title, description, children }: PageHeaderProps) {
+export function PageHeader({ eyebrow, title, description, meta, children }: PageHeaderProps) {
     return (
-        <header className="bg-[#0d0d0d] text-white pt-36 md:pt-48 pb-20 md:pb-28 relative overflow-hidden">
-            {/* Tekstur titik halus */}
-            <div
-                className="absolute inset-0 opacity-[0.07] pointer-events-none"
-                style={{ backgroundImage: "radial-gradient(circle at 1.5px 1.5px, white 1px, transparent 0)", backgroundSize: "36px 36px" }}
-            ></div>
-
-            <div className="max-w-[1400px] mx-auto px-6 md:px-12 relative">
-                <motion.span
-                    initial={{ opacity: 0, y: 30 }}
+        <header className="border-b border-white/10 bg-[#0f1115] pb-16 pt-36 text-white md:pb-20 md:pt-44">
+            <div className="mx-auto max-w-[1400px] px-6 md:px-12">
+                <motion.p
+                    initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="font-body text-xs uppercase tracking-[0.3em] text-[var(--premium-gold)] mb-6 block"
+                    transition={{ duration: 0.6, ease: EASE }}
+                    className="font-body text-[11px] uppercase tracking-[0.28em] text-white/40"
                 >
                     {eyebrow}
-                </motion.span>
-                <div className="overflow-hidden">
-                    <motion.h1
-                        initial={{ y: "110%" }}
-                        animate={{ y: 0 }}
-                        transition={{ duration: 1, delay: 0.15, ease: EASE }}
-                        className="font-display text-4xl md:text-7xl font-semibold leading-[1.05] tracking-tight max-w-5xl"
-                    >
-                        {title}
-                    </motion.h1>
-                </div>
+                </motion.p>
+
+                <motion.h1
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7, delay: 0.06, ease: EASE }}
+                    className="mt-6 max-w-4xl font-display text-[2.25rem] font-semibold leading-[1.14] tracking-tight md:text-[3.5rem]"
+                >
+                    {title}
+                </motion.h1>
+
                 {description && (
                     <motion.p
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-                        className="mt-8 font-body text-base md:text-lg text-white/50 leading-relaxed font-light max-w-2xl"
+                        transition={{ duration: 0.7, delay: 0.12, ease: EASE }}
+                        className="mt-7 max-w-2xl font-body text-base leading-relaxed text-white/55 md:text-lg"
                     >
                         {description}
                     </motion.p>
                 )}
+
+                {meta && meta.length > 0 && (
+                    <motion.dl
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.7, delay: 0.18, ease: EASE }}
+                        className="mt-12 grid grid-cols-1 gap-px border-t border-white/10 sm:grid-cols-3"
+                    >
+                        {meta.map((item) => (
+                            <div key={item.label} className="border-b border-white/10 py-5 sm:border-b-0 sm:pr-8">
+                                <dt className="font-body text-[10px] uppercase tracking-[0.24em] text-white/35">{item.label}</dt>
+                                <dd className="mt-2 font-body text-sm leading-relaxed text-white/75">{item.value}</dd>
+                            </div>
+                        ))}
+                    </motion.dl>
+                )}
+
                 {children}
             </div>
         </header>

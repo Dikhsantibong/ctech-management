@@ -2,46 +2,77 @@ import { PremiumNavbar } from '@/components/ui/PremiumNavbar';
 import { useLenis } from '@/hooks/use-lenis';
 
 import { Hero } from '@/components/public/sections/Hero';
-import { ServicesOverview } from '@/components/public/sections/ServicesOverview';
 import { About } from '@/components/public/sections/About';
+import { ServicesOverview } from '@/components/public/sections/ServicesOverview';
 import { Process } from '@/components/public/sections/Process';
 import { ProjectsShowcase } from '@/components/public/sections/ProjectsShowcase';
 import { Statistics } from '@/components/public/sections/Statistics';
-import { ClientMarquee } from '@/components/public/sections/ClientMarquee';
-import { Testimonials } from '@/components/public/sections/Testimonials';
 import { NewsHighlight } from '@/components/public/sections/NewsHighlight';
 import { Contact } from '@/components/public/sections/Contact';
 import { Footer } from '@/components/public/sections/Footer';
 
 import { SEO } from '@/components/SEO';
 
-export default function Welcome({ portfolios = [], news = [] }: { portfolios?: any[]; news?: any[] }) {
+type Company = {
+    legal_name?: string | null;
+    address?: string | null;
+    phone?: string | null;
+    email?: string | null;
+    website?: string | null;
+};
+
+/**
+ * Halaman utama.
+ *
+ * Urutan bagian mengikuti cara calon klien korporat menilai vendor:
+ * siapa (Hero) → apa dasarnya (Profil) → apa yang dikerjakan (Layanan) →
+ * bagaimana caranya (Tahapan) → buktinya (Portofolio, Angka) → kabar terbaru →
+ * cara menghubungi.
+ *
+ * Bagian Testimonials dan ClientMarquee sengaja tidak disertakan: isinya masih
+ * berupa nama dan kutipan buatan, yang justru merusak kredibilitas pada situs
+ * korporat. Komponennya tetap ada dan siap dipasang kembali begitu tersedia
+ * testimoni serta daftar klien yang sungguhan.
+ */
+export default function Welcome({
+    portfolios = [],
+    news = [],
+    company,
+    metrics = [],
+    capabilities = [],
+}: {
+    portfolios?: any[];
+    news?: any[];
+    company?: Company;
+    metrics?: { value: number; label: string }[];
+    capabilities?: string[];
+}) {
     useLenis();
 
+    const legalName = company?.legal_name ?? 'PT Kreatif Teknologi Maju Bersama';
+
     return (
-        <div className="bg-white text-[var(--premium-text)] selection:bg-[var(--premium-gold)] selection:text-white font-body">
+        <div className="bg-white font-body text-[#0f1115]">
             <SEO
-                title="CTECH | Agensi Digital Pemenang Penghargaan"
-                description="CTECH Creative adalah agensi digital premium yang berfokus pada pengembangan software enterprise, aplikasi web memukau, dan desain UI/UX kelas dunia."
+                title={`${legalName} | Pengembangan Sistem Informasi & Aplikasi Web`}
+                description="Perusahaan pengembang perangkat lunak untuk kebutuhan operasional instansi dan korporasi: sistem informasi manajemen, aplikasi web, serta integrasi dan migrasi data."
                 url="/"
             />
 
             <PremiumNavbar />
 
-            <main className="w-full overflow-hidden">
-                <Hero />
+            <main className="w-full">
+                <Hero company={company} metrics={metrics} />
+                <About company={company} capabilities={capabilities} />
                 <ServicesOverview />
-                <About />
                 <Process />
                 <ProjectsShowcase portfolios={portfolios} />
-                <Statistics />
-                <ClientMarquee />
-                <Testimonials />
+                <Statistics metrics={metrics} />
                 <NewsHighlight news={news} />
-                <Contact />
+                <Contact company={company} />
             </main>
 
-            <Footer />
+            <Footer company={company} />
         </div>
     );
 }
