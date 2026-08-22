@@ -11,6 +11,8 @@ import { NewsHighlight } from '@/components/public/sections/NewsHighlight';
 import { Contact } from '@/components/public/sections/Contact';
 import { Footer } from '@/components/public/sections/Footer';
 
+import { ClientMarquee } from '@/components/public/sections/ClientMarquee';
+
 import { SEO } from '@/components/SEO';
 
 type Company = {
@@ -64,6 +66,7 @@ export default function Welcome({
             <main className="w-full">
                 <Hero company={company} metrics={metrics} />
                 <About company={company} capabilities={capabilities} />
+                <ClientMarquee />
                 <ServicesOverview />
                 <Process />
                 <ProjectsShowcase portfolios={portfolios} />

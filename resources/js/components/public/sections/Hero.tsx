@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "@inertiajs/react";
+import { SectionBackdrop } from "@/components/public/SectionBackdrop";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -25,8 +26,11 @@ export function Hero({ company, metrics = [] }: { company?: Company; metrics?: {
     const headline = metrics.slice(0, 3);
 
     return (
-        <section className="relative w-full bg-[#0f1115] text-white">
-            <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-16 px-6 pb-16 pt-36 md:px-12 md:pb-20 md:pt-44 lg:grid-cols-12 lg:gap-20">
+        <section className="relative w-full overflow-hidden bg-[#0f1115] text-white">
+            {/* Latar belakang premium yang sesuai dengan tema teknologi korporat */}
+            <SectionBackdrop image="/img/hero-bg.jpg" overlay={80} position="center" />
+
+            <div className="relative mx-auto grid max-w-[1400px] grid-cols-1 gap-16 px-6 pb-16 pt-36 md:px-12 md:pb-20 md:pt-44 lg:grid-cols-12 lg:gap-20">
                 {/* Kolom utama */}
                 <div className="lg:col-span-8">
                     <motion.p
@@ -106,7 +110,7 @@ export function Hero({ company, metrics = [] }: { company?: Company; metrics?: {
 
             {/* Baris angka — hanya tampil bila datanya benar-benar ada */}
             {headline.length > 0 && (
-                <div className="border-t border-white/10">
+                <div className="relative border-t border-white/10 bg-[#0f1115]/70 backdrop-blur-sm">
                     <div className="mx-auto grid max-w-[1400px] grid-cols-1 divide-y divide-white/10 px-6 md:grid-cols-3 md:divide-x md:divide-y-0 md:px-12">
                         {headline.map((metric, i) => (
                             <motion.div

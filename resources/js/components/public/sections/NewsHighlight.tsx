@@ -54,7 +54,13 @@ export function NewsHighlight({ news = [] }: { news?: any[] }) {
                                 <div className="relative aspect-[4/3] overflow-hidden rounded-none bg-gray-100 mb-6">
                                     {item.image ? (
                                         <img
-                                            src={item.image.startsWith("http") ? item.image : `/storage/${item.image}`}
+                                            src={(() => {
+                                                if (item.image.startsWith("http") && item.image.includes("unsplash")) {
+                                                    const aiImages = ['/img/news/tech.jpg', '/img/news/creative.jpg', '/img/news/architecture.jpg'];
+                                                    return aiImages[i % aiImages.length];
+                                                }
+                                                return item.image.startsWith("http") ? item.image : `/storage/${item.image}`;
+                                            })()}
                                             alt={item.title}
                                             loading="lazy"
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

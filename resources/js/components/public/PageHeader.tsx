@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
+import { SectionBackdrop } from "@/components/public/SectionBackdrop";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -9,6 +10,9 @@ interface PageHeaderProps {
     description?: string;
     /** Keterangan ringkas bergaya dokumen, mis. { "Badan Usaha": "PT ..." } */
     meta?: { label: string; value: string }[];
+    /** Foto latar dari public/. Diredam kuat agar teks tetap terbaca. */
+    backdrop?: string;
+    backdropPosition?: string;
     children?: ReactNode;
 }
 
@@ -18,10 +22,20 @@ interface PageHeaderProps {
  * Tekstur titik dekoratif dan aksen emas dihilangkan; ruangnya dipakai untuk
  * keterangan yang berguna agar halaman terbaca sebagai dokumen resmi.
  */
-export function PageHeader({ eyebrow, title, description, meta, children }: PageHeaderProps) {
+export function PageHeader({
+    eyebrow,
+    title,
+    description,
+    meta,
+    backdrop,
+    backdropPosition = "center 35%",
+    children,
+}: PageHeaderProps) {
     return (
-        <header className="border-b border-white/10 bg-[#0f1115] pb-16 pt-36 text-white md:pb-20 md:pt-44">
-            <div className="mx-auto max-w-[1400px] px-6 md:px-12">
+        <header className="relative overflow-hidden border-b border-white/10 bg-[#0f1115] pb-16 pt-36 text-white md:pb-20 md:pt-44">
+            {backdrop && <SectionBackdrop image={backdrop} overlay={90} position={backdropPosition} />}
+
+            <div className="relative mx-auto max-w-[1400px] px-6 md:px-12">
                 <motion.p
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}

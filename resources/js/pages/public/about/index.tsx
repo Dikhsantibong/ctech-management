@@ -3,6 +3,7 @@ import { PremiumNavbar } from '@/components/ui/PremiumNavbar';
 import { Footer } from '@/components/public/sections/Footer';
 import { PageHeader } from '@/components/public/PageHeader';
 import { Statistics } from '@/components/public/sections/Statistics';
+import { DocumentationStrip, STORY_PHOTOS } from '@/components/public/SectionBackdrop';
 import { useLenis } from '@/hooks/use-lenis';
 import { SEO } from '@/components/SEO';
 
@@ -71,6 +72,8 @@ export default function AboutIndex({
                     title="Perusahaan pengembang perangkat lunak untuk kebutuhan operasional."
                     description="Kami menangani pembangunan sistem yang dipakai setiap hari oleh staf dan pengguna — bukan proyek sekali jadi yang ditinggalkan setelah peluncuran."
                     meta={meta}
+                    backdrop="/our-story/photo1.jpeg"
+                    backdropPosition="center 25%"
                 />
 
                 {/* Ringkasan perusahaan */}
@@ -155,6 +158,11 @@ export default function AboutIndex({
                         )}
                     </div>
                 </section>
+
+                <DocumentationStrip
+                    photos={STORY_PHOTOS.slice(0, 4)}
+                    caption="Dokumentasi kegiatan tim: perumusan kebutuhan, pengembangan, dan pendampingan di lokasi klien."
+                />
 
                 <Statistics metrics={metrics} />
             </main>

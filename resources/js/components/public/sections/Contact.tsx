@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { SectionBackdrop } from "@/components/public/SectionBackdrop";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -63,8 +64,10 @@ export function Contact({ company }: { company?: Company }) {
     const labelClass = "font-body text-[10px] uppercase tracking-[0.24em] text-white/40";
 
     return (
-        <section className="bg-[#0f1115] py-24 text-white md:py-32">
-            <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-16 px-6 md:px-12 lg:grid-cols-12 lg:gap-20">
+        <section className="relative overflow-hidden bg-[#0f1115] py-24 text-white md:py-32">
+            <SectionBackdrop image="/our-story/photo4.jpeg" overlay={92} position="center 30%" />
+
+            <div className="relative mx-auto grid max-w-[1400px] grid-cols-1 gap-16 px-6 md:px-12 lg:grid-cols-12 lg:gap-20">
                 {/* Keterangan resmi */}
                 <div className="lg:col-span-5">
                     <motion.div

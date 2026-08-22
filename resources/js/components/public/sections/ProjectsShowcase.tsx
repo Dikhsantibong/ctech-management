@@ -10,8 +10,12 @@ function stripHtml(html?: string) {
     return (html || "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
 }
 
-function imageUrl(image?: string) {
+function imageUrl(image?: string, index: number = 0) {
     if (!image) return null;
+    if (image.startsWith("http") && image.includes("unsplash")) {
+        const aiImages = ['/img/portfolio/software.jpg', '/img/portfolio/creative.jpg', '/img/portfolio/architecture.jpg'];
+        return aiImages[index % aiImages.length];
+    }
     return image.startsWith("http") ? image : `/storage/${image}`;
 }
 
@@ -93,7 +97,7 @@ export function ProjectsShowcase({ portfolios = [] }: { portfolios?: any }) {
                                 const visible = depth < 3;
                                 const year = project.created_at ? new Date(project.created_at).getFullYear() : null;
                                 const description = stripHtml(project.description);
-                                const img = imageUrl(project.image);
+                                const img = imageUrl(project.image, i);
 
                                 return (
                                     <motion.article

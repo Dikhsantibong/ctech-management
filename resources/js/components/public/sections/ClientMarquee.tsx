@@ -50,7 +50,7 @@ export function ClientMarquee() {
                         className="bg-white p-12 md:p-16 flex flex-col justify-between items-start border border-gray-100 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-500 rounded-lg group"
                     >
                         <div className="mb-16">
-                            <img src="/img/clients/pln-np.png" alt="Logo PT PLN Nusantara Power" className="h-16 w-auto object-contain mb-8 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
+                            <img src="/logos/company1.png" alt="Logo PT PLN Nusantara Power" className="h-16 w-auto object-contain mb-8 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
                             <span className="font-body text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-4 block">
                                 Badan Usaha Milik Negara (BUMN)
                             </span>
@@ -75,7 +75,7 @@ export function ClientMarquee() {
                         className="bg-white p-12 md:p-16 flex flex-col justify-between items-start border border-gray-100 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-500 rounded-lg group"
                     >
                         <div className="mb-16">
-                            <img src="/img/clients/muna-barat.png" alt="Logo Pemerintah Kabupaten Muna Barat" className="h-16 w-auto object-contain mb-8 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
+                            <img src="/logos/company4.png" alt="Logo Pemerintah Kabupaten Muna Barat" className="h-16 w-auto object-contain mb-8 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
                             <span className="font-body text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-4 block">
                                 Pemerintahan Daerah
                             </span>

@@ -49,6 +49,8 @@ export default function PortfolioIndex({
                     title="Pekerjaan yang telah kami tangani."
                     description="Daftar ini menjadi dasar penilaian atas pengalaman dan cakupan kemampuan kami. Rincian teknis tiap pekerjaan dapat kami sampaikan atas permintaan."
                     meta={meta}
+                    backdrop="/our-story/photo3.jpeg"
+                    backdropPosition="center 40%"
                 />
 
                 <PortfolioGallery portfolios={portfolios} />

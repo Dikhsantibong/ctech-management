@@ -85,6 +85,8 @@ export default function ServicesIndex({ company }: { company?: Company }) {
                         { label: 'Termin', value: 'Pembayaran mengikuti penyelesaian tahap' },
                         { label: 'Setelah Serah Terima', value: 'Masa pendampingan disepakati di muka' },
                     ]}
+                    backdrop="/our-story/photo2.jpeg"
+                    backdropPosition="center 30%"
                 />
 
                 {/* Rincian tiap lini */}

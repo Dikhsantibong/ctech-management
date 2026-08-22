@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { SectionBackdrop } from "@/components/public/SectionBackdrop";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -37,8 +38,10 @@ const PHASES = [
 
 export function Process() {
     return (
-        <section id="process" className="bg-[#0f1115] py-24 text-white md:py-32">
-            <div className="mx-auto max-w-[1400px] px-6 md:px-12">
+        <section id="process" className="relative overflow-hidden bg-[#0f1115] py-24 text-white md:py-32">
+            <SectionBackdrop image="/our-story/photo5.jpeg" overlay={92} position="center 40%" />
+
+            <div className="relative mx-auto max-w-[1400px] px-6 md:px-12">
                 <motion.div
                     initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}

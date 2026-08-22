@@ -40,6 +40,8 @@ export default function ContactIndex({ company }: { company?: Company }) {
                     title="Sampaikan kebutuhan Anda kepada kami."
                     description="Lengkapi keterangan pada formulir agar peninjauan lebih cepat. Semakin jelas proses yang ingin dibenahi, semakin akurat estimasi yang dapat kami susun."
                     meta={meta}
+                    backdrop="/our-story/photo5.jpeg"
+                    backdropPosition="center 35%"
                 />
 
                 <Contact company={company} />
