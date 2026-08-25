@@ -219,7 +219,7 @@ export default function CalendarIndex({ events: initialEvents }: { events: Calen
 
         const body = (
             <div
-                className={`rounded-lg border border-l-[3px] bg-card p-3 transition-shadow hover:shadow-sm ${meta.bar} ${
+                className={`rounded-lg border border-l-[3px] bg-card p-3 transition-shadow hover: ${meta.bar} ${
                     event.is_done ? 'opacity-70' : ''
                 }`}
             >
@@ -314,7 +314,7 @@ export default function CalendarIndex({ events: initialEvents }: { events: Calen
                         },
                         { label: 'Total Agenda', value: stats.total, icon: CircleDot, tone: 'text-foreground' },
                     ].map((stat) => (
-                        <div key={stat.label} className="rounded-xl border bg-card p-3.5 shadow-sm">
+                        <div key={stat.label} className="rounded-lg border bg-card p-3.5">
                             <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                 <stat.icon className="h-3.5 w-3.5" />
                                 {stat.label}
@@ -325,7 +325,7 @@ export default function CalendarIndex({ events: initialEvents }: { events: Calen
                 </div>
 
                 {/* Kontrol + filter jenis (sekaligus legenda) */}
-                <div className="space-y-3 rounded-xl border bg-card p-3 shadow-sm">
+                <div className="space-y-3 rounded-lg border bg-card p-3">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-2">
                             <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => shift(-1)} disabled={viewMode === 'agenda'}>
@@ -356,7 +356,7 @@ export default function CalendarIndex({ events: initialEvents }: { events: Calen
                                     type="button"
                                     onClick={() => setViewMode(mode)}
                                     className={`rounded-md px-3 py-1 text-sm font-medium capitalize transition-colors ${
-                                        viewMode === mode ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                                        viewMode === mode ? 'bg-background ' : 'text-muted-foreground hover:text-foreground'
                                     }`}
                                 >
                                     {mode}
@@ -394,7 +394,7 @@ export default function CalendarIndex({ events: initialEvents }: { events: Calen
                     <AgendaView events={visibleEvents} todayKey={todayKey} EventCard={EventCard} />
                 ) : (
                     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-                        <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+                        <div className="overflow-hidden rounded-lg border bg-card">
                             {/* Nama hari */}
                             <div className="grid grid-cols-7 border-b bg-muted/30">
                                 {DAY_NAMES.map((day, i) => (
@@ -510,7 +510,7 @@ export default function CalendarIndex({ events: initialEvents }: { events: Calen
                         </div>
 
                         {/* Panel rincian hari terpilih */}
-                        <aside className="flex flex-col rounded-xl border bg-card shadow-sm">
+                        <aside className="flex flex-col rounded-lg border bg-card">
                             <div className="border-b p-4">
                                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                     {selectedKey === todayKey ? 'Hari Ini' : 'Tanggal Terpilih'}
@@ -569,14 +569,14 @@ function AgendaView({
     }, [list]);
 
     return (
-        <div className="rounded-xl border bg-card shadow-sm">
+        <div className="rounded-lg border bg-card">
             <div className="flex items-center justify-between border-b p-3">
                 <div className="inline-flex rounded-lg border bg-muted/40 p-0.5">
                     <button
                         type="button"
                         onClick={() => setShowPast(false)}
                         className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
-                            !showPast ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                            !showPast ? 'bg-background ' : 'text-muted-foreground hover:text-foreground'
                         }`}
                     >
                         Mendatang ({upcoming.length})
@@ -585,7 +585,7 @@ function AgendaView({
                         type="button"
                         onClick={() => setShowPast(true)}
                         className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
-                            showPast ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                            showPast ? 'bg-background ' : 'text-muted-foreground hover:text-foreground'
                         }`}
                     >
                         Sudah Lewat ({past.length})

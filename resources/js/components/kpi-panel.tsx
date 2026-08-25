@@ -130,7 +130,7 @@ export default function KpiPanel({
     const tone = achievementTone(kpi.score ?? 0);
 
     return (
-        <div className="rounded-xl border bg-card shadow-sm">
+        <div className="rounded-lg border bg-card">
             <div className="flex items-center justify-between gap-3 border-b p-4">
                 <div>
                     <h3 className="text-base font-semibold">{compact ? 'KPI Saya' : kpi.role_label}</h3>

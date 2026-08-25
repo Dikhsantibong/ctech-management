@@ -147,7 +147,7 @@ export default function DailyReportsIndex({ users, projects }: { users: any[], p
                                             </div>
                                         ) : (
                                             reports.map(report => (
-                                                <div key={report.id} className="border rounded-lg p-4 bg-white shadow-sm">
+                                                <div key={report.id} className="border rounded-lg p-4 bg-white">
                                                     <div className="flex justify-between items-center mb-4 border-b pb-2">
                                                         <div className="font-semibold text-lg">{report.user.name}</div>
                                                         <div className="text-sm text-muted-foreground">{report.report_date}</div>

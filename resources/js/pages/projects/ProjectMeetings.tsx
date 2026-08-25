@@ -136,7 +136,7 @@ export default function ProjectMeetings({ project }: { project: any }) {
         const participants = meeting.participants ?? [];
 
         return (
-            <Card key={meeting.id} className="flex flex-col transition-shadow hover:shadow-md">
+            <Card key={meeting.id} className="flex flex-col transition-shadow hover:">
                 <CardHeader className="pb-2">
                     <div className="mb-2 flex items-start justify-between gap-2">
                         <span
@@ -241,7 +241,7 @@ export default function ProjectMeetings({ project }: { project: any }) {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h3 className="flex items-center gap-2 text-lg font-semibold">
                         <CalendarClock className="h-5 w-5 text-muted-foreground" /> Meeting & Notulen
@@ -348,12 +348,12 @@ export default function ProjectMeetings({ project }: { project: any }) {
             </div>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center rounded-xl border py-16 text-muted-foreground">
+                <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-muted-foreground">
                     <Loader2 className="mb-2 h-8 w-8 animate-spin opacity-50" />
                     <p className="text-sm">Memuat meeting…</p>
                 </div>
             ) : meetings.length === 0 ? (
-                <div className="rounded-xl border-2 border-dashed p-12 text-center">
+                <div className="rounded-lg border-2 border-dashed p-12 text-center">
                     <CalendarClock className="mx-auto mb-4 h-12 w-12 text-muted-foreground/30" />
                     <h3 className="mb-1 text-lg font-semibold">Belum ada meeting</h3>
                     <p className="mb-4 text-sm text-muted-foreground">

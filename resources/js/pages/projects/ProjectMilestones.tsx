@@ -233,7 +233,7 @@ export default function ProjectMilestones({ project }: { project: any }) {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h3 className="flex items-center gap-2 text-lg font-semibold">
                         <Target className="h-5 w-5 text-muted-foreground" /> Milestone & Timeline
@@ -248,7 +248,7 @@ export default function ProjectMilestones({ project }: { project: any }) {
             </div>
 
             {milestones.length === 0 ? (
-                <div className="rounded-xl border-2 border-dashed p-12 text-center">
+                <div className="rounded-lg border-2 border-dashed p-12 text-center">
                     <CheckSquare className="mx-auto mb-4 h-12 w-12 text-muted-foreground/30" />
                     <h3 className="mb-1 text-lg font-semibold">Belum ada milestone</h3>
                     <p className="mb-4 text-sm text-muted-foreground">
@@ -265,7 +265,7 @@ export default function ProjectMilestones({ project }: { project: any }) {
                         const items = milestones.filter((m) => m.status === status);
 
                         return (
-                            <div key={status} className="min-w-[300px] flex-1 rounded-xl bg-muted/30 p-3">
+                            <div key={status} className="min-w-[300px] flex-1 rounded-lg bg-muted/30 p-3">
                                 <div className={`mb-3 flex items-center justify-between border-b-2 pb-2 ${meta.head}`}>
                                     <span className="flex items-center gap-2 text-sm font-semibold">
                                         <span className={`h-2 w-2 rounded-full ${meta.dot}`} />
@@ -292,7 +292,7 @@ export default function ProjectMilestones({ project }: { project: any }) {
                                         return (
                                             <Card
                                                 key={milestone.id}
-                                                className={`transition-shadow hover:shadow-md ${busyId === milestone.id ? 'opacity-60' : ''}`}
+                                                className={`transition-shadow hover: ${busyId === milestone.id ? 'opacity-60' : ''}`}
                                             >
                                                 <CardContent className="space-y-3 p-4">
                                                     <div className="flex items-start justify-between gap-2">

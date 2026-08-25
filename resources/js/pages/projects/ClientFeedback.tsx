@@ -123,7 +123,7 @@ export default function ClientFeedback({ project }: { project: any }) {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h3 className="flex items-center gap-2 text-lg font-semibold">
                         <MessageSquare className="h-5 w-5 text-muted-foreground" /> Feedback Klien
@@ -222,7 +222,7 @@ export default function ClientFeedback({ project }: { project: any }) {
                     return (
                         <Card
                             key={fb.id}
-                            className={`flex flex-col border-l-4 transition-shadow hover:shadow-md ${priority.accent} ${
+                            className={`flex flex-col border-l-4 transition-shadow hover: ${priority.accent} ${
                                 busyId === fb.id ? 'opacity-60' : ''
                             }`}
                         >
@@ -289,7 +289,7 @@ export default function ClientFeedback({ project }: { project: any }) {
                 })}
 
                 {feedbacks.length === 0 && (
-                    <div className="rounded-xl border-2 border-dashed py-12 text-center md:col-span-2">
+                    <div className="rounded-lg border-2 border-dashed py-12 text-center md:col-span-2">
                         <MessageSquare className="mx-auto mb-3 h-12 w-12 text-muted-foreground/25" />
                         <h3 className="mb-1 text-lg font-semibold">Belum ada feedback</h3>
                         <p className="mb-4 text-sm text-muted-foreground">

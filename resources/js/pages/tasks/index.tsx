@@ -606,7 +606,7 @@ export default function TasksIndex({
                 </div>
 
                 {/* Filter */}
-                <div className="space-y-3 rounded-xl border bg-card p-3">
+                <div className="space-y-3 rounded-lg border bg-card p-3">
                     <div className="flex flex-col gap-2 sm:flex-row">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -688,7 +688,7 @@ export default function TasksIndex({
                         return (
                             <div
                                 key={status}
-                                className={`flex min-w-[340px] flex-1 flex-col rounded-xl border bg-muted/20 transition-colors ${
+                                className={`flex min-w-[340px] flex-1 flex-col rounded-lg border bg-muted/20 transition-colors ${
                                     isOver ? 'border-primary bg-primary/5' : ''
                                 }`}
                                 onDragOver={(e) => handleDragOver(e, status)}
@@ -730,7 +730,7 @@ export default function TasksIndex({
                                                 draggable
                                                 onDragStart={(e) => handleDragStart(e, task)}
                                                 onDragEnd={handleDragEnd}
-                                                className={`group relative cursor-grab overflow-hidden rounded-lg border bg-card pl-4 shadow-sm transition-shadow hover:shadow-md active:cursor-grabbing ${
+                                                className={`group relative cursor-grab overflow-hidden rounded-lg border bg-card pl-4  transition-shadow hover: active:cursor-grabbing ${
                                                     draggedTask?.id === task.id ? 'opacity-40' : ''
                                                 }`}
                                             >

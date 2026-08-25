@@ -176,7 +176,7 @@ export default function ProjectDocuments({ project }: { project: any }) {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                     <h3 className="flex items-center gap-2 text-lg font-semibold">
                         <Folder className="h-5 w-5 text-muted-foreground" /> Pusat Dokumen
@@ -266,7 +266,7 @@ export default function ProjectDocuments({ project }: { project: any }) {
                                         addFiles(e.dataTransfer.files);
                                     }}
                                     onClick={() => fileInputRef.current?.click()}
-                                    className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-8 text-center transition-colors ${
+                                    className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
                                         isDragging
                                             ? 'border-primary bg-primary/5'
                                             : 'border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/30'
@@ -380,7 +380,7 @@ export default function ProjectDocuments({ project }: { project: any }) {
                                 >
                                     {doc.is_confidential && (
                                         <div
-                                            className="absolute -right-2 -top-2 rounded-full bg-rose-500 p-1 text-white shadow-sm"
+                                            className="absolute -right-2 -top-2 rounded-full bg-rose-500 p-1 text-white"
                                             title="Dokumen rahasia"
                                         >
                                             <ShieldAlert className="h-3 w-3" />

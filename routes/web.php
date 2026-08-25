@@ -273,6 +273,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
     });
 
+    Route::middleware('menu:app-subscriptions')->group(function () {
+        Route::resource('app-subscriptions', \App\Http\Controllers\AppSubscriptionController::class)->except(['create', 'edit', 'show']);
+    });
+
     Route::middleware('menu:letters')->group(function () {
         Route::resource('letters', \App\Http\Controllers\LetterController::class);
         Route::get('letters/{letter}/preview', [\App\Http\Controllers\LetterController::class, 'previewPdf'])->name('letters.preview');

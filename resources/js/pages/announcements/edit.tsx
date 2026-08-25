@@ -67,7 +67,7 @@ export default function AnnouncementEdit({ announcement }: Props) {
                     <p className="text-muted-foreground">Edit pengumuman untuk tim Anda.</p>
                 </div>
 
-                <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6">
+                <div className="rounded-lg border bg-card text-card-foreground p-6">
                     <form onSubmit={submit} className="space-y-6">
                         <div className="space-y-2">
                             <Label htmlFor="title">Judul</Label>

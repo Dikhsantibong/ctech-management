@@ -98,7 +98,7 @@ export default function KpiIndex({
 
                 {/* Ringkasan skor */}
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                    <div className="rounded-xl border bg-gradient-to-br from-primary/5 to-card p-4 shadow-sm">
+                    <div className="rounded-lg border bg-muted/10 p-4">
                         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Skor Perusahaan</p>
                         <p className={`mt-1 text-3xl font-bold leading-none ${companyTone.text}`}>{companyScore}%</p>
                         <p className="mt-1 text-xs text-muted-foreground">Rata-rata {scored.length} role</p>
@@ -109,7 +109,7 @@ export default function KpiIndex({
                         const behind = role.metrics.filter((m) => m.achievement < 75).length;
 
                         return (
-                            <div key={role.role} className="rounded-xl border bg-card p-4 shadow-sm">
+                            <div key={role.role} className="rounded-lg border bg-card p-4">
                                 <p className="truncate text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                     {role.role_label}
                                 </p>

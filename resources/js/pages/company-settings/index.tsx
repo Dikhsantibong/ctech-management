@@ -37,7 +37,7 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
                 <form onSubmit={submit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Company Profile */}
-                        <Card className="shadow-sm">
+                        <Card className="">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Building className="h-5 w-5 text-primary" />
@@ -74,7 +74,7 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
                         </Card>
 
                         {/* Bank Details */}
-                        <Card className="shadow-sm">
+                        <Card className="">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <CreditCard className="h-5 w-5 text-primary" />
@@ -117,7 +117,7 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
                         </Card>
 
                         {/* Contact Info */}
-                        <Card className="shadow-sm md:col-span-2">
+                        <Card className="md:col-span-2">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <MapPin className="h-5 w-5 text-primary" />

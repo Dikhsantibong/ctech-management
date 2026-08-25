@@ -461,7 +461,7 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
                             </SelectContent>
                         </Select>
 
-                        <div className="flex rounded-md shadow-sm">
+                        <div className="flex rounded-md">
                             <Button 
                                 variant={viewMode === 'kanban' ? 'default' : 'outline'} 
                                 className="rounded-r-none px-3"
@@ -489,7 +489,7 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
                 </div>
 
                 {viewMode === 'table' ? (
-                    <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
+                    <div className="rounded-lg border bg-card text-card-foreground">
                         {/* Table View Implementation similar to Tasks */}
                         <div className="p-0">
                             <div className="overflow-x-auto">
@@ -549,7 +549,7 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
                             return (
                                 <div 
                                     key={status} 
-                                    className={`flex min-w-[300px] flex-1 flex-col rounded-xl border-t-4 bg-muted/30 transition-all duration-200 border-t-zinc-400 ${isOver ? 'ring-2 ring-primary bg-primary/5' : ''}`}
+                                    className={`flex min-w-[300px] flex-1 flex-col rounded-lg border-t-4 bg-muted/30 transition-all duration-200 border-t-zinc-400 ${isOver ? 'ring-2 ring-primary bg-primary/5' : ''}`}
                                     onDragOver={(e) => handleDragOver(e, status)}
                                     onDragLeave={handleDragLeave}
                                     onDrop={(e) => handleDrop(e, status)}
@@ -569,7 +569,7 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
                                                 draggable
                                                 onDragStart={(e) => handleDragStart(e, work)}
                                                 onDragEnd={handleDragEnd}
-                                                className={`group rounded-lg border bg-card p-3 shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing ${draggedWork?.id === work.id ? 'opacity-50' : ''}`}
+                                                className={`group rounded-lg border bg-card p-3 hover: transition-all cursor-grab active:cursor-grabbing ${draggedWork?.id === work.id ? 'opacity-50' : ''}`}
                                             >
                                                 <div className="mb-2 flex items-center justify-between">
                                                     <div className="flex items-center gap-1.5">

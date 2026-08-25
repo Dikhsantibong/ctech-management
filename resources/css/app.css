@@ -66,47 +66,48 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
+    --background: #F8FAFC;
+    --foreground: #101828;
+    --card: #FFFFFF;
+    --card-foreground: #101828;
+    --popover: #FFFFFF;
+    --popover-foreground: #101828;
+    --primary: #155EEF;
+    --primary-foreground: #FFFFFF;
+    --secondary: #FFFFFF;
+    --secondary-foreground: #344054;
+    --muted: #F9FAFB;
+    --muted-foreground: #667085;
+    --accent: #EFF4FF;
+    --accent-foreground: #155EEF;
+    --destructive: #F04438;
+    --destructive-foreground: #FFFFFF;
+    --border: #E4E7EC;
+    --input: #D0D5DD;
+    --ring: #155EEF;
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
-    --radius: 0.625rem;
-    /* Sidebar colors: Matching PayloProfile */
-    --sidebar: oklch(0.55 0.2 250);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.55 0.2 250);
-    --sidebar-accent: oklch(0.6 0.2 250);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.6 0.1 250);
-    --sidebar-ring: oklch(0.985 0 0);
+    --radius: 0.5rem;
+    
+    /* Sidebar colors */
+    --sidebar: #101828;
+    --sidebar-foreground: #FFFFFF;
+    --sidebar-primary: #155EEF;
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: #344054;
+    --sidebar-accent-foreground: #FFFFFF;
+    --sidebar-border: #475467;
+    --sidebar-ring: #155EEF;
 
     /* Premium Agency Design System Tokens (Dark Editorial + Blue Accent) */
     --premium-bg: #FFFFFF;
     --premium-bg-alt: #f9fafb;
     --premium-dark: #0d0d0d;
     --premium-surface: #1a1a1a;
-    --premium-gold: #3b82f6; /* Accent blue (kept var name for backward compat) */
+    --premium-gold: #3b82f6; /* Accent blue */
     --premium-gold-deep: #1e3a8a;
     --premium-beige: #f9fafb;
     --premium-gray: #f4f4f5;

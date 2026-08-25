@@ -91,9 +91,9 @@ export default function Dashboard({
     return (
         <>
             <Head title="Dashboard" />
-            <div className="flex flex-1 flex-col gap-4 p-4 w-full max-w-none">
+            <div className="flex flex-1 flex-col gap-8 p-6 md:p-8 w-full max-w-none">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight text-foreground">Dashboard</h2>
+                    <h2 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h2>
                     <p className="text-muted-foreground mt-1 text-sm">Overview of operations tailored for your role.</p>
                 </div>
 
@@ -101,7 +101,7 @@ export default function Dashboard({
                 {announcements && announcements.length > 0 && (
                     <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
                         {announcements.map((announcement: Announcement) => (
-                            <div key={announcement.id} className="rounded-xl border bg-card p-3 shadow-sm hover:shadow-md transition-shadow">
+                            <div key={announcement.id} className="rounded-lg border bg-card p-3 shadow-none">
                                 <div className="flex items-center gap-2 mb-1">
                                     <Bell className={`h-4 w-4 ${announcement.type === 'error' ? 'text-destructive' : 'text-primary'}`} />
                                     <h3 className="font-semibold text-sm line-clamp-1">{announcement.title}</h3>
@@ -134,43 +134,43 @@ export default function Dashboard({
                         {user_role === 'direktur_utama' && (
                             <div className="space-y-4">
                                 <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-                                    <Card className="hover:shadow-md transition-all py-1">
+                                    <Card className="shadow-none py-1">
                                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-4">
                                             <CardTitle className="text-sm font-medium">Project Health</CardTitle>
                                             <Activity className="h-4 w-4 text-emerald-500" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold">{stats?.project_health || 100}%</div>
+                                            <div className="text-2xl font-semibold">{stats?.project_health || 100}%</div>
                                             <p className="text-xs text-muted-foreground mt-0.5">Projects on-track</p>
                                         </CardContent>
                                     </Card>
-                                    <Card className="hover:shadow-md transition-all py-1">
+                                    <Card className="shadow-none py-1">
                                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-4">
                                             <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
                                             <Briefcase className="h-4 w-4 text-primary" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold">{stats?.active_projects || 0}</div>
+                                            <div className="text-2xl font-semibold">{stats?.active_projects || 0}</div>
                                             <p className="text-xs text-muted-foreground mt-0.5">Currently in progress</p>
                                         </CardContent>
                                     </Card>
-                                    <Card className="hover:shadow-md transition-all border-destructive/20 py-1">
+                                    <Card className="shadow-none border-gray-200 py-1">
                                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-4">
                                             <CardTitle className="text-sm font-medium">Delayed Projects</CardTitle>
                                             <AlertTriangle className="h-4 w-4 text-destructive" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold text-destructive">{stats?.delayed_projects || 0}</div>
+                                            <div className="text-2xl font-semibold text-destructive">{stats?.delayed_projects || 0}</div>
                                             <p className="text-xs text-muted-foreground mt-0.5">Projects behind schedule</p>
                                         </CardContent>
                                     </Card>
-                                    <Card className="hover:shadow-md transition-all py-1">
+                                    <Card className="shadow-none py-1">
                                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-4">
                                             <CardTitle className="text-sm font-medium">Team Members</CardTitle>
                                             <Users className="h-4 w-4 text-primary" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold">{stats?.team_members || 0}</div>
+                                            <div className="text-2xl font-semibold">{stats?.team_members || 0}</div>
                                             <p className="text-xs text-muted-foreground mt-0.5">Active in the system</p>
                                         </CardContent>
                                     </Card>
@@ -186,25 +186,25 @@ export default function Dashboard({
                                             <div className="grid grid-cols-3 gap-2 text-center mb-3 border-b pb-3">
                                                 <div className="space-y-0.5">
                                                     <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Total Revenue</p>
-                                                    <p className="text-lg lg:text-xl font-bold">Rp {Number(financials?.total_revenue || 0).toLocaleString('id-ID')}</p>
+                                                    <p className="text-lg lg:text-xl font-semibold">Rp {Number(financials?.total_revenue || 0).toLocaleString('id-ID')}</p>
                                                 </div>
                                                 <div className="space-y-0.5 border-l">
                                                     <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Total Cost</p>
-                                                    <p className="text-lg lg:text-xl font-bold text-destructive">Rp {Number(financials?.total_cost || 0).toLocaleString('id-ID')}</p>
+                                                    <p className="text-lg lg:text-xl font-semibold text-destructive">Rp {Number(financials?.total_cost || 0).toLocaleString('id-ID')}</p>
                                                 </div>
                                                 <div className="space-y-0.5 border-l">
                                                     <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Total Profit</p>
-                                                    <p className="text-lg lg:text-xl font-bold text-emerald-500">Rp {Number(financials?.total_profit || 0).toLocaleString('id-ID')}</p>
+                                                    <p className="text-lg lg:text-xl font-semibold text-emerald-500">Rp {Number(financials?.total_profit || 0).toLocaleString('id-ID')}</p>
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-2 gap-4 mt-2 mb-4 bg-muted/30 rounded-lg p-3">
                                                 <div>
                                                     <p className="text-xs text-muted-foreground mb-1">Paid Invoices</p>
-                                                    <p className="font-bold text-emerald-600">Rp {Number(stats?.paid_invoices || 0).toLocaleString('id-ID')}</p>
+                                                    <p className="font-semibold text-emerald-600">Rp {Number(stats?.paid_invoices || 0).toLocaleString('id-ID')}</p>
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-muted-foreground mb-1">Unpaid Invoices</p>
-                                                    <p className="font-bold text-destructive">Rp {Number(stats?.unpaid_invoices || 0).toLocaleString('id-ID')}</p>
+                                                    <p className="font-semibold text-destructive">Rp {Number(stats?.unpaid_invoices || 0).toLocaleString('id-ID')}</p>
                                                 </div>
                                             </div>
                                             <div className="flex-1 w-full min-h-[180px]">
@@ -240,7 +240,7 @@ export default function Dashboard({
                                                     {(team_workload || []).map((member: any) => (
                                                         <div key={member.id} className="flex items-center justify-between">
                                                             <div className="flex items-center gap-2">
-                                                                <div className="h-6 w-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
+                                                                <div className="h-6 w-6 rounded-full text-primary flex items-center justify-center text-xs font-semibold">
                                                                     {member.name.charAt(0)}
                                                                 </div>
                                                                 <p className="text-sm font-medium">{member.name}</p>
@@ -273,11 +273,11 @@ export default function Dashboard({
                                         </CardHeader>
                                         <CardContent>
                                             <div className="flex gap-4 items-center mb-4 p-3 bg-muted/50 rounded-lg">
-                                                <div className="p-3 bg-primary/10 text-primary rounded-full">
+                                                <div className="p-3 text-primary rounded-full">
                                                     <Building2 className="h-6 w-6" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-2xl font-bold">{stats?.active_clients || 0}</p>
+                                                    <p className="text-2xl font-semibold">{stats?.active_clients || 0}</p>
                                                     <p className="text-xs text-muted-foreground">Total Active Clients</p>
                                                 </div>
                                             </div>
@@ -326,31 +326,31 @@ export default function Dashboard({
                         {user_role === 'operation' && (
                             <div className="space-y-4">
                                 <div className="grid gap-3 md:grid-cols-3">
-                                    <Card className="hover:shadow-md transition-all py-1">
+                                    <Card className="shadow-none py-1">
                                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-4">
                                             <CardTitle className="text-sm font-medium">My Assigned Projects</CardTitle>
                                             <Briefcase className="h-4 w-4 text-primary" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold">{stats?.project_assigned || 0}</div>
+                                            <div className="text-2xl font-semibold">{stats?.project_assigned || 0}</div>
                                         </CardContent>
                                     </Card>
-                                    <Card className="hover:shadow-md transition-all border-amber-500/20 py-1">
+                                    <Card className="shadow-none border-gray-200 py-1">
                                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-4">
                                             <CardTitle className="text-sm font-medium">Pending Tasks</CardTitle>
                                             <ListTodo className="h-4 w-4 text-amber-500" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold text-amber-600">{stats?.pending_tasks || 0}</div>
+                                            <div className="text-2xl font-semibold text-amber-600">{stats?.pending_tasks || 0}</div>
                                         </CardContent>
                                     </Card>
-                                    <Card className="hover:shadow-md transition-all border-destructive/20 py-1">
+                                    <Card className="shadow-none border-gray-200 py-1">
                                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-4">
                                             <CardTitle className="text-sm font-medium">Tasks Due Today</CardTitle>
                                             <AlertTriangle className="h-4 w-4 text-destructive" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold text-destructive">{stats?.today_tasks || 0}</div>
+                                            <div className="text-2xl font-semibold text-destructive">{stats?.today_tasks || 0}</div>
                                         </CardContent>
                                     </Card>
                                 </div>
@@ -435,7 +435,7 @@ export default function Dashboard({
                                             <Building2 className="h-4 w-4 text-primary" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold">{stats?.total_clients || 0}</div>
+                                            <div className="text-2xl font-semibold">{stats?.total_clients || 0}</div>
                                         </CardContent>
                                     </Card>
                                     <Card className="py-1">
@@ -444,7 +444,7 @@ export default function Dashboard({
                                             <FolderOpen className="h-4 w-4 text-primary" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold">{stats?.active_portfolios || 0}</div>
+                                            <div className="text-2xl font-semibold">{stats?.active_portfolios || 0}</div>
                                         </CardContent>
                                     </Card>
                                     <Card className="py-1">
@@ -453,7 +453,7 @@ export default function Dashboard({
                                             <Newspaper className="h-4 w-4 text-primary" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold">{stats?.published_news || 0}</div>
+                                            <div className="text-2xl font-semibold">{stats?.published_news || 0}</div>
                                         </CardContent>
                                     </Card>
                                     <Card className="py-1">
@@ -462,7 +462,7 @@ export default function Dashboard({
                                             <Megaphone className="h-4 w-4 text-emerald-500" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold text-emerald-600">{stats?.content_plans || 0}</div>
+                                            <div className="text-2xl font-semibold text-emerald-600">{stats?.content_plans || 0}</div>
                                         </CardContent>
                                     </Card>
                                 </div>
@@ -491,7 +491,7 @@ export default function Dashboard({
                                                                 <p className="font-medium text-sm mb-0.5">{content.title}</p>
                                                                 <p className="text-[11px] text-muted-foreground font-medium">{content.platform}</p>
                                                             </div>
-                                                            <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-1 rounded-full shrink-0">
+                                                            <span className="text-[10px] font-semibold text-primary px-2 py-1 rounded-full shrink-0">
                                                                 {new Date(content.scheduled_at).toLocaleDateString('id-ID')}
                                                             </span>
                                                         </div>
@@ -544,7 +544,7 @@ export default function Dashboard({
                                             <CreditCard className="h-4 w-4 text-destructive" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold text-destructive">{stats?.invoices_pending || 0}</div>
+                                            <div className="text-2xl font-semibold text-destructive">{stats?.invoices_pending || 0}</div>
                                         </CardContent>
                                     </Card>
                                     <Card className="py-1">
@@ -553,7 +553,7 @@ export default function Dashboard({
                                             <MailOpen className="h-4 w-4 text-primary" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold">{stats?.surat_masuk || 0}</div>
+                                            <div className="text-2xl font-semibold">{stats?.surat_masuk || 0}</div>
                                         </CardContent>
                                     </Card>
                                     <Card className="py-1">
@@ -562,7 +562,7 @@ export default function Dashboard({
                                             <Mail className="h-4 w-4 text-primary" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold">{stats?.surat_keluar || 0}</div>
+                                            <div className="text-2xl font-semibold">{stats?.surat_keluar || 0}</div>
                                         </CardContent>
                                     </Card>
                                     <Card className="py-1">
@@ -571,7 +571,7 @@ export default function Dashboard({
                                             <FolderOpen className="h-4 w-4 text-primary" />
                                         </CardHeader>
                                         <CardContent className="px-4 pb-3">
-                                            <div className="text-2xl font-bold">{stats?.total_documents || 0}</div>
+                                            <div className="text-2xl font-semibold">{stats?.total_documents || 0}</div>
                                         </CardContent>
                                     </Card>
                                 </div>
@@ -587,11 +587,11 @@ export default function Dashboard({
                                                 {(recent_invoices || []).map((invoice: any) => (
                                                     <div key={invoice.id} className="flex justify-between items-center rounded-md border p-3 hover:bg-muted/50">
                                                         <div>
-                                                            <p className="font-bold text-sm mb-0.5">{invoice.invoice_number}</p>
+                                                            <p className="font-semibold text-sm mb-0.5">{invoice.invoice_number}</p>
                                                             <p className="text-[11px] text-muted-foreground font-medium">Project: {invoice.project?.project_name}</p>
                                                         </div>
                                                         <div className="text-right">
-                                                            <p className="text-base font-bold text-destructive mb-0.5">Rp {Number(invoice.total).toLocaleString('id-ID')}</p>
+                                                            <p className="text-base font-semibold text-destructive mb-0.5">Rp {Number(invoice.total).toLocaleString('id-ID')}</p>
                                                             <p className="text-[11px] text-muted-foreground font-medium flex justify-end items-center gap-1">
                                                                 <Clock className="h-3 w-3" />
                                                                 Due: {new Date(invoice.due_date).toLocaleDateString('id-ID')}
@@ -648,15 +648,15 @@ export default function Dashboard({
                                     {(activity_logs || []).map((log: ActivityLog) => (
                                         <div key={log.id} className="relative flex items-start gap-3 group">
                                             {/* Icon */}
-                                            <div className="flex items-center justify-center w-10 h-10 rounded-full border-[3px] border-background bg-primary text-primary-foreground shadow-sm shrink-0 z-10 group-hover:scale-110 transition-transform">
+                                            <div className="flex items-center justify-center w-10 h-10 rounded-full border-[3px] border-background bg-primary text-primary-foreground shadow-none shrink-0 z-10 group-hover:scale-110 transition-transform">
                                                 <Activity className="h-4 w-4" />
                                             </div>
                                             
                                             {/* Content */}
-                                            <div className="flex-1 bg-background/80 backdrop-blur-sm p-3 rounded-lg border shadow-sm group-hover:border-primary/40 group-hover:shadow-md transition-all">
+                                            <div className="flex-1 bg-background/80 p-3 rounded-lg border shadow-none group-hover:border-primary/40 group-hover: transition-all">
                                                 <div className="flex items-center justify-between mb-1 gap-2">
-                                                    <span className="font-bold text-sm text-foreground line-clamp-1">{log.user?.name || 'System'}</span>
-                                                    <span className="text-[9px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">{log.action}</span>
+                                                    <span className="font-semibold text-sm text-foreground line-clamp-1">{log.user?.name || 'System'}</span>
+                                                    <span className="text-[9px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">{log.action}</span>
                                                 </div>
                                                 <p className="text-xs text-muted-foreground leading-snug line-clamp-2">{log.description}</p>
                                                 <time className="block text-[10px] text-muted-foreground mt-2 font-medium opacity-70">
@@ -677,3 +677,5 @@ export default function Dashboard({
         </>
     );
 }
+
+

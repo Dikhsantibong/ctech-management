@@ -139,7 +139,7 @@ export default function SocialAccountsIndex({
 
                 {/* Status sistem */}
                 {!featureEnabled ? (
-                    <div className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm dark:border-rose-900 dark:bg-rose-950/40">
+                    <div className="flex items-start gap-2.5 rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm dark:border-rose-900 dark:bg-rose-950/40">
                         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400" />
                         <div>
                             <p className="font-medium text-rose-800 dark:text-rose-300">Fitur posting otomatis sedang dimatikan</p>
@@ -149,7 +149,7 @@ export default function SocialAccountsIndex({
                         </div>
                     </div>
                 ) : simulationMode ? (
-                    <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-900 dark:bg-amber-950/40">
+                    <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-900 dark:bg-amber-950/40">
                         <FlaskConical className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                         <div>
                             <p className="font-medium text-amber-800 dark:text-amber-300">Mode simulasi aktif</p>
@@ -161,7 +161,7 @@ export default function SocialAccountsIndex({
                         </div>
                     </div>
                 ) : (
-                    <div className="flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-900 dark:bg-emerald-950/40">
+                    <div className="flex items-start gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-900 dark:bg-emerald-950/40">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
                         <p className="text-emerald-800 dark:text-emerald-300">
                             Mode aktif — konten akan benar-benar diposting ke platform yang kredensialnya lengkap dan sakelarnya menyala.
@@ -175,7 +175,7 @@ export default function SocialAccountsIndex({
                         const ready = platform.has_credentials;
 
                         return (
-                            <div key={platform.platform} className="flex flex-col rounded-xl border bg-card shadow-sm">
+                            <div key={platform.platform} className="flex flex-col rounded-lg border bg-card">
                                 <div className="flex items-start justify-between gap-3 border-b p-4">
                                     <div className="min-w-0">
                                         <h3 className="font-semibold">{platform.display_name ?? platform.label}</h3>
@@ -253,7 +253,7 @@ export default function SocialAccountsIndex({
                 </div>
 
                 {/* Riwayat pengiriman */}
-                <div className="rounded-xl border bg-card shadow-sm">
+                <div className="rounded-lg border bg-card">
                     <div className="border-b p-4">
                         <h3 className="font-semibold">Riwayat Pengiriman</h3>
                         <p className="text-xs text-muted-foreground">20 pengiriman terakhir ke media sosial.</p>

@@ -112,7 +112,7 @@ export default function UsersIndex({ users }: { users: any[] }) {
                     </Button>
                 </div>
 
-                <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
+                <div className="rounded-lg border bg-card text-card-foreground">
                     <div className="p-0">
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">

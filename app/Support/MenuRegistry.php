@@ -59,6 +59,10 @@ class MenuRegistry
                 'label' => 'Invoices', 'href' => '/invoices', 'group' => 'Finance', 'icon' => 'Receipt',
                 'defaults' => ['administrasi'],
             ],
+            'app-subscriptions' => [
+                'label' => 'Langganan Aplikasi', 'href' => '/app-subscriptions', 'group' => 'Finance', 'icon' => 'CreditCard',
+                'defaults' => ['administrasi', 'operation'],
+            ],
 
             // ===== Marketing =====
             'news' => [

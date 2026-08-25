@@ -49,7 +49,7 @@ export default function ProjectActivity({ project }: { project: any }) {
 
     return (
         <div className="space-y-6">
-            <div className="rounded-xl border bg-card p-4 shadow-sm">
+            <div className="rounded-lg border bg-card p-4">
                 <h3 className="flex items-center gap-2 text-lg font-semibold">
                     <Activity className="h-5 w-5 text-muted-foreground" /> Linimasa Aktivitas
                 </h3>
@@ -88,7 +88,7 @@ export default function ProjectActivity({ project }: { project: any }) {
 
                                 return (
                                     <div key={activity.id} className="relative pl-6">
-                                        <div className="absolute -left-[13px] top-0 rounded-full border bg-background p-1 shadow-sm">
+                                        <div className="absolute -left-[13px] top-0 rounded-full border bg-background p-1">
                                             <Icon className={`h-3.5 w-3.5 ${meta.tone}`} />
                                         </div>
                                         <div className="space-y-0.5">

@@ -166,7 +166,7 @@ export default function FilesIndex({ files, clients }: { files: any[]; clients: 
                         <button
                             type="button"
                             onClick={() => setActiveFolder('general')}
-                            className="group flex flex-col items-start gap-3 rounded-xl border bg-card p-5 text-left shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
+                            className="group flex flex-col items-start gap-3 rounded-lg border bg-card p-5 text-left transition-all hover:border-primary/50 hover:"
                         >
                             <Folder className="h-10 w-10 text-amber-500 transition-transform group-hover:scale-110" />
                             <div>
@@ -179,7 +179,7 @@ export default function FilesIndex({ files, clients }: { files: any[]; clients: 
                                 key={client.id}
                                 type="button"
                                 onClick={() => setActiveFolder(client.id)}
-                                className="group flex flex-col items-start gap-3 rounded-xl border bg-card p-5 text-left shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
+                                className="group flex flex-col items-start gap-3 rounded-lg border bg-card p-5 text-left transition-all hover:border-primary/50 hover:"
                             >
                                 <FolderOpen className="h-10 w-10 text-blue-500 transition-transform group-hover:scale-110" />
                                 <div>
@@ -193,12 +193,12 @@ export default function FilesIndex({ files, clients }: { files: any[]; clients: 
                     /* ===== Isi folder ===== */
                     <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                         {visibleFiles.map((file) => (
-                            <Card key={file.id} className="group relative overflow-hidden flex flex-col transition-all hover:shadow-md hover:border-primary/50">
+                            <Card key={file.id} className="group relative overflow-hidden flex flex-col transition-all hover: hover:border-primary/50">
                                 <CardHeader className="p-4 pb-2 border-b bg-muted/20 flex flex-row items-start justify-between space-y-0">
                                     <a href={`/files/${file.id}/preview`} target="_blank" rel="noreferrer" className="flex items-center justify-center w-full h-24 bg-card rounded-md border border-dashed hover:bg-muted transition-colors cursor-pointer">
                                         {getFileIcon(file.extension)}
                                     </a>
-                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background rounded-md shadow-sm border">
+                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background rounded-md border">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -244,7 +244,7 @@ export default function FilesIndex({ files, clients }: { files: any[]; clients: 
                         ))}
 
                         {visibleFiles.length === 0 && (
-                            <div className="col-span-full py-16 text-center text-muted-foreground border-2 border-dashed rounded-xl">
+                            <div className="col-span-full py-16 text-center text-muted-foreground border-2 border-dashed rounded-lg">
                                 <Folder className="mx-auto h-12 w-12 opacity-20 mb-3" />
                                 <h3 className="font-semibold text-lg mb-1">Folder masih kosong</h3>
                                 <p className="mb-4 text-sm">Upload file pertama untuk folder {activeFolderName}.</p>
@@ -289,7 +289,7 @@ export default function FilesIndex({ files, clients }: { files: any[]; clients: 
                             onDragLeave={() => setIsDragging(false)}
                             onDrop={handleDrop}
                             onClick={() => fileInputRef.current?.click()}
-                            className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-8 text-center transition-colors ${
+                            className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
                                 isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/30'
                             }`}
                         >

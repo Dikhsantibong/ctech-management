@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('reminders:send-deadlines')->dailyAt('08:00');
+Schedule::command('invoices:generate-subscriptions')->dailyAt('08:00');

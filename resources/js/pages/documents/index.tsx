@@ -113,8 +113,8 @@ export default function DocumentsIndex({ documents, filters }: { documents: any,
 
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {(documents.data || documents).map((document: any) => (
-                        <div key={document.id} className="group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-card p-5 text-card-foreground shadow-sm transition-all hover:shadow-md">
-                            <div className="absolute top-4 right-4 flex items-center gap-1 bg-card shadow-sm border rounded-md p-0.5">
+                        <div key={document.id} className="group relative flex flex-col justify-between overflow-hidden rounded-lg border bg-card p-5 text-card-foreground transition-all hover:">
+                            <div className="absolute top-4 right-4 flex items-center gap-1 bg-card border rounded-md p-0.5">
                                 <Button variant="ghost" size="icon" onClick={(e) => { e.preventDefault(); openEditModal(document); }} className="h-7 w-7 text-muted-foreground hover:text-primary">
                                     <Edit2 className="h-3.5 w-3.5" />
                                     <span className="sr-only">Edit</span>
@@ -149,7 +149,7 @@ export default function DocumentsIndex({ documents, filters }: { documents: any,
                         </div>
                     ))}
                     {(documents.data || documents).length === 0 && (
-                        <div className="col-span-full py-12 text-center text-muted-foreground border-2 border-dashed rounded-xl">
+                        <div className="col-span-full py-12 text-center text-muted-foreground border-2 border-dashed rounded-lg">
                             <BookOpen className="mx-auto h-12 w-12 opacity-20 mb-3" />
                             <h3 className="font-semibold text-lg mb-1">No documents found</h3>
                             <p className="mb-4">Create your first company document or wiki page.</p>

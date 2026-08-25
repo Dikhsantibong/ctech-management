@@ -102,7 +102,7 @@ export default function RolePermissionsIndex({
                 </div>
 
                 {/* Catatan penting */}
-                <div className="flex flex-col gap-2 rounded-xl border bg-muted/30 p-4 text-sm sm:flex-row sm:items-center sm:gap-6">
+                <div className="flex flex-col gap-2 rounded-lg border bg-muted/30 p-4 text-sm sm:flex-row sm:items-center sm:gap-6">
                     <span className="flex items-center gap-2">
                         <Crown className="h-4 w-4 text-amber-500" />
                         <span className="text-muted-foreground">
@@ -124,7 +124,7 @@ export default function RolePermissionsIndex({
                         const dirty = isDirty(role.value);
 
                         return (
-                            <div key={role.value} className="flex flex-col rounded-xl border bg-card shadow-sm">
+                            <div key={role.value} className="flex flex-col rounded-lg border bg-card">
                                 <div className="flex items-start justify-between gap-3 border-b p-4">
                                     <div>
                                         <h3 className="font-semibold">{role.label}</h3>

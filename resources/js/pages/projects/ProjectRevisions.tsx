@@ -85,7 +85,7 @@ export default function ProjectRevisions({ project }: { project: any }) {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h3 className="flex items-center gap-2 text-lg font-semibold">
                         <GitCommit className="h-5 w-5 text-muted-foreground" /> Riwayat Revisi
@@ -201,7 +201,7 @@ export default function ProjectRevisions({ project }: { project: any }) {
                     return (
                         <Card
                             key={rev.id}
-                            className={`overflow-hidden transition-shadow hover:shadow-md ${busyId === rev.id ? 'opacity-60' : ''}`}
+                            className={`overflow-hidden transition-shadow hover: ${busyId === rev.id ? 'opacity-60' : ''}`}
                         >
                             <div className={`flex flex-col gap-4 border-l-4 p-4 md:flex-row md:items-start md:justify-between ${meta.accent}`}>
                                 <div className="min-w-0 flex-1 space-y-1.5">
@@ -259,7 +259,7 @@ export default function ProjectRevisions({ project }: { project: any }) {
                 })}
 
                 {revisions.length === 0 && (
-                    <div className="rounded-xl border-2 border-dashed py-12 text-center">
+                    <div className="rounded-lg border-2 border-dashed py-12 text-center">
                         <GitCommit className="mx-auto mb-3 h-12 w-12 text-muted-foreground/25" />
                         <h3 className="mb-1 text-lg font-semibold">Belum ada revisi</h3>
                         <p className="mb-4 text-sm text-muted-foreground">

@@ -10,3 +10,9 @@ export function cn(...inputs: ClassValue[]) {
 export function toUrl(url: NonNullable<InertiaLinkProps['href']>): string {
     return typeof url === 'string' ? url : url.url;
 }
+
+export function formatRupiah(amount: number | string): string {
+    const value = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (isNaN(value)) return 'Rp 0';
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value);
+}

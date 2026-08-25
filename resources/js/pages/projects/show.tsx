@@ -81,7 +81,7 @@ function StatCard({
     };
 
     return (
-        <div className="flex items-center gap-3 rounded-xl border bg-card p-4 shadow-sm transition-colors hover:border-primary/30">
+        <div className="flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors hover:border-primary/30">
             <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${tones[tone]}`}>
                 <Icon className="h-5 w-5" />
             </div>
@@ -206,7 +206,7 @@ export default function ProjectShow({ project }: { project: any }) {
             <Head title={project.project_name} />
             <div className="flex flex-1 flex-col gap-6 p-6">
                 {/* ===== Header ===== */}
-                <div className="overflow-hidden rounded-xl border bg-gradient-to-r from-primary/5 via-card to-card shadow-sm">
+                <div className="overflow-hidden rounded-lg border bg-muted/10 to-card">
                     <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between">
                         <div className="flex items-start gap-4">
                             <Button variant="outline" size="icon" asChild className="mt-0.5 shrink-0">
@@ -305,7 +305,7 @@ export default function ProjectShow({ project }: { project: any }) {
                 <Tabs defaultValue="overview" className="w-full">
                     <TabsList className="mb-4 h-auto flex-wrap gap-1 bg-muted/50 p-1">
                         {tabs.map((tab) => (
-                            <TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 rounded-md data-[state=active]:shadow-sm">
+                            <TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 rounded-md data-[state=active]:">
                                 <tab.icon className="h-4 w-4" />
                                 {tab.label}
                                 {tab.count !== null && tab.count > 0 && (

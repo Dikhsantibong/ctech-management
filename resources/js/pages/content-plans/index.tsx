@@ -540,7 +540,7 @@ export default function ContentPlansIndex({
                 draggable
                 onDragStart={() => setDraggedPlan(plan)}
                 onDragEnd={() => { setDraggedPlan(null); setDragOverColumn(null); }}
-                className={`group cursor-grab rounded-lg border bg-card p-3 shadow-sm transition-shadow hover:shadow-md active:cursor-grabbing ${
+                className={`group cursor-grab rounded-lg border bg-card p-3  transition-shadow hover: active:cursor-grabbing ${
                     draggedPlan?.id === plan.id ? 'opacity-40' : ''
                 }`}
             >
@@ -725,7 +725,7 @@ export default function ContentPlansIndex({
                             tone: stats.overdue > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-foreground',
                         },
                     ].map((stat) => (
-                        <div key={stat.label} className="rounded-xl border bg-card p-3.5 shadow-sm">
+                        <div key={stat.label} className="rounded-lg border bg-card p-3.5">
                             <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                 <stat.icon className="h-3.5 w-3.5" />
                                 {stat.label}
@@ -736,7 +736,7 @@ export default function ContentPlansIndex({
                 </div>
 
                 {/* Filter */}
-                <div className="flex flex-col gap-2 rounded-xl border bg-card p-3 shadow-sm lg:flex-row lg:items-center">
+                <div className="flex flex-col gap-2 rounded-lg border bg-card p-3 lg:flex-row lg:items-center">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
@@ -789,7 +789,7 @@ export default function ContentPlansIndex({
                                 type="button"
                                 onClick={() => setViewMode(mode)}
                                 className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-sm font-medium capitalize transition-colors ${
-                                    viewMode === mode ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                                    viewMode === mode ? 'bg-background ' : 'text-muted-foreground hover:text-foreground'
                                 }`}
                             >
                                 {mode === 'kanban' ? <LayoutGrid className="h-3.5 w-3.5" /> : <List className="h-3.5 w-3.5" />}
@@ -813,7 +813,7 @@ export default function ContentPlansIndex({
                                     onDragOver={(e) => { e.preventDefault(); setDragOverColumn(status); }}
                                     onDragLeave={() => setDragOverColumn(null)}
                                     onDrop={(e) => handleDrop(e, status)}
-                                    className={`flex min-w-[300px] flex-1 flex-col rounded-xl border bg-muted/20 transition-colors ${
+                                    className={`flex min-w-[300px] flex-1 flex-col rounded-lg border bg-muted/20 transition-colors ${
                                         isOver ? 'border-primary bg-primary/5' : ''
                                     }`}
                                 >
@@ -849,7 +849,7 @@ export default function ContentPlansIndex({
                         })}
                     </div>
                 ) : (
-                    <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+                    <div className="overflow-hidden rounded-lg border bg-card">
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead className="border-b bg-muted/30">
