@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
-import { format, differenceInDays, addMonths, subMonths } from 'date-fns';
+import { format, differenceInDays, differenceInMonths, addMonths, subMonths } from 'date-fns';
 import { id } from 'date-fns/locale';
 
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ export default function AppSubscriptionsIndex({ subscriptions }: { subscriptions
         client_name: '',
         app_name: '',
         billing_amount: '',
+        siklus_tagihan: 12,
         start_date: '',
         deadline: '',
         is_invoiced: false,
@@ -36,6 +37,7 @@ export default function AppSubscriptionsIndex({ subscriptions }: { subscriptions
             client_name: '',
             app_name: '',
             billing_amount: '',
+            siklus_tagihan: 12,
             start_date: '',
             deadline: '',
             is_invoiced: false,
@@ -63,6 +65,7 @@ export default function AppSubscriptionsIndex({ subscriptions }: { subscriptions
             client_name: sub.client_name,
             app_name: sub.app_name,
             billing_amount: sub.billing_amount,
+            siklus_tagihan: sub.siklus_tagihan || 12,
             start_date: sub.start_date,
             deadline: sub.deadline,
             is_invoiced: sub.is_invoiced,
@@ -179,7 +182,8 @@ export default function AppSubscriptionsIndex({ subscriptions }: { subscriptions
                                 <thead>
                                     <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Klien & Aplikasi</th>
-                                        <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tagihan</th>
+                                        <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tagihan & Siklus</th>
+                                        <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Total Terbayar</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Periode</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status Invoiced</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status Masa Aktif</th>
@@ -189,7 +193,7 @@ export default function AppSubscriptionsIndex({ subscriptions }: { subscriptions
                                 <tbody>
                                     {subscriptions.length === 0 ? (
                                         <tr>
-                                            <td colSpan={6} className="p-4 text-center text-muted-foreground">
+                                            <td colSpan={7} className="p-4 text-center text-muted-foreground">
                                                 Belum ada data langganan.
                                             </td>
                                         </tr>
@@ -201,7 +205,17 @@ export default function AppSubscriptionsIndex({ subscriptions }: { subscriptions
                                                     <p className="text-xs text-muted-foreground">{sub.app_name}</p>
                                                 </td>
                                                 <td className="p-4 align-middle">
-                                                    <span className="font-medium">{formatRupiah(sub.billing_amount)}</span>
+                                                    <div className="font-medium">{formatRupiah(sub.billing_amount)}</div>
+                                                    <div className="text-xs text-muted-foreground mt-0.5">Per {sub.siklus_tagihan || 12} Bulan</div>
+                                                </td>
+                                                <td className="p-4 align-middle text-emerald-600 dark:text-emerald-500 font-medium">
+                                                    {(() => {
+                                                        const elapsedMonths = differenceInMonths(new Date(), new Date(sub.start_date));
+                                                        if (elapsedMonths < 0) return formatRupiah(0);
+                                                        const cycle = sub.siklus_tagihan || 12;
+                                                        const cyclesPaid = Math.floor(elapsedMonths / cycle) + 1;
+                                                        return formatRupiah(cyclesPaid * sub.billing_amount);
+                                                    })()}
                                                 </td>
                                                 <td className="p-4 align-middle text-muted-foreground">
                                                     <div className="text-xs space-y-1">
@@ -330,13 +344,26 @@ export default function AppSubscriptionsIndex({ subscriptions }: { subscriptions
                                         type="number" 
                                         placeholder="12"
                                         onChange={(e) => {
-                                            const siklus = parseInt(e.target.value) || 12;
+                                            const newSiklus = parseInt(e.target.value) || 1;
+                                            const oldSiklus = formData.siklus_tagihan || 1;
+                                            
+                                            let newDeadline = formData.deadline;
                                             if (formData.start_date) {
-                                                setFormData(prev => ({
-                                                    ...prev, 
-                                                    deadline: autoCalculateDeadline(prev.start_date, siklus)
-                                                }));
+                                                newDeadline = autoCalculateDeadline(formData.start_date, newSiklus);
                                             }
+                                            
+                                            let newBilling = formData.billing_amount;
+                                            if (newBilling && !isNaN(Number(newBilling))) {
+                                                const base = Number(newBilling) / oldSiklus;
+                                                newBilling = String(base * newSiklus);
+                                            }
+                                            
+                                            setFormData(prev => ({
+                                                ...prev, 
+                                                siklus_tagihan: newSiklus,
+                                                deadline: newDeadline,
+                                                billing_amount: newBilling
+                                            }));
                                         }}
                                     />
                                 </div>
@@ -445,13 +472,26 @@ export default function AppSubscriptionsIndex({ subscriptions }: { subscriptions
                                         type="number" 
                                         placeholder="Hitung Kedepan (Opsional)"
                                         onChange={(e) => {
-                                            const siklus = parseInt(e.target.value) || 12;
+                                            const newSiklus = parseInt(e.target.value) || 1;
+                                            const oldSiklus = formData.siklus_tagihan || 1;
+                                            
+                                            let newDeadline = formData.deadline;
                                             if (formData.start_date) {
-                                                setFormData(prev => ({
-                                                    ...prev, 
-                                                    deadline: autoCalculateDeadline(prev.start_date, siklus)
-                                                }));
+                                                newDeadline = autoCalculateDeadline(formData.start_date, newSiklus);
                                             }
+                                            
+                                            let newBilling = formData.billing_amount;
+                                            if (newBilling && !isNaN(Number(newBilling))) {
+                                                const base = Number(newBilling) / oldSiklus;
+                                                newBilling = String(base * newSiklus);
+                                            }
+                                            
+                                            setFormData(prev => ({
+                                                ...prev, 
+                                                siklus_tagihan: newSiklus,
+                                                deadline: newDeadline,
+                                                billing_amount: newBilling
+                                            }));
                                         }}
                                     />
                                 </div>

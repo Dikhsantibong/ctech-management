@@ -25,6 +25,7 @@ class AppSubscriptionController extends Controller
             'client_name' => 'required|string|max:255',
             'app_name' => 'required|string|max:255',
             'billing_amount' => 'required|numeric|min:0',
+            'siklus_tagihan' => 'required|integer|min:1',
             'start_date' => 'required|date',
             'deadline' => 'required|date|after_or_equal:start_date',
         ]);
@@ -42,6 +43,7 @@ class AppSubscriptionController extends Controller
             'client_name' => 'required|string|max:255',
             'app_name' => 'required|string|max:255',
             'billing_amount' => 'required|numeric|min:0',
+            'siklus_tagihan' => 'required|integer|min:1',
             'start_date' => 'required|date',
             'deadline' => 'required|date|after_or_equal:start_date',
             'is_invoiced' => 'boolean',
