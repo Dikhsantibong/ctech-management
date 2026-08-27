@@ -32,7 +32,7 @@ class GenerateSubscriptionInvoices extends Command
 
         $targetDate = Carbon::now()->addDays(3)->toDateString();
 
-        $subscriptions = AppSubscription::where('is_active', true)
+        $subscriptions = AppSubscription::where('status', AppSubscription::STATUS_ACTIVE)
             ->where('is_invoiced', false)
             ->whereDate('deadline', '<=', $targetDate)
             ->get();
@@ -52,23 +52,27 @@ class GenerateSubscriptionInvoices extends Command
                             ->count() + 1;
             $invoiceNumber = 'CTECH/' . $year . '/' . $month . '/' . str_pad($count, 3, '0', STR_PAD_LEFT);
 
-            // Create the invoice
+            // Nominal sekali tagih = harga per bulan x siklus tagihan
+            $amount = $sub->cycle_amount;
+            $periodEnd = Carbon::parse($sub->deadline)->addMonths($sub->billing_cycle_months);
+
             $invoice = Invoice::create([
                 'invoice_number' => $invoiceNumber,
                 'client_name' => $sub->client_name,
                 'due_date' => $sub->deadline,
-                'subtotal' => $sub->billing_amount,
-                'tax' => 0, // Assume no tax by default for automated subscription
-                'total' => $sub->billing_amount,
+                'subtotal' => $amount,
+                'tax' => 0, // Langganan otomatis diterbitkan tanpa pajak
+                'total' => $amount,
                 'status' => 'Draft',
             ]);
 
-            // Create the invoice item
             $invoice->items()->create([
-                'description' => "Tagihan Langganan: {$sub->app_name} (S/d " . Carbon::parse($sub->deadline)->format('d M Y') . ")",
+                'description' => "Langganan {$sub->app_name} — periode "
+                    . Carbon::parse($sub->deadline)->format('d M Y') . ' s/d ' . $periodEnd->format('d M Y')
+                    . " ({$sub->billing_cycle_months} bulan)",
                 'quantity' => 1,
-                'price' => $sub->billing_amount,
-                'total' => $sub->billing_amount,
+                'price' => $amount,
+                'total' => $amount,
             ]);
 
             // Mark subscription as invoiced

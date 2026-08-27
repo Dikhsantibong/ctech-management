@@ -275,6 +275,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware('menu:app-subscriptions')->group(function () {
         Route::resource('app-subscriptions', \App\Http\Controllers\AppSubscriptionController::class)->except(['create', 'edit', 'show']);
+
+        // Pencatatan pembayaran — sumber angka "sudah dibayar"
+        Route::post('app-subscriptions/{app_subscription}/payments', [\App\Http\Controllers\AppSubscriptionController::class, 'recordPayment'])->name('app-subscriptions.payments.store');
+        Route::delete('app-subscriptions/{app_subscription}/payments/{payment}', [\App\Http\Controllers\AppSubscriptionController::class, 'destroyPayment'])->name('app-subscriptions.payments.destroy');
+
+        // Kelola kategori aplikasi (POS App, Photobooth App, dst.)
+        Route::post('app-categories', [\App\Http\Controllers\AppSubscriptionController::class, 'storeCategory'])->name('app-categories.store');
+        Route::put('app-categories/{category}', [\App\Http\Controllers\AppSubscriptionController::class, 'updateCategory'])->name('app-categories.update');
+        Route::delete('app-categories/{category}', [\App\Http\Controllers\AppSubscriptionController::class, 'destroyCategory'])->name('app-categories.destroy');
     });
 
     Route::middleware('menu:letters')->group(function () {
