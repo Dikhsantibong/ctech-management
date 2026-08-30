@@ -47,10 +47,20 @@ class GenerateSubscriptionInvoices extends Command
 
         foreach ($subscriptions as $sub) {
             // Generate invoice number
-            $count = Invoice::whereYear('created_at', $year)
-                            ->whereMonth('created_at', $month)
-                            ->count() + 1;
-            $invoiceNumber = 'CTECH/' . $year . '/' . $month . '/' . str_pad($count, 3, '0', STR_PAD_LEFT);
+            $prefix = "CTECH/{$year}/{$month}/";
+            
+            $latestInvoice = Invoice::where('invoice_number', 'like', "{$prefix}%")
+                                    ->orderBy('invoice_number', 'desc')
+                                    ->first();
+                                    
+            if ($latestInvoice) {
+                $lastSequence = (int) substr($latestInvoice->invoice_number, -3);
+                $nextId = $lastSequence + 1;
+            } else {
+                $nextId = 1;
+            }
+            
+            $invoiceNumber = $prefix . str_pad($nextId, 3, '0', STR_PAD_LEFT);
 
             // Nominal sekali tagih = harga per bulan x siklus tagihan
             $amount = $sub->cycle_amount;
