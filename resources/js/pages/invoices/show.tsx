@@ -66,6 +66,11 @@ export default function InvoiceShow({ invoice }: { invoice: any }) {
                                 <Eye className="mr-2 h-4 w-4" /> Preview PDF
                             </a>
                         </Button>
+                        <Button asChild variant="secondary">
+                            <a href={`/invoices/${invoice.id}/kwitansi`} target="_blank" rel="noopener noreferrer">
+                                <FileText className="mr-2 h-4 w-4" /> Kwitansi
+                            </a>
+                        </Button>
                     </div>
                 </div>
 

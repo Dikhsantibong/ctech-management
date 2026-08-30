@@ -271,6 +271,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
         Route::put('invoices/{invoice}/status', [\App\Http\Controllers\InvoiceController::class, 'updateStatus'])->name('invoices.status');
         Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
+        Route::get('invoices/{invoice}/kwitansi', [\App\Http\Controllers\InvoiceController::class, 'downloadKwitansi'])->name('invoices.kwitansi');
     });
 
     Route::middleware('menu:app-subscriptions')->group(function () {

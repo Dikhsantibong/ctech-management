@@ -187,4 +187,28 @@ class InvoiceController extends Controller
 
         return $pdf->stream(str_replace('/', '-', $invoice->invoice_number) . '.pdf');
     }
+
+    public function downloadKwitansi(Invoice $invoice)
+    {
+        $invoice->load('items');
+        $settings = \App\Models\CompanySetting::first();
+
+        // Dompdf butuh ekstensi GD untuk merender PNG; tanpa guard ini server tanpa GD akan 500
+        $logo = null;
+        $logoPath = public_path('letter/main-logo.png');
+        if (is_file($logoPath) && extension_loaded('gd')) {
+            $logo = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+        }
+
+        $kwitansi_number = str_replace('CTECH', 'KWT', $invoice->invoice_number);
+
+        $pdf = Pdf::loadView('pdf.kwitansi', [
+            'invoice' => $invoice,
+            'settings' => $settings,
+            'logo' => $logo,
+            'kwitansi_number' => $kwitansi_number,
+        ])->setPaper('a5', 'landscape');
+
+        return $pdf->stream(str_replace('/', '-', $kwitansi_number) . '.pdf');
+    }
 }

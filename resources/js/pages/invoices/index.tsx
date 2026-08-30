@@ -204,6 +204,11 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
                                                                 <Eye className="mr-2 h-4 w-4" /> Preview PDF
                                                             </a>
                                                         </DropdownMenuItem>
+                                                        <DropdownMenuItem asChild>
+                                                            <a href={`/invoices/${invoice.id}/kwitansi`} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
+                                                                <FileText className="mr-2 h-4 w-4" /> Cetak Kwitansi
+                                                            </a>
+                                                        </DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => openDeleteModal(invoice)} className="text-destructive">
                                                             <Trash2 className="mr-2 h-4 w-4" /> Delete
                                                         </DropdownMenuItem>
