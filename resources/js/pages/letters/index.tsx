@@ -216,9 +216,7 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                         <Button variant="outline" onClick={openNumberModal}>
                             <Hash className="mr-2 h-4 w-4" /> Generate Nomor Saja
                         </Button>
-                        <Button onClick={openCreateModal}>
-                            <Plus className="mr-2 h-4 w-4" /> Create Letter
-                        </Button>
+                        <Button asChild><Link href="/letters/create"><Plus className="mr-2 h-4 w-4" /> Create Letter</Link></Button>
                     </div>
                 </div>
 
@@ -302,9 +300,7 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                                                                 <Eye className="mr-2 h-4 w-4" /> View
                                                             </Link>
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => openEditModal(letter)}>
-                                                            <Edit2 className="mr-2 h-4 w-4" /> Edit
-                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem asChild><Link href={`/letters/${letter.id}/edit`} className="cursor-pointer flex items-center"><Edit2 className="mr-2 h-4 w-4" /> Edit</Link></DropdownMenuItem>
                                                         {letter.content && (
                                                             <DropdownMenuItem asChild>
                                                                 <a href={`/letters/${letter.id}/preview`} target="_blank" rel="noreferrer" className="cursor-pointer flex items-center">
@@ -334,164 +330,9 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                 </div>
             </div>
 
-            {/* Create Modal */}
-            <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-                <DialogContent className="max-w-3xl">
-                    <DialogHeader>
-                        <DialogTitle>Create Official Letter</DialogTitle>
-                        <DialogDescription>Draft a new official document for the company.</DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={submitCreate} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2 col-span-2 md:col-span-1">
-                                <Label htmlFor="type">Jenis Surat</Label>
-                                <Select value={data.type} onValueChange={handleTypeChange}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Pilih jenis surat" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {Object.keys(LETTER_TEMPLATES).map((type) => (
-                                            <SelectItem key={type} value={type}>{type}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
-                            </div>
-                            <div className="space-y-2 col-span-2 md:col-span-1">
-                                <Label htmlFor="letter_date">Tanggal Surat</Label>
-                                <Input id="letter_date" type="date" value={data.letter_date} onChange={e => setData('letter_date', e.target.value)} required />
-                                {errors.letter_date && <p className="text-sm text-destructive">{errors.letter_date}</p>}
-                            </div>
-                            <div className="space-y-2 col-span-2 md:col-span-1">
-                                <Label htmlFor="sifat">Sifat Surat</Label>
-                                <Select value={data.sifat} onValueChange={val => setData('sifat', val)}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Pilih sifat" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Biasa">Biasa</SelectItem>
-                                        <SelectItem value="Penting">Penting</SelectItem>
-                                        <SelectItem value="Segera">Segera</SelectItem>
-                                        <SelectItem value="Sangat Segera">Sangat Segera</SelectItem>
-                                        <SelectItem value="Rahasia">Rahasia</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                {errors.sifat && <p className="text-sm text-destructive">{errors.sifat}</p>}
-                            </div>
-                            <div className="space-y-2 col-span-2 md:col-span-1">
-                                <Label htmlFor="recipient">Penerima</Label>
-                                <Input id="recipient" value={data.recipient} onChange={e => setData('recipient', e.target.value)} required />
-                                {errors.recipient && <p className="text-sm text-destructive">{errors.recipient}</p>}
-                            </div>
-                            <div className="space-y-2 col-span-2">
-                                <Label htmlFor="subject">Perihal</Label>
-                                <Input id="subject" value={data.subject} onChange={e => setData('subject', e.target.value)} required />
-                                {errors.subject && <p className="text-sm text-destructive">{errors.subject}</p>}
-                            </div>
-                            <div className="space-y-2 col-span-2">
-                                <Label htmlFor="content">Isi Surat</Label>
-                                <p className="text-xs text-muted-foreground">Kop surat, tanggal, penerima, dan tanda tangan otomatis ditambahkan pada PDF — cukup tulis isi suratnya saja. Untuk poin a, b, c: buat list bernomor lalu tekan tombol indent (Tab).</p>
-                                <LetterEditor value={data.content} onChange={(value) => setData('content', value)} />
-                                {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
-                            </div>
-                            <div className="col-span-2">
-                                <LetterPageSettings data={data} setData={setData} />
-                            </div>
-                        </div>
-                        
-                        <DialogFooter className="mt-6">
-                            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
-                            <Button type="submit" disabled={processing}>Draft Letter</Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
+            
 
-            {/* Edit Modal */}
-            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-                <DialogContent className="max-w-3xl">
-                    <DialogHeader>
-                        <DialogTitle>Edit Letter</DialogTitle>
-                        <DialogDescription>Update document details.</DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={submitEdit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2 col-span-2 md:col-span-1">
-                                <Label htmlFor="edit-type">Jenis Surat</Label>
-                                <Select value={data.type} onValueChange={handleTypeChange}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Pilih jenis surat" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {Object.keys(LETTER_TEMPLATES).map((type) => (
-                                            <SelectItem key={type} value={type}>{type}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
-                            </div>
-                            <div className="space-y-2 col-span-2 md:col-span-1">
-                                <Label htmlFor="edit-letter_date">Tanggal Surat</Label>
-                                <Input id="edit-letter_date" type="date" value={data.letter_date} onChange={e => setData('letter_date', e.target.value)} required />
-                                {errors.letter_date && <p className="text-sm text-destructive">{errors.letter_date}</p>}
-                            </div>
-                            <div className="space-y-2 col-span-2 md:col-span-1">
-                                <Label htmlFor="edit-sifat">Sifat Surat</Label>
-                                <Select value={data.sifat} onValueChange={val => setData('sifat', val)}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Pilih sifat" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Biasa">Biasa</SelectItem>
-                                        <SelectItem value="Penting">Penting</SelectItem>
-                                        <SelectItem value="Segera">Segera</SelectItem>
-                                        <SelectItem value="Sangat Segera">Sangat Segera</SelectItem>
-                                        <SelectItem value="Rahasia">Rahasia</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                {errors.sifat && <p className="text-sm text-destructive">{errors.sifat}</p>}
-                            </div>
-                            <div className="space-y-2 col-span-2 md:col-span-1">
-                                <Label htmlFor="edit-recipient">Penerima</Label>
-                                <Input id="edit-recipient" value={data.recipient} onChange={e => setData('recipient', e.target.value)} required />
-                                {errors.recipient && <p className="text-sm text-destructive">{errors.recipient}</p>}
-                            </div>
-                            <div className="space-y-2 col-span-2 md:col-span-1">
-                                <Label htmlFor="edit-subject">Perihal</Label>
-                                <Input id="edit-subject" value={data.subject} onChange={e => setData('subject', e.target.value)} required />
-                                {errors.subject && <p className="text-sm text-destructive">{errors.subject}</p>}
-                            </div>
-                            <div className="space-y-2 col-span-2 md:col-span-1">
-                                <Label htmlFor="edit-status">Status</Label>
-                                <Select value={data.status} onValueChange={val => setData('status', val)}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Draft">Draft</SelectItem>
-                                        <SelectItem value="Final">Final</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                {errors.status && <p className="text-sm text-destructive">{errors.status}</p>}
-                            </div>
-                            <div className="space-y-2 col-span-2">
-                                <Label htmlFor="edit-content">Isi Surat</Label>
-                                <p className="text-xs text-muted-foreground">Kop surat, tanggal, penerima, dan tanda tangan otomatis ditambahkan pada PDF — cukup tulis isi suratnya saja. Untuk poin a, b, c: buat list bernomor lalu tekan tombol indent (Tab).</p>
-                                <LetterEditor value={data.content} onChange={(value) => setData('content', value)} />
-                                {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
-                            </div>
-                            <div className="col-span-2">
-                                <LetterPageSettings data={data} setData={setData} />
-                            </div>
-                        </div>
-                        
-                        <DialogFooter className="mt-6">
-                            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
-                            <Button type="submit" disabled={processing}>Update Letter</Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
+            
 
             {/* Generate Number Only Modal */}
             <Dialog open={isNumberModalOpen} onOpenChange={setIsNumberModalOpen}>
@@ -590,3 +431,5 @@ LettersIndex.layout = {
         },
     ],
 };
+
+

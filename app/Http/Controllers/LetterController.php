@@ -123,7 +123,7 @@ class LetterController extends Controller
                 : "Surat berhasil dibuat: {$letter->reference_number}",
         ]);
 
-        return redirect()->back()->with('success', 'Letter created successfully.');
+        return redirect()->route('letters.index')->with('success', 'Letter created successfully.');
     }
 
     public function show(Letter $letter)
@@ -162,7 +162,7 @@ class LetterController extends Controller
 
         $this->logActivity('updated', 'Letter', $letter->id, "Mengupdate surat: {$letter->reference_number}");
 
-        return redirect()->back()->with('success', 'Letter updated successfully.');
+        return redirect()->route('letters.index')->with('success', 'Letter updated successfully.');
     }
 
     public function edit(Letter $letter)
