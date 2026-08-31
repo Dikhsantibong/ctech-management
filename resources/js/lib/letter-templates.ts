@@ -54,4 +54,8 @@ export const LETTER_TEMPLATES: Record<string, { subject: string; content: string
         subject: 'Perjanjian Kerja Sama — [Nama Project]',
         content: `<p>Pada hari ini, [Hari, Tanggal], pihak-pihak yang bertanda tangan di bawah ini:</p><ol><li><strong>Pihak Pertama</strong>: [Nama Perusahaan/Perwakilan], selanjutnya disebut sebagai penyedia jasa;</li><li><strong>Pihak Kedua</strong>: [Nama Klien/Vendor], selanjutnya disebut sebagai pengguna jasa.</li></ol><p>Kedua belah pihak sepakat mengikatkan diri dalam perjanjian kerja sama dengan ketentuan sebagai berikut:</p><ol><li><strong>Ruang Lingkup Pekerjaan:</strong> [detail pekerjaan/deliverables yang disepakati];</li><li><strong>Nilai Kontrak dan Pembayaran:</strong> [nominal total beserta termin, misal: DP 50%, pelunasan 50% setelah serah terima];</li><li><strong>Jangka Waktu Pelaksanaan:</strong> [jadwal mulai hingga selesai];</li><li><strong>Revisi:</strong> [batas revisi, misal: maksimal 2 kali revisi minor];</li><li><strong>Hak Kekayaan Intelektual:</strong> [kepemilikan aset akhir setelah pelunasan].</li></ol><p>Demikian perjanjian ini dibuat dalam keadaan sadar, tanpa paksaan dari pihak mana pun, dan mengikat kedua belah pihak.</p>`,
     },
+    'Surat Pernyataan': {
+        subject: 'Surat Pernyataan',
+        content: `<p>Yang bertanda tangan di bawah ini:</p><p>Nama : [Nama Lengkap]<br>NIK / No. Identitas : [Nomor KTP/Identitas]<br>Jabatan : [Posisi/Role]<br>Alamat : [Alamat Lengkap]</p><p>Dengan ini menyatakan dengan sebenar-benarnya bahwa:</p><ol><li>[Isi pernyataan 1];</li><li>[Isi pernyataan 2].</li></ol><p>Demikian surat pernyataan ini dibuat dalam keadaan sadar dan tanpa ada paksaan dari pihak mana pun, untuk dipergunakan sebagaimana mestinya.</p>`,
+    },
 };
