@@ -209,17 +209,22 @@
             </tr>
         </table>
 
-        <div style="margin-top: 20px;">
-            <div class="amount-display">
-                Rp {{ number_format($invoice->total, 0, ',', '.') }}
-            </div>
-        </div>
-
-        {{-- Signatures --}}
+        {{-- Signatures & Notes --}}
         <table class="signature-table">
             <tr>
-                <td></td>
-                <td>
+                <td style="text-align: left; vertical-align: top; width: 60%;">
+                    <div class="amount-display" style="margin-top: 0; margin-bottom: 12px;">
+                        Rp {{ number_format($invoice->total, 0, ',', '.') }}
+                    </div>
+                    
+                    <div style="font-size: 10px; color: #4b5563; line-height: 1.4; padding-left: 2px;">
+                        <strong style="color: #374151;">Catatan Pembayaran:</strong><br>
+                        Bank: {{ $settings->bank_name ?? '-' }}<br>
+                        No. Rekening: {{ $settings->bank_account_number ?? '-' }}<br>
+                        Atas Nama: {{ $settings->bank_account_name ?? '-' }}
+                    </div>
+                </td>
+                <td style="text-align: center; vertical-align: bottom; width: 40%;">
                     {{ $settings->city ?? 'Kendari' }}, {{ \Carbon\Carbon::now()->locale('id')->translatedFormat('d F Y') }}<br>
                     Penerima,
                     <div class="sign-area"></div>
