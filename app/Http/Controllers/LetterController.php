@@ -76,13 +76,21 @@ class LetterController extends Controller
         ];
         $monthRoman = $romanMonths[$month];
         
-        // Count specific to the letter type, year, and month for a cleaner sequence
-        $count = Letter::where('type', $validated['type'])
-                       ->whereYear('created_at', $year)
-                       ->whereMonth('created_at', $month)
-                       ->count() + 1;
+        // Get the latest sequence based on the letter suffix format
+        $suffix = "/{$typeCode}/CTECH/{$monthRoman}/{$year}";
+        
+        $latestLetter = Letter::where('reference_number', 'like', "%{$suffix}")
+                       ->orderBy('reference_number', 'desc')
+                       ->first();
                        
-        $refNumber = str_pad($count, 3, '0', STR_PAD_LEFT) . '/' . $typeCode . '/CTECH/' . $monthRoman . '/' . $year;
+        if ($latestLetter) {
+            $lastSequence = (int) explode('/', $latestLetter->reference_number)[0];
+            $nextId = $lastSequence + 1;
+        } else {
+            $nextId = 1;
+        }
+                       
+        $refNumber = str_pad($nextId, 3, '0', STR_PAD_LEFT) . $suffix;
 
         $isNumberOnly = empty($validated['content']);
 
