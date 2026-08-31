@@ -69,11 +69,11 @@ export default function LetterForm({ letter }: { letter: any | null }) {
     return (
         <>
             <Head title={isEdit ? "Edit Letter" : "Create Letter"} />
-            <div className="flex flex-1 flex-col gap-6 p-6 max-w-7xl mx-auto w-full">
+            <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center gap-4">
-                    <Button variant="outline" size="icon" asChild>
+                    <Button variant="ghost" size="icon" asChild className="rounded-full">
                         <Link href="/letters">
-                            <ArrowLeft className="h-4 w-4" />
+                            <ArrowLeft className="h-5 w-5" />
                         </Link>
                     </Button>
                     <div>
@@ -177,18 +177,17 @@ export default function LetterForm({ letter }: { letter: any | null }) {
                                         <LetterEditor value={data.content} onChange={(value) => setData('content', value)} className="flex-1 min-h-[500px]" />
                                         {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
                                     </div>
-                                </CardContent>
+                                                                </CardContent>
+                                <div className="flex items-center justify-end gap-4 p-6 pt-0 mt-auto">
+                                    <Button type="button" variant="outline" asChild>
+                                        <Link href="/letters">Batal</Link>
+                                    </Button>
+                                    <Button type="submit" disabled={processing}>
+                                        <Save className="mr-2 h-4 w-4" />
+                                        {isEdit ? 'Simpan Perubahan' : 'Buat Surat'}
+                                    </Button>
+                                </div>
                             </Card>
-
-                            <div className="flex justify-end gap-4">
-                                <Button type="button" variant="outline" asChild>
-                                    <Link href="/letters">Batal</Link>
-                                </Button>
-                                <Button type="submit" disabled={processing}>
-                                    <Save className="mr-2 h-4 w-4" />
-                                    {isEdit ? 'Simpan Perubahan' : 'Buat Surat'}
-                                </Button>
-                            </div>
                         </div>
                     </div>
                 </form>
@@ -203,3 +202,4 @@ LetterForm.layout = {
         { title: 'Form', href: '#' },
     ],
 };
+
