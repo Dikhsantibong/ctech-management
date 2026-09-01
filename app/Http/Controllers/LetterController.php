@@ -66,12 +66,15 @@ class LetterController extends Controller
             'Surat Kontrak' => 'SKTR',
             'Surat Pernyataan' => 'SPER',
             'Berita Acara' => 'BA',
+            'Berita Acara Serah Terima Pekerjaan' => 'BAST',
+            'Berita Acara Pemeriksaan Pekerjaan' => 'BAPP',
         ];
 
         $typeCode = $codeMap[$validated['type']] ?? 'SRT';
         
-        $year = date('Y');
-        $month = date('m');
+        $parsedDate = \Carbon\Carbon::parse($validated['letter_date']);
+        $year = $parsedDate->format('Y');
+        $month = $parsedDate->format('m');
         $romanMonths = [
             '01' => 'I', '02' => 'II', '03' => 'III', '04' => 'IV', '05' => 'V', '06' => 'VI',
             '07' => 'VII', '08' => 'VIII', '09' => 'IX', '10' => 'X', '11' => 'XI', '12' => 'XII'
