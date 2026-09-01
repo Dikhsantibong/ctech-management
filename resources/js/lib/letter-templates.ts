@@ -58,4 +58,8 @@ export const LETTER_TEMPLATES: Record<string, { subject: string; content: string
         subject: 'Surat Pernyataan',
         content: `<p>Yang bertanda tangan di bawah ini:</p><p>Nama : [Nama Lengkap]<br>NIK / No. Identitas : [Nomor KTP/Identitas]<br>Jabatan : [Posisi/Role]<br>Alamat : [Alamat Lengkap]</p><p>Dengan ini menyatakan dengan sebenar-benarnya bahwa:</p><ol><li>[Isi pernyataan 1];</li><li>[Isi pernyataan 2].</li></ol><p>Demikian surat pernyataan ini dibuat dalam keadaan sadar dan tanpa ada paksaan dari pihak mana pun, untuk dipergunakan sebagaimana mestinya.</p>`,
     },
+    'Berita Acara': {
+        subject: 'Berita Acara Serah Terima [Pekerjaan/Barang]',
+        content: `<p>Pada hari ini, [Hari, Tanggal], bertempat di [Lokasi/Tempat], telah dilakukan serah terima [pekerjaan/barang/jasa] oleh dan antara:</p><ol><li><strong>PIHAK PERTAMA (Yang Menyerahkan):</strong><br>Nama : [Nama Perwakilan]<br>Jabatan : [Posisi/Role]<br>Instansi : [Nama Perusahaan/Vendor]</li><li><strong>PIHAK KEDUA (Yang Menerima):</strong><br>Nama : [Nama Perwakilan Klien]<br>Jabatan : [Posisi/Role]<br>Instansi : [Nama Klien/Instansi]</li></ol><p>Kedua belah pihak telah menyepakati hal-hal sebagai berikut:</p><ol><li>PIHAK PERTAMA menyerahkan kepada PIHAK KEDUA, dan PIHAK KEDUA menyatakan telah menerima dari PIHAK PERTAMA berupa [jelaskan secara detail apa yang diserahkan].</li><li>Bahwa [pekerjaan/barang/jasa] yang diserahkan telah diperiksa dan dinyatakan [dalam keadaan baik/sesuai dengan spesifikasi dan kontrak/berfungsi sebagaimana mestinya].</li></ol><p>Demikian Berita Acara Serah Terima ini dibuat dalam rangkap 2 (dua) yang memiliki kekuatan hukum yang sama, untuk dapat dipergunakan sebagaimana mestinya.</p>`,
+    },
 };

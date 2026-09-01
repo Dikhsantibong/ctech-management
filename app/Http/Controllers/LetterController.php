@@ -65,6 +65,7 @@ class LetterController extends Controller
             'Surat Permohonan' => 'SPRM',
             'Surat Kontrak' => 'SKTR',
             'Surat Pernyataan' => 'SPER',
+            'Berita Acara' => 'BA',
         ];
 
         $typeCode = $codeMap[$validated['type']] ?? 'SRT';
