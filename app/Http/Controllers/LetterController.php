@@ -68,6 +68,10 @@ class LetterController extends Controller
             'Berita Acara' => 'BA',
             'Berita Acara Serah Terima Pekerjaan' => 'BAST',
             'Berita Acara Pemeriksaan Pekerjaan' => 'BAPP',
+            'Berita Acara Kesepakatan' => 'BAK',
+            'Berita Acara Pembayaran' => 'BAP',
+            'Berita Acara Rapat' => 'BAR',
+            'Berita Acara Kejadian' => 'BAKJ',
         ];
 
         $typeCode = $codeMap[$validated['type']] ?? 'SRT';
