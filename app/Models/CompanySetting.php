@@ -16,5 +16,7 @@ class CompanySetting extends Model
         'phone',
         'email',
         'website',
+        'bank_accounts',
     ];
 }
+

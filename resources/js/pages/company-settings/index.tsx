@@ -1,5 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
-import { Save, Building, User, CreditCard, MapPin, Phone, Mail, Globe } from 'lucide-react';
+import { Save, Building, User, CreditCard, MapPin, Phone, Mail, Globe, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,7 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
     const { data, setData, post, processing, errors } = useForm({
         company_name: settings?.company_name || '',
         leader_name: settings?.leader_name || '',
+        bank_accounts: settings?.bank_accounts?.length ? settings.bank_accounts : [{ bank_name: settings?.bank_name || '', account_number: settings?.bank_account_number || '', account_name: settings?.bank_account_name || '' }],
         bank_name: settings?.bank_name || '',
         bank_account_number: settings?.bank_account_number || '',
         bank_account_name: settings?.bank_account_name || '',
@@ -73,46 +74,89 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
                             </CardContent>
                         </Card>
 
-                        {/* Bank Details */}
-                        <Card className="">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <CreditCard className="h-5 w-5 text-primary" />
-                                    Informasi Rekening Bank
-                                </CardTitle>
-                                <CardDescription>Data ini akan ditampilkan di Invoice.</CardDescription>
+                                                {/* Bank Details */}
+                        <Card className="flex flex-col">
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <div className="space-y-1.5">
+                                    <CardTitle className="flex items-center gap-2">
+                                        <CreditCard className="h-5 w-5 text-primary" />
+                                        Informasi Rekening Bank
+                                    </CardTitle>
+                                    <CardDescription>Data ini akan ditampilkan di Invoice & Kwitansi.</CardDescription>
+                                </div>
+                                <Button 
+                                    type="button" 
+                                    variant="outline" 
+                                    size="sm" 
+                                    onClick={() => setData('bank_accounts', [...data.bank_accounts, { bank_name: '', account_number: '', account_name: '' }])}
+                                >
+                                    <Plus className="h-4 w-4 mr-2" /> Tambah Rekening
+                                </Button>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="bank_name">Nama Bank</Label>
-                                    <Input 
-                                        id="bank_name" 
-                                        value={data.bank_name} 
-                                        onChange={e => setData('bank_name', e.target.value)} 
-                                        placeholder="Bank Sultra"
-                                    />
-                                    {errors.bank_name && <p className="text-sm text-destructive">{errors.bank_name}</p>}
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="bank_account_number">Nomor Rekening</Label>
-                                    <Input 
-                                        id="bank_account_number" 
-                                        value={data.bank_account_number} 
-                                        onChange={e => setData('bank_account_number', e.target.value)} 
-                                        placeholder="1234567890"
-                                    />
-                                    {errors.bank_account_number && <p className="text-sm text-destructive">{errors.bank_account_number}</p>}
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="bank_account_name">Atas Nama (Pemilik Rekening)</Label>
-                                    <Input 
-                                        id="bank_account_name" 
-                                        value={data.bank_account_name} 
-                                        onChange={e => setData('bank_account_name', e.target.value)} 
-                                        placeholder="PT C-Tech Solutions"
-                                    />
-                                    {errors.bank_account_name && <p className="text-sm text-destructive">{errors.bank_account_name}</p>}
-                                </div>
+                            <CardContent className="space-y-6 flex-1 max-h-[300px] overflow-y-auto pr-4">
+                                {data.bank_accounts.map((bank: any, index: number) => (
+                                    <div key={index} className="space-y-4 p-4 border rounded-lg relative bg-slate-50/50 dark:bg-slate-900/50">
+                                        <div className="absolute top-2 right-2">
+                                            {data.bank_accounts.length > 1 && (
+                                                <Button 
+                                                    type="button" 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                    onClick={() => {
+                                                        const newAccounts = [...data.bank_accounts];
+                                                        newAccounts.splice(index, 1);
+                                                        setData('bank_accounts', newAccounts);
+                                                    }}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            )}
+                                        </div>
+                                        <div className="space-y-2 pr-8">
+                                            <Label>Nama Bank</Label>
+                                            <Input 
+                                                value={bank.bank_name} 
+                                                onChange={e => {
+                                                    const newAccounts = [...data.bank_accounts];
+                                                    newAccounts[index].bank_name = e.target.value;
+                                                    setData('bank_accounts', newAccounts);
+                                                }} 
+                                                placeholder="BCA / Mandiri / BRI"
+                                            />
+                                            {/* @ts-ignore */}
+                                            {errors['bank_accounts.' + index + '.bank_name'] && <p className="text-sm text-destructive">{errors['bank_accounts.' + index + '.bank_name']}</p>}
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Nomor Rekening</Label>
+                                            <Input 
+                                                value={bank.account_number} 
+                                                onChange={e => {
+                                                    const newAccounts = [...data.bank_accounts];
+                                                    newAccounts[index].account_number = e.target.value;
+                                                    setData('bank_accounts', newAccounts);
+                                                }} 
+                                                placeholder="1234567890"
+                                            />
+                                            {/* @ts-ignore */}
+                                            {errors['bank_accounts.' + index + '.account_number'] && <p className="text-sm text-destructive">{errors['bank_accounts.' + index + '.account_number']}</p>}
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Atas Nama</Label>
+                                            <Input 
+                                                value={bank.account_name} 
+                                                onChange={e => {
+                                                    const newAccounts = [...data.bank_accounts];
+                                                    newAccounts[index].account_name = e.target.value;
+                                                    setData('bank_accounts', newAccounts);
+                                                }} 
+                                                placeholder="PT C-Tech Solutions"
+                                            />
+                                            {/* @ts-ignore */}
+                                            {errors['bank_accounts.' + index + '.account_name'] && <p className="text-sm text-destructive">{errors['bank_accounts.' + index + '.account_name']}</p>}
+                                        </div>
+                                    </div>
+                                ))}
                             </CardContent>
                         </Card>
 
