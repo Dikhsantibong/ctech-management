@@ -1,5 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
-import { Save, Building, User, CreditCard, MapPin, Phone, Mail, Globe, Plus, Trash2 } from 'lucide-react';
+import { Save, Building, User, CreditCard, MapPin, Phone, Mail, Globe, Plus, Trash2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,7 +11,7 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
     const { data, setData, post, processing, errors } = useForm({
         company_name: settings?.company_name || '',
         leader_name: settings?.leader_name || '',
-        bank_accounts: settings?.bank_accounts?.length ? settings.bank_accounts : [{ bank_name: settings?.bank_name || '', account_number: settings?.bank_account_number || '', account_name: settings?.bank_account_name || '' }],
+        bank_accounts: settings?.bank_accounts?.length ? settings.bank_accounts.map((b: any, i: number) => ({...b, is_active: b.is_active !== undefined ? b.is_active : i === 0})) : [{ bank_name: settings?.bank_name || '', account_number: settings?.bank_account_number || '', account_name: settings?.bank_account_name || '', is_active: true }],
         bank_name: settings?.bank_name || '',
         bank_account_number: settings?.bank_account_number || '',
         bank_account_name: settings?.bank_account_name || '',
@@ -74,38 +74,65 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
                             </CardContent>
                         </Card>
 
-                                                {/* Bank Details */}
-                        <Card className="flex flex-col">
+                                                                        {/* Bank Details */}
+                        <Card className="md:col-span-2">
                             <CardHeader className="flex flex-row items-center justify-between">
                                 <div className="space-y-1.5">
                                     <CardTitle className="flex items-center gap-2">
                                         <CreditCard className="h-5 w-5 text-primary" />
                                         Informasi Rekening Bank
                                     </CardTitle>
-                                    <CardDescription>Data ini akan ditampilkan di Invoice & Kwitansi.</CardDescription>
+                                    <CardDescription>Atur rekening bank Anda. Pilih salah satu sebagai rekening utama (aktif) yang akan dicetak di Invoice & Kwitansi.</CardDescription>
                                 </div>
                                 <Button 
                                     type="button" 
                                     variant="outline" 
                                     size="sm" 
-                                    onClick={() => setData('bank_accounts', [...data.bank_accounts, { bank_name: '', account_number: '', account_name: '' }])}
+                                    onClick={() => setData('bank_accounts', [...data.bank_accounts, { bank_name: '', account_number: '', account_name: '', is_active: data.bank_accounts.length === 0 }])}
                                 >
                                     <Plus className="h-4 w-4 mr-2" /> Tambah Rekening
                                 </Button>
                             </CardHeader>
-                            <CardContent className="space-y-6 flex-1 max-h-[300px] overflow-y-auto pr-4">
+                            <CardContent>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
                                 {data.bank_accounts.map((bank: any, index: number) => (
-                                    <div key={index} className="space-y-4 p-4 border rounded-lg relative bg-slate-50/50 dark:bg-slate-900/50">
-                                        <div className="absolute top-2 right-2">
+                                    <div key={index} className={`space-y-4 p-4 border rounded-lg relative transition-all duration-200 ${bank.is_active ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'bg-slate-50/50 dark:bg-slate-900/50'}`}>
+                                        
+                                        <div className="absolute top-2 right-2 flex items-center gap-1">
+                                            {bank.is_active ? (
+                                                <span className="flex items-center text-xs font-medium text-primary mr-2 bg-primary/10 px-2 py-1 rounded-full">
+                                                    <CheckCircle2 className="h-3 w-3 mr-1" /> Aktif Digunakan
+                                                </span>
+                                            ) : (
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="text-xs h-7 mr-1"
+                                                    onClick={() => {
+                                                        const newAccounts = data.bank_accounts.map((b: any, i: number) => ({
+                                                            ...b,
+                                                            is_active: i === index
+                                                        }));
+                                                        setData('bank_accounts', newAccounts);
+                                                    }}
+                                                >
+                                                    Jadikan Utama
+                                                </Button>
+                                            )}
+
                                             {data.bank_accounts.length > 1 && (
                                                 <Button 
                                                     type="button" 
                                                     variant="ghost" 
                                                     size="icon" 
-                                                    className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                    className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
                                                     onClick={() => {
                                                         const newAccounts = [...data.bank_accounts];
                                                         newAccounts.splice(index, 1);
+                                                        if (bank.is_active && newAccounts.length > 0) {
+                                                            newAccounts[0].is_active = true;
+                                                        }
                                                         setData('bank_accounts', newAccounts);
                                                     }}
                                                 >
@@ -113,7 +140,8 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
                                                 </Button>
                                             )}
                                         </div>
-                                        <div className="space-y-2 pr-8">
+
+                                        <div className="space-y-2 pr-20">
                                             <Label>Nama Bank</Label>
                                             <Input 
                                                 value={bank.bank_name} 
@@ -124,8 +152,6 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
                                                 }} 
                                                 placeholder="BCA / Mandiri / BRI"
                                             />
-                                            {/* @ts-ignore */}
-                                            {errors['bank_accounts.' + index + '.bank_name'] && <p className="text-sm text-destructive">{errors['bank_accounts.' + index + '.bank_name']}</p>}
                                         </div>
                                         <div className="space-y-2">
                                             <Label>Nomor Rekening</Label>
@@ -138,8 +164,6 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
                                                 }} 
                                                 placeholder="1234567890"
                                             />
-                                            {/* @ts-ignore */}
-                                            {errors['bank_accounts.' + index + '.account_number'] && <p className="text-sm text-destructive">{errors['bank_accounts.' + index + '.account_number']}</p>}
                                         </div>
                                         <div className="space-y-2">
                                             <Label>Atas Nama</Label>
@@ -152,11 +176,10 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
                                                 }} 
                                                 placeholder="PT C-Tech Solutions"
                                             />
-                                            {/* @ts-ignore */}
-                                            {errors['bank_accounts.' + index + '.account_name'] && <p className="text-sm text-destructive">{errors['bank_accounts.' + index + '.account_name']}</p>}
                                         </div>
                                     </div>
                                 ))}
+                                </div>
                             </CardContent>
                         </Card>
 
@@ -250,3 +273,4 @@ CompanySettingsIndex.layout = {
         },
     ],
 };
+

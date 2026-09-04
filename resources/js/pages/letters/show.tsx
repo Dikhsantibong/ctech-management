@@ -1,11 +1,20 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Download, FileText, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Download, FileText, CheckCircle, Eye, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import LetterDocumentPreview, { type CompanySettings } from '@/components/letter-document-preview';
 
-export default function LetterShow({ letter }: { letter: any }) {
+export default function LetterShow({
+    letter,
+    settings,
+    verification_code,
+}: {
+    letter: any;
+    settings?: CompanySettings | null;
+    verification_code?: string | null;
+}) {
     const statusBadgeColor = (status: string) => {
         switch (status) {
             case 'Final': return 'default';
@@ -54,11 +63,18 @@ export default function LetterShow({ letter }: { letter: any }) {
                             </Select>
                         </div>
                         {letter.content && (
-                            <Button asChild>
-                                <a href={`/letters/${letter.id}/pdf`} target="_blank" rel="noopener noreferrer">
-                                    <Download className="mr-2 h-4 w-4" /> Download PDF
-                                </a>
-                            </Button>
+                            <>
+                                <Button variant="outline" asChild>
+                                    <a href={`/letters/${letter.id}/preview`} target="_blank" rel="noopener noreferrer">
+                                        <Eye className="mr-2 h-4 w-4" /> Preview PDF
+                                    </a>
+                                </Button>
+                                <Button asChild>
+                                    <a href={`/letters/${letter.id}/pdf`} target="_blank" rel="noopener noreferrer">
+                                        <Download className="mr-2 h-4 w-4" /> Download PDF
+                                    </a>
+                                </Button>
+                            </>
                         )}
                     </div>
                 </div>
@@ -67,35 +83,29 @@ export default function LetterShow({ letter }: { letter: any }) {
                     <div className="md:col-span-2 space-y-6">
                         <Card className="min-h-[500px]">
                             <CardHeader className="border-b bg-muted/20 pb-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <FileText className="h-5 w-5 text-muted-foreground" />
-                                    <CardTitle>Document Preview</CardTitle>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 text-sm mt-4">
-                                    <div>
-                                        <span className="text-muted-foreground">To: </span>
-                                        <span className="font-medium">{letter.recipient}</span>
+                                <div className="flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2">
+                                        <FileText className="h-5 w-5 text-muted-foreground" />
+                                        <CardTitle>Document Preview</CardTitle>
                                     </div>
-                                    <div>
-                                        <span className="text-muted-foreground">Subject: </span>
-                                        <span className="font-medium">{letter.subject}</span>
-                                    </div>
+                                    {letter.content && (
+                                        <span className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${letter.status === 'Final' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300' : 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300'}`}>
+                                            <ShieldCheck className="h-3.5 w-3.5" />
+                                            {letter.status === 'Final' ? 'Final — Cap Resmi' : 'Draft — Watermark'}
+                                        </span>
+                                    )}
                                 </div>
                             </CardHeader>
-                            <CardContent className="pt-6">
+                            <CardContent className="bg-muted/30 p-4">
                                 {letter.content ? (
-                                    /<\w+[^>]*>/.test(letter.content) ? (
-                                        <div
-                                            className="prose prose-sm max-w-none dark:prose-invert font-serif"
-                                            dangerouslySetInnerHTML={{ __html: letter.content }}
-                                        />
-                                    ) : (
-                                        <div className="prose prose-sm max-w-none dark:prose-invert whitespace-pre-wrap font-serif">
-                                            {letter.content}
-                                        </div>
-                                    )
+                                    <LetterDocumentPreview
+                                        data={letter}
+                                        settings={settings}
+                                        creatorName={letter.creator?.name}
+                                        verificationCode={verification_code}
+                                    />
                                 ) : (
-                                    <p className="text-sm text-muted-foreground italic">
+                                    <p className="p-4 text-sm text-muted-foreground italic">
                                         Surat ini hanya reservasi nomor — tidak memiliki isi surat untuk ditampilkan.
                                     </p>
                                 )}

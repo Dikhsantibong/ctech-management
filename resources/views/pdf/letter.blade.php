@@ -151,9 +151,163 @@
             margin: 0;
         }
         .signature-role { margin: 2px 0 0 0; }
+
+        /* ===== Watermark DRAFT (dokumen belum disahkan) ===== */
+        .wm-draft {
+            position: fixed;
+            top: 34%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            transform: rotate(-45deg);
+            transform-origin: center center;
+            z-index: -1;
+        }
+        .wm-draft .wm-word {
+            font-size: 150pt;
+            font-weight: bold;
+            letter-spacing: 12px;
+            color: #dc2626;
+            opacity: 0.09;
+            margin: 0;
+        }
+        .wm-draft .wm-sub {
+            font-size: 20pt;
+            letter-spacing: 8px;
+            color: #dc2626;
+            opacity: 0.11;
+            margin: 4px 0 0 0;
+            text-transform: uppercase;
+        }
+
+        /* ===== Watermark keamanan CTECH (dokumen final/resmi) ===== */
+        .wm-final {
+            position: fixed;
+            top: -15%;
+            left: -20%;
+            width: 140%;
+            height: 130%;
+            transform: rotate(-30deg);
+            transform-origin: center center;
+            opacity: 0.05;
+            z-index: -1;
+        }
+        .wm-final .wm-line {
+            font-size: 30pt;
+            font-weight: bold;
+            letter-spacing: 10px;
+            color: #1e3a8a;
+            white-space: nowrap;
+            line-height: 2.6;
+            text-align: center;
+            margin: 0;
+        }
+
+        /* ===== Stempel / cap resmi ===== */
+        .official-stamp {
+            width: 118px;
+            height: 118px;
+            border: 2.5px solid #1e3a8a;
+            border-radius: 50%;
+            text-align: center;
+            color: #1e3a8a;
+            transform: rotate(-14deg);
+            padding: 0;
+            margin: 6px 0 0 8px;
+            opacity: 0.9;
+        }
+        .official-stamp .stamp-inner {
+            border: 1px solid #1e3a8a;
+            border-radius: 50%;
+            width: 104px;
+            height: 104px;
+            margin: 5px auto;
+            padding-top: 20px;
+        }
+        .official-stamp .stamp-top {
+            font-size: 6.5pt;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+        .official-stamp .stamp-main {
+            font-size: 12pt;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin: 6px 0 4px 0;
+        }
+        .official-stamp .stamp-code {
+            font-size: 6pt;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+        .official-stamp .stamp-bottom {
+            font-size: 5.5pt;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 4px 0 0 0;
+        }
+
+        /* ===== Footer verifikasi (di dalam margin bawah) ===== */
+        .doc-footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: -10mm;
+            text-align: center;
+            font-size: 7pt;
+            color: #6b7280;
+            padding-top: 3px;
+            border-top: 0.5px solid #d1d5db;
+        }
+        .doc-footer .verif-code {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #1e3a8a;
+        }
+        .doc-footer.footer-draft {
+            color: #dc2626;
+            border-top-color: #fca5a5;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+
+    @php
+        $isDraft = ($letter->status ?? 'Draft') !== 'Final';
+    @endphp
+
+    {{-- ===== Watermark ===== --}}
+    @if($isDraft)
+        <div class="wm-draft">
+            <p class="wm-word">DRAFT</p>
+            <p class="wm-sub">Belum Disahkan</p>
+        </div>
+    @else
+        <div class="wm-final">
+            @for($i = 0; $i < 14; $i++)
+                <p class="wm-line">CTECH &nbsp;&bull;&nbsp; CTECH &nbsp;&bull;&nbsp; CTECH &nbsp;&bull;&nbsp; CTECH &nbsp;&bull;&nbsp; CTECH</p>
+            @endfor
+        </div>
+    @endif
+
+    {{-- ===== Footer verifikasi (muncul di setiap halaman) ===== --}}
+    @if($isDraft)
+        <div class="doc-footer footer-draft">
+            DOKUMEN DRAFT &mdash; belum disahkan dan tidak berlaku sebagai dokumen resmi.
+            @if(!empty($isPreview)) Pratinjau sebelum surat dibuat. @endif
+        </div>
+    @else
+        <div class="doc-footer">
+            Dokumen ini diterbitkan secara elektronik oleh {{ $settings->company_name ?? 'CTECH' }} dan sah tanpa tanda tangan basah.
+            Kode Verifikasi: <span class="verif-code">{{ $verificationCode ?? '-' }}</span>
+            @if(!empty($printedAt)) &nbsp;&bull;&nbsp; Dicetak: {{ $printedAt }} @endif
+        </div>
+    @endif
 
     {{-- ===== Kop Surat ===== --}}
     <table class="kop-table">
@@ -228,7 +382,18 @@
     {{-- ===== Tanda tangan (satu-satunya blok tanda tangan; jangan tulis ulang di isi surat) ===== --}}
     <table class="signature-table">
         <tr>
-            <td style="width: 55%;"></td>
+            <td style="width: 55%; vertical-align: bottom;">
+                @if(!$isDraft)
+                    <div class="official-stamp">
+                        <div class="stamp-inner">
+                            <p class="stamp-top">Dokumen Resmi</p>
+                            <p class="stamp-main">CTECH</p>
+                            <p class="stamp-code">{{ $verificationCode ?? '' }}</p>
+                            <p class="stamp-bottom">Terverifikasi</p>
+                        </div>
+                    </div>
+                @endif
+            </td>
             <td class="signature-cell">
                 <p style="margin: 0 0 2px 0;">Hormat kami,</p>
                 <p style="margin: 0;"><strong>{{ $settings->company_name ?? '' }}</strong></p>

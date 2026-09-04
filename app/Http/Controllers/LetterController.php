@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CompanySetting;
 use App\Models\Letter;
 use App\Traits\LogsActivity;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class LetterController extends Controller
 {
     use LogsActivity;
+
     public function index(Request $request)
     {
         $search = $request->query('search', '');
@@ -20,16 +23,17 @@ class LetterController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('reference_number', 'like', "%{$search}%")
-                  ->orWhere('type', 'like', "%{$search}%")
-                  ->orWhere('recipient', 'like', "%{$search}%")
-                  ->orWhere('subject', 'like', "%{$search}%");
+                    ->orWhere('type', 'like', "%{$search}%")
+                    ->orWhere('recipient', 'like', "%{$search}%")
+                    ->orWhere('subject', 'like', "%{$search}%");
             });
         }
 
         $letters = $query->latest()->get();
+
         return Inertia::render('letters/index', [
             'letters' => $letters,
-            'search' => $search
+            'search' => $search,
         ]);
     }
 
@@ -75,31 +79,31 @@ class LetterController extends Controller
         ];
 
         $typeCode = $codeMap[$validated['type']] ?? 'SRT';
-        
-        $parsedDate = \Carbon\Carbon::parse($validated['letter_date']);
+
+        $parsedDate = Carbon::parse($validated['letter_date']);
         $year = $parsedDate->format('Y');
         $month = $parsedDate->format('m');
         $romanMonths = [
             '01' => 'I', '02' => 'II', '03' => 'III', '04' => 'IV', '05' => 'V', '06' => 'VI',
-            '07' => 'VII', '08' => 'VIII', '09' => 'IX', '10' => 'X', '11' => 'XI', '12' => 'XII'
+            '07' => 'VII', '08' => 'VIII', '09' => 'IX', '10' => 'X', '11' => 'XI', '12' => 'XII',
         ];
         $monthRoman = $romanMonths[$month];
-        
+
         // Get the latest sequence based on the letter suffix format
         $suffix = "/{$typeCode}/CTECH/{$monthRoman}/{$year}";
-        
+
         $latestLetter = Letter::where('reference_number', 'like', "%{$suffix}")
-                       ->orderBy('reference_number', 'desc')
-                       ->first();
-                       
+            ->orderBy('reference_number', 'desc')
+            ->first();
+
         if ($latestLetter) {
             $lastSequence = (int) explode('/', $latestLetter->reference_number)[0];
             $nextId = $lastSequence + 1;
         } else {
             $nextId = 1;
         }
-                       
-        $refNumber = str_pad($nextId, 3, '0', STR_PAD_LEFT) . $suffix;
+
+        $refNumber = str_pad($nextId, 3, '0', STR_PAD_LEFT).$suffix;
 
         $isNumberOnly = empty($validated['content']);
 
@@ -124,7 +128,7 @@ class LetterController extends Controller
             ? "Generate nomor surat: {$letter->reference_number}"
             : "Membuat surat baru: {$letter->reference_number}");
 
-        \Inertia\Inertia::flash('toast', [
+        Inertia::flash('toast', [
             'type' => 'success',
             'message' => $isNumberOnly
                 ? "Nomor surat berhasil digenerate: {$letter->reference_number}"
@@ -137,8 +141,11 @@ class LetterController extends Controller
     public function show(Letter $letter)
     {
         $letter->load('creator');
+
         return Inertia::render('letters/show', [
-            'letter' => $letter
+            'letter' => $letter,
+            'verification_code' => $letter->content ? $this->verificationCode($letter) : null,
+            'settings' => CompanySetting::first(),
         ]);
     }
 
@@ -146,6 +153,7 @@ class LetterController extends Controller
     {
         return Inertia::render('letters/form', [
             'letter' => null,
+            'settings' => CompanySetting::first(),
         ]);
     }
 
@@ -176,8 +184,10 @@ class LetterController extends Controller
     public function edit(Letter $letter)
     {
         $letter->load('creator');
+
         return Inertia::render('letters/form', [
             'letter' => $letter,
+            'settings' => CompanySetting::first(),
         ]);
     }
 
@@ -185,27 +195,67 @@ class LetterController extends Controller
     {
         $this->logActivity('deleted', 'Letter', $letter->id, "Menghapus surat: {$letter->reference_number}");
         $letter->delete();
+
         return redirect()->back()->with('success', 'Letter deleted.');
     }
 
     public function downloadPdf(Letter $letter)
     {
         $pdf = $this->buildPdf($letter);
-        return $pdf->download(str_replace('/', '-', $letter->reference_number) . '.pdf');
+
+        return $pdf->download(str_replace('/', '-', $letter->reference_number).'.pdf');
     }
 
     public function previewPdf(Letter $letter)
     {
         $pdf = $this->buildPdf($letter);
-        return $pdf->stream(str_replace('/', '-', $letter->reference_number) . '.pdf');
+
+        return $pdf->stream(str_replace('/', '-', $letter->reference_number).'.pdf');
     }
 
-    private function buildPdf(Letter $letter)
+    /**
+     * Pratinjau PDF dari data form sebelum surat benar-benar disimpan.
+     * Selalu diberi watermark DRAFT karena dokumennya belum resmi.
+     */
+    public function previewDraft(Request $request)
+    {
+        $validated = $request->validate([
+            'type' => 'required|string|max:255',
+            'letter_date' => 'required|date',
+            'sifat' => 'required|string|max:255',
+            'recipient' => 'required|string|max:255',
+            'subject' => 'required|string|max:255',
+            'content' => 'required|string',
+            'status' => 'nullable|in:Draft,Final',
+            'reference_number' => 'nullable|string|max:255',
+            'margin_top' => 'nullable|integer|min:5|max:60',
+            'margin_right' => 'nullable|integer|min:5|max:60',
+            'margin_bottom' => 'nullable|integer|min:5|max:60',
+            'margin_left' => 'nullable|integer|min:5|max:60',
+            'line_spacing' => 'nullable|in:1,1.15,1.5,2',
+        ]);
+
+        $letter = new Letter($validated);
+        $letter->reference_number = $validated['reference_number'] ?? 'XXX/DRAFT/CTECH';
+        // Pratinjau selalu Draft agar tidak menghasilkan dokumen yang tampak resmi
+        $letter->status = 'Draft';
+        $letter->setRelation('creator', Auth::user());
+
+        $pdf = $this->buildPdf($letter, isPreview: true);
+
+        return $pdf->stream('pratinjau-surat.pdf');
+    }
+
+    private function buildPdf(Letter $letter, bool $isPreview = false)
     {
         abort_if(empty($letter->content), 404, 'Surat ini hanya reservasi nomor, tidak memiliki isi untuk dicetak.');
 
-        $letter->load('creator');
-        $settings = \App\Models\CompanySetting::first();
+        // Model transien (pratinjau) belum punya relasi tersimpan; hanya load bila sudah ada di DB
+        if ($letter->exists && ! $letter->relationLoaded('creator')) {
+            $letter->load('creator');
+        }
+
+        $settings = CompanySetting::first();
 
         // Konten hasil paste dari Word/PDF sering penuh non-breaking space sehingga
         // dompdf tidak bisa memotong baris dan teks keluar dari halaman
@@ -215,16 +265,36 @@ class LetterController extends Controller
         $logo = null;
         $logoPath = public_path('letter/main-logo.png');
         if (is_file($logoPath) && extension_loaded('gd')) {
-            $logo = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+            $logo = 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath));
         }
 
         $pdf = Pdf::loadView('pdf.letter', [
             'letter' => $letter,
             'settings' => $settings,
             'logo' => $logo,
+            'verificationCode' => $this->verificationCode($letter),
+            'printedAt' => now()->locale('id')->translatedFormat('d M Y H:i'),
+            'isPreview' => $isPreview,
         ]);
         $pdf->setPaper('a4', 'portrait');
 
         return $pdf;
+    }
+
+    /**
+     * Kode verifikasi deterministik untuk dokumen resmi.
+     * Format: XXXX-XXXX-XXXX (12 karakter heksadesimal huruf besar).
+     */
+    private function verificationCode(Letter $letter): string
+    {
+        $seed = implode('|', [
+            $letter->reference_number ?? '',
+            $letter->id ?? 'preview',
+            optional($letter->letter_date)->format('Y-m-d') ?? '',
+        ]);
+
+        $hash = strtoupper(substr(hash('sha256', $seed), 0, 12));
+
+        return implode('-', str_split($hash, 4));
     }
 }
