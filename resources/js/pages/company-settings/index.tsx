@@ -11,7 +11,7 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
     const { data, setData, post, processing, errors } = useForm({
         company_name: settings?.company_name || '',
         leader_name: settings?.leader_name || '',
-        bank_accounts: settings?.bank_accounts?.length ? settings.bank_accounts.map((b: any, i: number) => ({...b, is_active: b.is_active !== undefined ? b.is_active : i === 0})) : [{ bank_name: settings?.bank_name || '', account_number: settings?.bank_account_number || '', account_name: settings?.bank_account_name || '', is_active: true }],
+        bank_accounts: Array.isArray(settings?.bank_accounts) && settings.bank_accounts.length > 0 ? settings.bank_accounts.map((b: any, i: number) => ({...b, is_active: b.is_active !== undefined ? b.is_active : i === 0})) : [{ bank_name: settings?.bank_name || '', account_number: settings?.bank_account_number || '', account_name: settings?.bank_account_name || '', is_active: true }],
         bank_name: settings?.bank_name || '',
         bank_account_number: settings?.bank_account_number || '',
         bank_account_name: settings?.bank_account_name || '',

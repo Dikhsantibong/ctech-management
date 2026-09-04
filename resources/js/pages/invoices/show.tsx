@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Download, FileText, Printer, CheckCircle, Eye } from 'lucide-react';
+import { ArrowLeft, Download, FileText, Printer, CheckCircle, Eye, Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -61,6 +61,11 @@ export default function InvoiceShow({ invoice }: { invoice: any }) {
                                 </SelectContent>
                             </Select>
                         </div>
+                        <Button variant="outline" asChild>
+                            <Link href={`/invoices/${invoice.id}/edit`}>
+                                <Edit2 className="mr-2 h-4 w-4" /> Edit
+                            </Link>
+                        </Button>
                         <Button asChild>
                             <a href={`/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer">
                                 <Eye className="mr-2 h-4 w-4" /> Preview PDF

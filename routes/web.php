@@ -314,6 +314,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Akses ditentukan hak akses menu (diatur direktur utama), bukan daftar role tetap
     Route::middleware('menu:invoices')->group(function () {
+        Route::post('invoices/preview-draft', [InvoiceController::class, 'previewDraft'])->name('invoices.preview-draft');
         Route::resource('invoices', InvoiceController::class);
         Route::put('invoices/{invoice}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.status');
         Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');

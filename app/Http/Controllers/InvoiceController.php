@@ -2,20 +2,45 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
+use App\Models\CompanySetting;
 use App\Models\Invoice;
+use App\Models\InvoiceItem;
 use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 
 class InvoiceController extends Controller
 {
     use LogsActivity;
+
     public function index()
     {
         $invoices = Invoice::with('items')->latest()->get();
         return Inertia::render('invoices/index', [
-            'invoices' => $invoices
+            'invoices' => $invoices,
+        ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('invoices/form', [
+            'invoice' => null,
+            'clients' => Client::orderBy('name')->get(['name', 'pic']),
+            'settings' => CompanySetting::first(),
+        ]);
+    }
+
+    public function edit(Invoice $invoice)
+    {
+        $invoice->load('items');
+
+        return Inertia::render('invoices/form', [
+            'invoice' => $invoice,
+            'clients' => Client::orderBy('name')->get(['name', 'pic']),
+            'settings' => CompanySetting::first(),
         ]);
     }
 
@@ -79,14 +104,14 @@ class InvoiceController extends Controller
 
         $this->logActivity('created', 'Invoice', $invoice->id, "Membuat invoice baru: {$invoice->invoice_number}");
 
-        return redirect()->back()->with('success', 'Invoice created successfully.');
+        return redirect()->route('invoices.index')->with('success', 'Invoice berhasil dibuat.');
     }
 
     public function show(Invoice $invoice)
     {
         $invoice->load('items');
         return Inertia::render('invoices/show', [
-            'invoice' => $invoice
+            'invoice' => $invoice,
         ]);
     }
 
@@ -143,7 +168,7 @@ class InvoiceController extends Controller
 
         $this->logActivity('updated', 'Invoice', $invoice->id, "Mengupdate invoice: {$invoice->invoice_number}");
 
-        return redirect()->back()->with('success', 'Invoice updated successfully.');
+        return redirect()->route('invoices.index')->with('success', 'Invoice berhasil diperbarui.');
     }
 
     public function updateStatus(Request $request, Invoice $invoice)
@@ -166,34 +191,62 @@ class InvoiceController extends Controller
         return redirect()->back()->with('success', 'Invoice deleted.');
     }
 
+    /**
+     * Pratinjau PDF dari data form sebelum invoice disimpan.
+     */
+    public function previewDraft(Request $request)
+    {
+        $validated = $request->validate([
+            'client_name' => 'nullable|string|max:255',
+            'due_date' => 'nullable|date',
+            'use_tax' => 'required|boolean',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
+            'items' => 'required|array|min:1',
+            'items.*.description' => 'required|string',
+            'items.*.quantity' => 'required|numeric|min:1',
+            'items.*.price' => 'required|numeric|min:0',
+        ]);
+
+        $subtotal = 0;
+        foreach ($validated['items'] as $item) {
+            $subtotal += $item['quantity'] * $item['price'];
+        }
+        $taxRate = $validated['use_tax'] ? (float) ($validated['tax_rate'] ?? 0) : 0;
+        $tax = $subtotal * ($taxRate / 100);
+        $total = $subtotal + $tax;
+
+        $invoice = new Invoice([
+            'client_name' => $validated['client_name'] ?? '-',
+            'due_date' => $validated['due_date'] ?? now()->toDateString(),
+            'subtotal' => $subtotal,
+            'tax' => $tax,
+            'total' => $total,
+            'status' => 'Draft',
+        ]);
+        $invoice->invoice_number = $request->input('invoice_number') ?: 'DRAFT';
+
+        $items = collect(array_values($validated['items']))->map(fn ($item) => new InvoiceItem([
+            'description' => $item['description'],
+            'quantity' => (float) $item['quantity'],
+            'price' => (float) $item['price'],
+            'total' => (float) $item['quantity'] * (float) $item['price'],
+        ]));
+
+        $invoice->setRelation('items', $items);
+
+        return $this->buildPdf($invoice)->stream('pratinjau-invoice.pdf');
+    }
+
     public function downloadPdf(Invoice $invoice)
     {
-        $invoice->load('items');
-
-        $settings = \App\Models\CompanySetting::first();
-
-        // Dompdf butuh ekstensi GD untuk merender PNG; tanpa guard ini server tanpa GD akan 500
-        $logo = null;
-        $logoPath = public_path('letter/main-logo.png');
-        if (is_file($logoPath) && extension_loaded('gd')) {
-            $logo = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
-        }
-
-        $pdf = Pdf::loadView('pdf.invoice', [
-            'invoice' => $invoice,
-            'settings' => $settings,
-            'logo' => $logo,
-        ])->setPaper('a4');
-
-        return $pdf->stream(str_replace('/', '-', $invoice->invoice_number) . '.pdf');
+        return $this->buildPdf($invoice)->stream(str_replace('/', '-', $invoice->invoice_number) . '.pdf');
     }
 
     public function downloadKwitansi(Invoice $invoice)
     {
         $invoice->load('items');
-        $settings = \App\Models\CompanySetting::first();
+        $settings = CompanySetting::first();
 
-        // Dompdf butuh ekstensi GD untuk merender PNG; tanpa guard ini server tanpa GD akan 500
         $logo = null;
         $logoPath = public_path('letter/main-logo.png');
         if (is_file($logoPath) && extension_loaded('gd')) {
@@ -210,5 +263,28 @@ class InvoiceController extends Controller
         ])->setPaper('a5', 'landscape');
 
         return $pdf->stream(str_replace('/', '-', $kwitansi_number) . '.pdf');
+    }
+
+    private function buildPdf(Invoice $invoice)
+    {
+        if ($invoice->exists) {
+            $invoice->load('items');
+        }
+
+        $settings = CompanySetting::first();
+
+        $logo = null;
+        $logoPath = public_path('letter/main-logo.png');
+        if (is_file($logoPath) && extension_loaded('gd')) {
+            $logo = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+        }
+
+        $pdf = Pdf::loadView('pdf.invoice', [
+            'invoice' => $invoice,
+            'settings' => $settings,
+            'logo' => $logo,
+        ])->setPaper('a4');
+
+        return $pdf;
     }
 }

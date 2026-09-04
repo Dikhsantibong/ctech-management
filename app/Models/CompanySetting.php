@@ -18,5 +18,8 @@ class CompanySetting extends Model
         'website',
         'bank_accounts',
     ];
-}
 
+    protected $casts = [
+        'bank_accounts' => 'array',
+    ];
+}
