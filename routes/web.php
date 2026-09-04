@@ -325,6 +325,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('quotations/preview-draft', [QuotationController::class, 'previewDraft'])->name('quotations.preview-draft');
         Route::resource('quotations', QuotationController::class);
         Route::put('quotations/{quotation}/status', [QuotationController::class, 'updateStatus'])->name('quotations.status');
+        Route::put('quotations/{quotation}/verify', [QuotationController::class, 'verifyDocument'])->name('quotations.verify');
+        Route::put('quotations/{quotation}/unverify', [QuotationController::class, 'unverifyDocument'])->name('quotations.unverify');
         Route::get('quotations/{quotation}/pdf', [QuotationController::class, 'downloadPdf'])->name('quotations.pdf');
         Route::get('quotations/{quotation}/preview', [QuotationController::class, 'previewPdf'])->name('quotations.preview');
     });
@@ -347,6 +349,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('letters/verify', [LetterController::class, 'verify'])->name('letters.verify');
         Route::post('letters/verify', [LetterController::class, 'verify'])->name('letters.verify.check');
         Route::resource('letters', LetterController::class);
+        Route::put('letters/{letter}/verify', [LetterController::class, 'verifyDocument'])->name('letters.verify-document');
+        Route::put('letters/{letter}/unverify', [LetterController::class, 'unverifyDocument'])->name('letters.unverify-document');
         Route::get('letters/{letter}/preview', [LetterController::class, 'previewPdf'])->name('letters.preview');
         Route::get('letters/{letter}/pdf', [LetterController::class, 'downloadPdf'])->name('letters.pdf');
     });

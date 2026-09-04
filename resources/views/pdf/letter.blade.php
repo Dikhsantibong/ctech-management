@@ -189,6 +189,7 @@
             text-align: center;
             transform: rotate(-45deg);
             transform-origin: center center;
+            font-family: Helvetica, Arial, sans-serif;
             z-index: -1;
         }
         .wm-draft .wm-word {
@@ -221,6 +222,7 @@
             z-index: -1;
         }
         .wm-final .wm-line {
+            font-family: Helvetica, Arial, sans-serif;
             font-size: 30pt;
             font-weight: bold;
             letter-spacing: 10px;
@@ -259,7 +261,8 @@
 <body>
 
     @php
-        $isDraft = ($letter->status ?? 'Draft') !== 'Final';
+        // Dokumen dianggap resmi hanya setelah diverifikasi Direktur Utama
+        $isDraft = empty($isVerified ?? false);
     @endphp
 
     {{-- ===== Watermark ===== --}}
@@ -284,6 +287,10 @@
         </div>
     @else
         <div class="doc-footer">
+            @if(!empty($verifierName))
+                Diverifikasi &amp; disahkan oleh <strong>{{ $verifierName }}</strong> (Direktur Utama){{ !empty($verifiedAt) ? ' pada '.$verifiedAt : '' }}.
+                <br>
+            @endif
             Dokumen ini dihasilkan oleh sistem informasi {{ $settings->company_name ?? 'CTECH' }}. Keabsahan dokumen mensyaratkan tanda tangan pejabat berwenang dan cap resmi perusahaan.
             <br>
             Kode Dokumen: <span class="verif-code">{{ $verificationCode ?? '-' }}</span> &nbsp;&bull;&nbsp; untuk pengecekan keaslian arsip @if(!empty($printedAt)) &nbsp;&bull;&nbsp; Dicetak: {{ $printedAt }} @endif

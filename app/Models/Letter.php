@@ -22,14 +22,22 @@ class Letter extends Model
         'margin_bottom',
         'margin_left',
         'line_spacing',
+        'verified_at',
+        'verified_by',
     ];
 
     protected $casts = [
         'letter_date' => 'date',
+        'verified_at' => 'datetime',
     ];
 
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function verifier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 }

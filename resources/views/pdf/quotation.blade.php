@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <title>Penawaran {{ $quotation->quotation_number }}</title>
     @php
-        $isDraft = ($quotation->status ?? 'Draft') === 'Draft';
+        // Dokumen dianggap resmi hanya setelah diverifikasi Direktur Utama
+        $isDraft = empty($isVerified ?? false);
         $grouped = $quotation->items->groupBy(fn ($i) => $i->category ?: '');
         $hasCategories = $quotation->items->contains(fn ($i) => ! empty($i->category));
         $sectionLetters = range('A', 'Z');
@@ -161,6 +162,10 @@
         </div>
     @else
         <div class="doc-footer">
+            @if(!empty($verifierName))
+                Diverifikasi &amp; disahkan oleh <strong>{{ $verifierName }}</strong> (Direktur Utama){{ !empty($verifiedAt) ? ' pada '.$verifiedAt : '' }}.
+                <br>
+            @endif
             Dokumen ini dihasilkan oleh sistem informasi {{ $settings->company_name ?? 'CTECH' }}. Keabsahan mensyaratkan tanda tangan pejabat berwenang dan cap resmi perusahaan.
             <br>
             Kode Dokumen: <span class="code">{{ $documentCode ?? '-' }}</span> &nbsp;&bull;&nbsp; untuk pengecekan keaslian arsip @if(!empty($printedAt)) &nbsp;&bull;&nbsp; Dicetak: {{ $printedAt }} @endif

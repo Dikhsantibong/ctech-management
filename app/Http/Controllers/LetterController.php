@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CompanySetting;
 use App\Models\Letter;
+use App\Support\MenuRegistry;
 use App\Traits\LogsActivity;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -140,13 +141,53 @@ class LetterController extends Controller
 
     public function show(Letter $letter)
     {
-        $letter->load('creator');
+        $letter->load('creator', 'verifier');
 
         return Inertia::render('letters/show', [
             'letter' => $letter,
             'verification_code' => $letter->content ? $this->verificationCode($letter) : null,
             'settings' => CompanySetting::first(),
+            'can_verify' => Auth::user()?->role === MenuRegistry::SUPER_ROLE,
         ]);
+    }
+
+    /**
+     * Verifikasi/pengesahan dokumen — hanya Direktur Utama.
+     * Menandai surat sah (Final) beserta jejak siapa & kapan memverifikasi.
+     */
+    public function verifyDocument(Letter $letter)
+    {
+        $this->authorizeVerifier();
+
+        abort_if(empty($letter->content), 422, 'Surat tanpa isi tidak dapat diverifikasi.');
+
+        $letter->update([
+            'status' => 'Final',
+            'verified_at' => now(),
+            'verified_by' => Auth::id(),
+        ]);
+
+        $this->logActivity('verified', 'Letter', $letter->id, "Memverifikasi surat: {$letter->reference_number}");
+
+        return redirect()->back()->with('success', 'Surat berhasil diverifikasi.');
+    }
+
+    /**
+     * Batalkan verifikasi — hanya Direktur Utama. Surat kembali menjadi Draft.
+     */
+    public function unverifyDocument(Letter $letter)
+    {
+        $this->authorizeVerifier();
+
+        $letter->update([
+            'status' => 'Draft',
+            'verified_at' => null,
+            'verified_by' => null,
+        ]);
+
+        $this->logActivity('unverified', 'Letter', $letter->id, "Membatalkan verifikasi surat: {$letter->reference_number}");
+
+        return redirect()->back()->with('success', 'Verifikasi surat dibatalkan.');
     }
 
     public function create()
@@ -166,7 +207,6 @@ class LetterController extends Controller
             'recipient' => 'required|string|max:255',
             'subject' => 'required|string|max:255',
             'content' => 'nullable|string',
-            'status' => 'required|in:Draft,Final',
             'margin_top' => 'nullable|integer|min:5|max:60',
             'margin_right' => 'nullable|integer|min:5|max:60',
             'margin_bottom' => 'nullable|integer|min:5|max:60',
@@ -174,6 +214,7 @@ class LetterController extends Controller
             'line_spacing' => 'nullable|in:1,1.15,1.5,2',
         ]);
 
+        // Status/pengesahan tidak diubah di sini — hanya lewat verifikasi Direktur Utama
         $letter->update($validated);
 
         $this->logActivity('updated', 'Letter', $letter->id, "Mengupdate surat: {$letter->reference_number}");
@@ -306,7 +347,7 @@ class LetterController extends Controller
 
         // Model transien (pratinjau) belum punya relasi tersimpan; hanya load bila sudah ada di DB
         if ($letter->exists && ! $letter->relationLoaded('creator')) {
-            $letter->load('creator');
+            $letter->load('creator', 'verifier');
         }
 
         $settings = CompanySetting::first();
@@ -329,6 +370,9 @@ class LetterController extends Controller
             'verificationCode' => $this->verificationCode($letter),
             'printedAt' => now()->locale('id')->translatedFormat('d M Y H:i'),
             'isPreview' => $isPreview,
+            'isVerified' => ! $isPreview && ! empty($letter->verified_at),
+            'verifierName' => $letter->verifier?->name,
+            'verifiedAt' => $letter->verified_at ? $letter->verified_at->locale('id')->translatedFormat('d F Y') : null,
         ]);
         $pdf->setPaper('a4', 'portrait');
         // Panel verifikasi memakai glyph centang dari DejaVu Sans; subsetting menjaga
@@ -355,5 +399,17 @@ class LetterController extends Controller
         $hash = strtoupper(substr(hash('sha256', $seed), 0, 12));
 
         return implode('-', str_split($hash, 4));
+    }
+
+    /**
+     * Pastikan hanya Direktur Utama yang dapat memverifikasi/membatalkan verifikasi.
+     */
+    private function authorizeVerifier(): void
+    {
+        abort_unless(
+            Auth::user()?->role === MenuRegistry::SUPER_ROLE,
+            403,
+            'Hanya Direktur Utama yang dapat memverifikasi dokumen.'
+        );
     }
 }

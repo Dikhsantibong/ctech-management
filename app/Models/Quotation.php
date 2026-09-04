@@ -27,6 +27,8 @@ class Quotation extends Model
         'total',
         'status',
         'created_by',
+        'verified_at',
+        'verified_by',
     ];
 
     protected $casts = [
@@ -38,6 +40,7 @@ class Quotation extends Model
         'subtotal' => 'decimal:2',
         'tax' => 'decimal:2',
         'total' => 'decimal:2',
+        'verified_at' => 'datetime',
     ];
 
     public function items(): HasMany
@@ -48,6 +51,11 @@ class Quotation extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function verifier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 
     public function getTerbilangAttribute(): string

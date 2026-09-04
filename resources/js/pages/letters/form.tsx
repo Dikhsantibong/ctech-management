@@ -187,18 +187,8 @@ export default function LetterForm({ letter, settings }: { letter: any | null; s
                                         <Input id="recipient" value={data.recipient} onChange={e => setData('recipient', e.target.value)} required />
                                         {errors.recipient && <p className="text-sm text-destructive">{errors.recipient}</p>}
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="status">Status</Label>
-                                        <Select value={data.status} onValueChange={val => setData('status', val)}>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select status" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="Draft">Draft</SelectItem>
-                                                <SelectItem value="Final">Final</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        {errors.status && <p className="text-sm text-destructive">{errors.status}</p>}
+                                    <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-700 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300">
+                                        Status pengesahan tidak diatur di sini. Surat menjadi <strong>resmi</strong> setelah <strong>diverifikasi oleh Direktur Utama</strong> dari halaman detail surat.
                                     </div>
                                 </CardContent>
                             </Card>

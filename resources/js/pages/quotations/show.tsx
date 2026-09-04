@@ -1,12 +1,14 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Fragment } from 'react';
-import { ArrowLeft, Download, Eye, FileSpreadsheet } from 'lucide-react';
+import { ArrowLeft, Download, Eye, FileSpreadsheet, ShieldCheck, ShieldX, Clock, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-export default function QuotationShow({ quotation }: { quotation: any; settings?: any }) {
+export default function QuotationShow({ quotation, can_verify }: { quotation: any; settings?: any; can_verify?: boolean }) {
+    const isVerified = !!quotation.verified_at;
+
     const formatCurrency = (amount: number) =>
         new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount || 0);
 
@@ -15,6 +17,9 @@ export default function QuotationShow({ quotation }: { quotation: any; settings?
     const updateStatus = (status: string) => {
         router.put(`/quotations/${quotation.id}/status`, { status }, { preserveScroll: true });
     };
+
+    const verify = () => router.put(`/quotations/${quotation.id}/verify`, {}, { preserveScroll: true });
+    const unverify = () => router.put(`/quotations/${quotation.id}/unverify`, {}, { preserveScroll: true });
 
     const statusBadge = (status: string) => {
         switch (status) {
@@ -52,9 +57,14 @@ export default function QuotationShow({ quotation }: { quotation: any; settings?
                             <Link href="/quotations"><ArrowLeft className="h-4 w-4" /></Link>
                         </Button>
                         <div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-wrap items-center gap-3">
                                 <h2 className="text-2xl font-bold tracking-tight">{quotation.quotation_number}</h2>
                                 <Badge variant={statusBadge(quotation.status)}>{quotation.status}</Badge>
+                                {isVerified && (
+                                    <span className="flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950/40 dark:text-green-300">
+                                        <ShieldCheck className="h-3.5 w-3.5" /> Terverifikasi
+                                    </span>
+                                )}
                             </div>
                             <p className="text-muted-foreground">{quotation.subject}</p>
                         </div>
@@ -71,6 +81,23 @@ export default function QuotationShow({ quotation }: { quotation: any; settings?
                                 </SelectContent>
                             </Select>
                         </div>
+                        {isVerified ? (
+                            can_verify && (
+                                <Button variant="outline" onClick={unverify} className="text-amber-600">
+                                    <ShieldX className="mr-2 h-4 w-4" /> Batalkan Verifikasi
+                                </Button>
+                            )
+                        ) : (
+                            can_verify ? (
+                                <Button onClick={verify} className="bg-green-600 hover:bg-green-700">
+                                    <ShieldCheck className="mr-2 h-4 w-4" /> Verifikasi
+                                </Button>
+                            ) : (
+                                <span className="flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-700 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300">
+                                    <Clock className="h-4 w-4" /> Menunggu verifikasi Direktur Utama
+                                </span>
+                            )
+                        )}
                         <Button variant="outline" asChild>
                             <a href={`/quotations/${quotation.id}/preview`} target="_blank" rel="noopener noreferrer"><Eye className="mr-2 h-4 w-4" /> Preview PDF</a>
                         </Button>
@@ -174,6 +201,20 @@ export default function QuotationShow({ quotation }: { quotation: any; settings?
                                 <div><p className="text-muted-foreground">Tanggal</p><p className="font-medium">{formatDate(quotation.quotation_date)}</p></div>
                                 <div><p className="text-muted-foreground">Berlaku Sampai</p><p className="font-medium">{formatDate(quotation.valid_until)}</p></div>
                                 <div><p className="text-muted-foreground">Dibuat oleh</p><p className="font-medium">{quotation.creator?.name || '-'}</p></div>
+                                {isVerified ? (
+                                    <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3 text-green-700 dark:border-green-900 dark:bg-green-950/30 dark:text-green-300">
+                                        <CheckCircle className="mt-0.5 h-5 w-5 shrink-0" />
+                                        <div>
+                                            <p className="font-medium">Terverifikasi &amp; Sah</p>
+                                            <p className="text-xs opacity-90">oleh {quotation.verifier?.name || 'Direktur Utama'}{quotation.verified_at ? ` · ${formatDate(quotation.verified_at)}` : ''}</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-700 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300">
+                                        <Clock className="h-5 w-5" />
+                                        <span className="font-medium">Belum diverifikasi</span>
+                                    </div>
+                                )}
                                 <div className="rounded-lg border bg-muted/30 p-3">
                                     <p className="text-xs text-muted-foreground">Grand Total</p>
                                     <p className="text-lg font-bold text-primary">{formatCurrency(Number(quotation.total))}</p>

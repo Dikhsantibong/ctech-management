@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\CompanySetting;
 use App\Models\Quotation;
 use App\Models\QuotationItem;
+use App\Support\MenuRegistry;
 use App\Traits\LogsActivity;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -83,12 +84,47 @@ class QuotationController extends Controller
 
     public function show(Quotation $quotation)
     {
-        $quotation->load('items', 'creator');
+        $quotation->load('items', 'creator', 'verifier');
 
         return Inertia::render('quotations/show', [
             'quotation' => $quotation,
             'settings' => CompanySetting::first(),
+            'can_verify' => Auth::user()?->role === MenuRegistry::SUPER_ROLE,
         ]);
+    }
+
+    /**
+     * Verifikasi/pengesahan penawaran (RAB) — hanya Direktur Utama.
+     */
+    public function verifyDocument(Quotation $quotation)
+    {
+        $this->authorizeVerifier();
+
+        $quotation->update([
+            'verified_at' => now(),
+            'verified_by' => Auth::id(),
+        ]);
+
+        $this->logActivity('verified', 'Quotation', $quotation->id, "Memverifikasi penawaran: {$quotation->quotation_number}");
+
+        return redirect()->back()->with('success', 'Penawaran berhasil diverifikasi.');
+    }
+
+    /**
+     * Batalkan verifikasi penawaran — hanya Direktur Utama.
+     */
+    public function unverifyDocument(Quotation $quotation)
+    {
+        $this->authorizeVerifier();
+
+        $quotation->update([
+            'verified_at' => null,
+            'verified_by' => null,
+        ]);
+
+        $this->logActivity('unverified', 'Quotation', $quotation->id, "Membatalkan verifikasi penawaran: {$quotation->quotation_number}");
+
+        return redirect()->back()->with('success', 'Verifikasi penawaran dibatalkan.');
     }
 
     public function update(Request $request, Quotation $quotation)
@@ -329,7 +365,7 @@ class QuotationController extends Controller
         // Model transien (pratinjau) sudah punya relasi yang di-set manual;
         // hanya muat ulang dari DB bila record memang sudah tersimpan.
         if ($quotation->exists) {
-            $quotation->load('items', 'creator');
+            $quotation->load('items', 'creator', 'verifier');
         }
 
         $settings = CompanySetting::first();
@@ -346,6 +382,9 @@ class QuotationController extends Controller
             'logo' => $logo,
             'documentCode' => $this->documentCode($quotation),
             'printedAt' => now()->locale('id')->translatedFormat('d M Y H:i'),
+            'isVerified' => ! empty($quotation->verified_at),
+            'verifierName' => $quotation->verifier?->name,
+            'verifiedAt' => $quotation->verified_at ? $quotation->verified_at->locale('id')->translatedFormat('d F Y') : null,
         ]);
         $pdf->setPaper('a4', 'portrait');
         $pdf->setOption('isFontSubsettingEnabled', true);
@@ -365,5 +404,17 @@ class QuotationController extends Controller
         ]);
 
         return implode('-', str_split(strtoupper(substr(hash('sha256', $seed), 0, 12)), 4));
+    }
+
+    /**
+     * Pastikan hanya Direktur Utama yang dapat memverifikasi/membatalkan verifikasi.
+     */
+    private function authorizeVerifier(): void
+    {
+        abort_unless(
+            Auth::user()?->role === MenuRegistry::SUPER_ROLE,
+            403,
+            'Hanya Direktur Utama yang dapat memverifikasi dokumen.'
+        );
     }
 }
