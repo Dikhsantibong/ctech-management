@@ -24,47 +24,75 @@
             margin: 0;
         }
 
-        /* ===== Kop Surat ===== */
-        .kop-table {
+        /* ===== Kop Surat (Modern Tech Corporate) ===== */
+        .letterhead {
             width: 100%;
             border-collapse: collapse;
         }
-        .kop-logo-cell {
-            width: 80px;
+        .lh-logo-cell {
+            width: 66px;
             vertical-align: middle;
-            text-align: left;
         }
-        .kop-text-cell {
+        .lh-brand-cell {
             vertical-align: middle;
-            text-align: center;
-            padding: 0 80px 0 0; /* balance the logo width so text stays centered on the page */
+            padding-left: 12px;
         }
-        .kop-company {
-            font-size: 17pt;
+        .lh-name {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 18pt;
             font-weight: bold;
-            letter-spacing: 1px;
-            color: #1e3a8a;
+            color: #0f172a;
+            letter-spacing: 0.3px;
             text-transform: uppercase;
             margin: 0;
+            line-height: 1.05;
         }
-        .kop-address {
-            font-size: 9pt;
-            color: #374151;
-            margin: 3px 0 0 0;
+        .lh-tagline {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 7pt;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #2563eb;
+            margin: 4px 0 0 0;
         }
-        .kop-contact {
-            font-size: 9pt;
-            color: #374151;
-            margin: 1px 0 0 0;
+        .lh-contact-cell {
+            vertical-align: middle;
+            text-align: right;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 8pt;
+            color: #475569;
+            line-height: 1.55;
         }
-        .kop-rule-thick {
-            border-bottom: 3px solid #1e3a8a;
-            margin-top: 10px;
+        .lh-contact-cell p {
+            margin: 0;
         }
-        .kop-rule-thin {
-            border-bottom: 1px solid #1e3a8a;
-            margin-top: 2px;
-            margin-bottom: 18px;
+        .lh-contact-cell .lh-c-label {
+            color: #94a3b8;
+            font-weight: bold;
+        }
+        /* Accent bar dua warna + hairline */
+        .lh-bar {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        .lh-bar td {
+            height: 4px;
+            padding: 0;
+            font-size: 0;
+            line-height: 0;
+        }
+        .lh-bar-accent {
+            width: 84px;
+            background-color: #22d3ee;
+        }
+        .lh-bar-primary {
+            background-color: #2563eb;
+        }
+        .lh-subrule {
+            border-bottom: 0.75px solid #e2e8f0;
+            margin-top: 3px;
+            margin-bottom: 20px;
         }
 
         /* ===== Meta ===== */
@@ -203,54 +231,7 @@
             margin: 0;
         }
 
-        /* ===== Stempel / cap resmi ===== */
-        .official-stamp {
-            width: 118px;
-            height: 118px;
-            border: 2.5px solid #1e3a8a;
-            border-radius: 50%;
-            text-align: center;
-            color: #1e3a8a;
-            transform: rotate(-14deg);
-            padding: 0;
-            margin: 6px 0 0 8px;
-            opacity: 0.9;
-        }
-        .official-stamp .stamp-inner {
-            border: 1px solid #1e3a8a;
-            border-radius: 50%;
-            width: 104px;
-            height: 104px;
-            margin: 5px auto;
-            padding-top: 20px;
-        }
-        .official-stamp .stamp-top {
-            font-size: 6.5pt;
-            font-weight: bold;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin: 0;
-        }
-        .official-stamp .stamp-main {
-            font-size: 12pt;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin: 6px 0 4px 0;
-        }
-        .official-stamp .stamp-code {
-            font-size: 6pt;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 0.5px;
-            margin: 0;
-        }
-        .official-stamp .stamp-bottom {
-            font-size: 5.5pt;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin: 4px 0 0 0;
-        }
-
-        /* ===== Footer verifikasi (di dalam margin bawah) ===== */
+        /* ===== Footer kode dokumen (di dalam margin bawah) ===== */
         .doc-footer {
             position: fixed;
             left: 0;
@@ -303,33 +284,39 @@
         </div>
     @else
         <div class="doc-footer">
-            Dokumen ini diterbitkan secara elektronik oleh {{ $settings->company_name ?? 'CTECH' }} dan sah tanpa tanda tangan basah.
-            Kode Verifikasi: <span class="verif-code">{{ $verificationCode ?? '-' }}</span>
-            @if(!empty($printedAt)) &nbsp;&bull;&nbsp; Dicetak: {{ $printedAt }} @endif
+            Dokumen ini dihasilkan oleh sistem informasi {{ $settings->company_name ?? 'CTECH' }}. Keabsahan dokumen mensyaratkan tanda tangan pejabat berwenang dan cap resmi perusahaan.
+            <br>
+            Kode Dokumen: <span class="verif-code">{{ $verificationCode ?? '-' }}</span> &nbsp;&bull;&nbsp; untuk pengecekan keaslian arsip @if(!empty($printedAt)) &nbsp;&bull;&nbsp; Dicetak: {{ $printedAt }} @endif
         </div>
     @endif
 
-    {{-- ===== Kop Surat ===== --}}
-    <table class="kop-table">
+    {{-- ===== Kop Surat (Modern Tech Corporate) ===== --}}
+    <table class="letterhead">
         <tr>
-            <td class="kop-logo-cell">
-                @if(!empty($logo))
-                    <img src="{{ $logo }}" style="width: 64px;" alt="Logo">
-                @endif
+            @if(!empty($logo))
+                <td class="lh-logo-cell">
+                    <img src="{{ $logo }}" style="width: 60px;" alt="Logo">
+                </td>
+            @endif
+            <td class="lh-brand-cell" @if(empty($logo)) style="padding-left: 0;" @endif>
+                <p class="lh-name">{{ $settings->company_name ?? 'PT KREATIF TEKNOLOGI MAJU BERSAMA' }}</p>
+                <p class="lh-tagline">Technology &bull; Digital &bull; Creative Solutions</p>
             </td>
-            <td class="kop-text-cell" @if(empty($logo)) style="padding: 0;" @endif>
-                <p class="kop-company">{{ $settings->company_name ?? 'PT KREATIF TEKNOLOGI MAJU BERSAMA' }}</p>
-                <p class="kop-address">{{ $settings->address ?? '' }}</p>
-                <p class="kop-contact">
-                    @if(!empty($settings->phone)) Telp: {{ $settings->phone }} @endif
-                    @if(!empty($settings->email)) &bull; Email: {{ $settings->email }} @endif
-                    @if(!empty($settings->website)) &bull; {{ $settings->website }} @endif
-                </p>
+            <td class="lh-contact-cell">
+                @if(!empty($settings->address))<p>{{ $settings->address }}</p>@endif
+                @if(!empty($settings->phone))<p><span class="lh-c-label">T</span> {{ $settings->phone }}</p>@endif
+                @if(!empty($settings->email))<p><span class="lh-c-label">E</span> {{ $settings->email }}</p>@endif
+                @if(!empty($settings->website))<p><span class="lh-c-label">W</span> {{ $settings->website }}</p>@endif
             </td>
         </tr>
     </table>
-    <div class="kop-rule-thick"></div>
-    <div class="kop-rule-thin"></div>
+    <table class="lh-bar">
+        <tr>
+            <td class="lh-bar-accent"></td>
+            <td class="lh-bar-primary"></td>
+        </tr>
+    </table>
+    <div class="lh-subrule"></div>
 
     {{-- ===== Tanggal ===== --}}
     <div class="date-line">
@@ -382,18 +369,7 @@
     {{-- ===== Tanda tangan (satu-satunya blok tanda tangan; jangan tulis ulang di isi surat) ===== --}}
     <table class="signature-table">
         <tr>
-            <td style="width: 55%; vertical-align: bottom;">
-                @if(!$isDraft)
-                    <div class="official-stamp">
-                        <div class="stamp-inner">
-                            <p class="stamp-top">Dokumen Resmi</p>
-                            <p class="stamp-main">CTECH</p>
-                            <p class="stamp-code">{{ $verificationCode ?? '' }}</p>
-                            <p class="stamp-bottom">Terverifikasi</p>
-                        </div>
-                    </div>
-                @endif
-            </td>
+            <td style="width: 55%; vertical-align: bottom;"></td>
             <td class="signature-cell">
                 <p style="margin: 0 0 2px 0;">Hormat kami,</p>
                 <p style="margin: 0;"><strong>{{ $settings->company_name ?? '' }}</strong></p>

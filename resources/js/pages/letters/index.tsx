@@ -1,6 +1,6 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { Plus, MoreVertical, Mail, Trash2, Eye, Edit2, Search, Hash } from 'lucide-react';
+import { Plus, MoreVertical, Mail, Trash2, Eye, Edit2, Search, Hash, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -213,6 +213,9 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                         <p className="text-muted-foreground">Manage official company correspondence.</p>
                     </div>
                     <div className="flex items-center gap-2">
+                        <Button variant="outline" asChild>
+                            <Link href="/letters/verify"><ShieldCheck className="mr-2 h-4 w-4" /> Verifikasi Dokumen</Link>
+                        </Button>
                         <Button variant="outline" onClick={openNumberModal}>
                             <Hash className="mr-2 h-4 w-4" /> Generate Nomor Saja
                         </Button>

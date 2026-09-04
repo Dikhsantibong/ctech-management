@@ -23,6 +23,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SocialAccountController;
@@ -319,6 +320,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('invoices/{invoice}/kwitansi', [InvoiceController::class, 'downloadKwitansi'])->name('invoices.kwitansi');
     });
 
+    Route::middleware('menu:quotations')->group(function () {
+        Route::post('quotations/preview-draft', [QuotationController::class, 'previewDraft'])->name('quotations.preview-draft');
+        Route::resource('quotations', QuotationController::class);
+        Route::put('quotations/{quotation}/status', [QuotationController::class, 'updateStatus'])->name('quotations.status');
+        Route::get('quotations/{quotation}/pdf', [QuotationController::class, 'downloadPdf'])->name('quotations.pdf');
+        Route::get('quotations/{quotation}/preview', [QuotationController::class, 'previewPdf'])->name('quotations.preview');
+    });
+
     Route::middleware('menu:app-subscriptions')->group(function () {
         Route::resource('app-subscriptions', AppSubscriptionController::class)->except(['create', 'edit', 'show']);
 
@@ -334,6 +343,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware('menu:letters')->group(function () {
         Route::post('letters/preview-draft', [LetterController::class, 'previewDraft'])->name('letters.preview-draft');
+        Route::get('letters/verify', [LetterController::class, 'verify'])->name('letters.verify');
+        Route::post('letters/verify', [LetterController::class, 'verify'])->name('letters.verify.check');
         Route::resource('letters', LetterController::class);
         Route::get('letters/{letter}/preview', [LetterController::class, 'previewPdf'])->name('letters.preview');
         Route::get('letters/{letter}/pdf', [LetterController::class, 'downloadPdf'])->name('letters.pdf');

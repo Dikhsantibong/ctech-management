@@ -219,14 +219,15 @@ class LetterController extends Controller
      */
     public function previewDraft(Request $request)
     {
+        // Pratinjau bersifat longgar: hanya isi surat yang wajib agar draft
+        // setengah jadi tetap bisa dilihat. Field lain diberi nilai default.
         $validated = $request->validate([
-            'type' => 'required|string|max:255',
-            'letter_date' => 'required|date',
-            'sifat' => 'required|string|max:255',
-            'recipient' => 'required|string|max:255',
-            'subject' => 'required|string|max:255',
+            'type' => 'nullable|string|max:255',
+            'letter_date' => 'nullable|date',
+            'sifat' => 'nullable|string|max:255',
+            'recipient' => 'nullable|string|max:255',
+            'subject' => 'nullable|string|max:255',
             'content' => 'required|string',
-            'status' => 'nullable|in:Draft,Final',
             'reference_number' => 'nullable|string|max:255',
             'margin_top' => 'nullable|integer|min:5|max:60',
             'margin_right' => 'nullable|integer|min:5|max:60',
@@ -235,7 +236,19 @@ class LetterController extends Controller
             'line_spacing' => 'nullable|in:1,1.15,1.5,2',
         ]);
 
-        $letter = new Letter($validated);
+        $letter = new Letter([
+            'type' => $validated['type'] ?? 'Surat',
+            'letter_date' => $validated['letter_date'] ?? now()->toDateString(),
+            'sifat' => $validated['sifat'] ?? 'Biasa',
+            'recipient' => $validated['recipient'] ?? '-',
+            'subject' => $validated['subject'] ?? '-',
+            'content' => $validated['content'],
+            'margin_top' => $validated['margin_top'] ?? null,
+            'margin_right' => $validated['margin_right'] ?? null,
+            'margin_bottom' => $validated['margin_bottom'] ?? null,
+            'margin_left' => $validated['margin_left'] ?? null,
+            'line_spacing' => $validated['line_spacing'] ?? null,
+        ]);
         $letter->reference_number = $validated['reference_number'] ?? 'XXX/DRAFT/CTECH';
         // Pratinjau selalu Draft agar tidak menghasilkan dokumen yang tampak resmi
         $letter->status = 'Draft';
@@ -244,6 +257,47 @@ class LetterController extends Controller
         $pdf = $this->buildPdf($letter, isPreview: true);
 
         return $pdf->stream('pratinjau-surat.pdf');
+    }
+
+    /**
+     * Halaman verifikasi internal: mencocokkan Kode Dokumen ke arsip surat.
+     * Bukan verifikasi TTE tersertifikasi — hanya konfirmasi keaslian arsip
+     * internal untuk staf yang sudah login.
+     */
+    public function verify(Request $request)
+    {
+        $input = (string) $request->input('code', '');
+        $normalized = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $input));
+
+        $result = null;
+
+        if ($normalized !== '') {
+            $match = Letter::with('creator')->get()->first(
+                fn (Letter $letter) => str_replace('-', '', $this->verificationCode($letter)) === $normalized
+            );
+
+            if ($match) {
+                $result = [
+                    'found' => true,
+                    'reference_number' => $match->reference_number,
+                    'type' => $match->type,
+                    'subject' => $match->subject,
+                    'recipient' => $match->recipient,
+                    'letter_date' => optional($match->letter_date)->toDateString(),
+                    'status' => $match->status,
+                    'issuer' => CompanySetting::first()?->company_name,
+                    'creator' => $match->creator?->name,
+                    'code' => $this->verificationCode($match),
+                ];
+            } else {
+                $result = ['found' => false];
+            }
+        }
+
+        return Inertia::render('letters/verify', [
+            'code' => $input,
+            'result' => $result,
+        ]);
     }
 
     private function buildPdf(Letter $letter, bool $isPreview = false)
@@ -277,12 +331,17 @@ class LetterController extends Controller
             'isPreview' => $isPreview,
         ]);
         $pdf->setPaper('a4', 'portrait');
+        // Panel verifikasi memakai glyph centang dari DejaVu Sans; subsetting menjaga
+        // ukuran PDF tetap kecil (hanya glyph terpakai yang di-embed, bukan seluruh font)
+        $pdf->setOption('isFontSubsettingEnabled', true);
 
         return $pdf;
     }
 
     /**
-     * Kode verifikasi deterministik untuk dokumen resmi.
+     * Kode dokumen deterministik untuk kebutuhan penomoran arsip internal.
+     * Bukan tanda tangan/verifikasi elektronik tersertifikasi (TTE) — hanya
+     * referensi pengecekan keaslian arsip di sistem perusahaan.
      * Format: XXXX-XXXX-XXXX (12 karakter heksadesimal huruf besar).
      */
     private function verificationCode(Letter $letter): string

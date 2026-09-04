@@ -55,6 +55,10 @@ class MenuRegistry
             ],
 
             // ===== Finance =====
+            'quotations' => [
+                'label' => 'Penawaran / RAB', 'href' => '/quotations', 'group' => 'Finance', 'icon' => 'FileSpreadsheet',
+                'defaults' => ['administrasi', 'marketing'],
+            ],
             'invoices' => [
                 'label' => 'Invoices', 'href' => '/invoices', 'group' => 'Finance', 'icon' => 'Receipt',
                 'defaults' => ['administrasi'],

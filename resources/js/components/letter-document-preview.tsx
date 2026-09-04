@@ -128,21 +128,25 @@ export default function LetterDocumentPreview({
 
                 {/* ===== Konten dokumen ===== */}
                 <div className="relative z-10">
-                    {/* Kop surat */}
-                    <div className="flex items-center gap-4 pb-2">
-                        <img src="/letter/main-logo.png" alt="Logo" className="h-16 w-16 object-contain" onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')} />
-                        <div className="flex-1 pr-16 text-center">
-                            <p className="m-0 text-[17px] font-bold uppercase tracking-wide text-[#1e3a8a]">{companyName}</p>
-                            {settings?.address && <p className="m-0 mt-1 text-[10px] text-gray-700">{settings.address}</p>}
-                            <p className="m-0 text-[10px] text-gray-700">
-                                {settings?.phone && <span>Telp: {settings.phone} </span>}
-                                {settings?.email && <span>&bull; Email: {settings.email} </span>}
-                                {settings?.website && <span>&bull; {settings.website}</span>}
-                            </p>
+                    {/* Kop surat modern (asimetris, gaya tech corporate) */}
+                    <div className="flex items-center gap-3 pb-1">
+                        <img src="/letter/main-logo.png" alt="Logo" className="h-14 w-14 shrink-0 object-contain" onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')} />
+                        <div className="min-w-0 flex-1 font-sans">
+                            <p className="m-0 truncate text-[17px] font-bold uppercase leading-tight tracking-wide text-slate-900">{companyName}</p>
+                            <p className="m-0 mt-1 text-[8px] font-semibold uppercase tracking-[3px] text-blue-600">Technology &bull; Digital &bull; Creative Solutions</p>
+                        </div>
+                        <div className="shrink-0 text-right font-sans text-[9px] leading-relaxed text-slate-500">
+                            {settings?.address && <p className="m-0 max-w-[180px] text-slate-600">{settings.address}</p>}
+                            {settings?.phone && <p className="m-0"><span className="font-bold text-slate-400">T</span> {settings.phone}</p>}
+                            {settings?.email && <p className="m-0"><span className="font-bold text-slate-400">E</span> {settings.email}</p>}
+                            {settings?.website && <p className="m-0"><span className="font-bold text-slate-400">W</span> {settings.website}</p>}
                         </div>
                     </div>
-                    <div className="border-b-[3px] border-[#1e3a8a]" />
-                    <div className="mb-4 mt-0.5 border-b border-[#1e3a8a]" />
+                    <div className="mt-3 flex h-[4px] w-full overflow-hidden">
+                        <div className="w-[70px] bg-cyan-400" />
+                        <div className="flex-1 bg-blue-600" />
+                    </div>
+                    <div className="mb-5 mt-[3px] border-b border-slate-200" />
 
                     {/* Tanggal */}
                     <div className="mb-1.5 text-right">Kendari, {formatIndoDate(data.letter_date) || '—'}</div>
@@ -199,23 +203,9 @@ export default function LetterDocumentPreview({
                         <p className="italic text-gray-400">Isi surat akan tampil di sini…</p>
                     )}
 
-                    {/* Tanda tangan + stempel */}
+                    {/* Tanda tangan */}
                     <div className="mt-8 flex items-end justify-between">
-                        <div className="relative h-[130px] w-[45%]">
-                            {isFinal && (
-                                <div
-                                    className="flex h-[118px] w-[118px] items-center justify-center rounded-full border-[2.5px] border-[#1e3a8a] text-center text-[#1e3a8a]"
-                                    style={{ transform: 'rotate(-14deg)', opacity: 0.9 }}
-                                >
-                                    <div className="flex h-[104px] w-[104px] flex-col items-center justify-center rounded-full border border-[#1e3a8a]">
-                                        <div className="text-[7px] font-bold uppercase tracking-wide">Dokumen Resmi</div>
-                                        <div className="my-0.5 text-[13px] font-bold tracking-widest">CTECH</div>
-                                        <div className="font-mono text-[6px]">{verificationCode || ''}</div>
-                                        <div className="mt-0.5 text-[6px] uppercase tracking-wide">Terverifikasi</div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        <div className="w-[50%]" />
                         <div className="w-[45%] text-center">
                             <p className="m-0">Hormat kami,</p>
                             <p className="m-0 font-bold">{companyName}</p>
@@ -225,13 +215,15 @@ export default function LetterDocumentPreview({
                         </div>
                     </div>
 
-                    {/* Footer verifikasi */}
+                    {/* Footer kode dokumen */}
                     <div className="mt-8 border-t pt-2 text-center text-[9px]">
                         {isFinal ? (
                             <p className="m-0 text-gray-500">
-                                Dokumen ini diterbitkan secara elektronik oleh {companyName} dan sah tanpa tanda tangan basah.{' '}
-                                Kode Verifikasi:{' '}
-                                <span className="font-mono font-bold tracking-wide text-[#1e3a8a]">{verificationCode || '—'}</span>
+                                Dokumen ini dihasilkan oleh sistem informasi {companyName}. Keabsahan dokumen mensyaratkan tanda tangan pejabat berwenang dan cap resmi perusahaan.
+                                <br />
+                                Kode Dokumen:{' '}
+                                <span className="font-mono font-bold tracking-wide text-slate-600">{verificationCode || '—'}</span>{' '}
+                                &bull; untuk pengecekan keaslian arsip
                             </p>
                         ) : (
                             <p className="m-0 flex items-center justify-center gap-1 font-semibold text-red-600">

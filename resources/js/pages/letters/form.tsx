@@ -86,20 +86,35 @@ export default function LetterForm({ letter, settings }: { letter: any | null; s
                 headers: {
                     'Content-Type': 'application/json',
                     'X-XSRF-TOKEN': xsrf,
-                    Accept: 'application/pdf',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    Accept: 'application/json',
                 },
                 body: JSON.stringify({ ...data, reference_number: letter?.reference_number }),
             });
-            if (!response.ok) {
-                throw new Error('Gagal membuat pratinjau PDF.');
+
+            const contentType = response.headers.get('content-type') || '';
+
+            // Bila bukan PDF (validasi gagal / sesi habis), tampilkan pesan yang jelas
+            // alih-alih membuka blob HTML yang bikin "Failed to load PDF document".
+            if (!response.ok || !contentType.includes('pdf')) {
+                let message = 'Gagal membuat pratinjau PDF. Pastikan isi surat sudah terisi.';
+                if (contentType.includes('json')) {
+                    const body = await response.json();
+                    message = body?.message || Object.values(body?.errors || {}).flat().join('\n') || message;
+                } else if (response.status === 419) {
+                    message = 'Sesi kedaluwarsa. Muat ulang halaman lalu coba lagi.';
+                }
+                alert(message);
+                return;
             }
+
             const blob = await response.blob();
             const url = URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
             window.open(url, '_blank', 'noopener,noreferrer');
             setTimeout(() => URL.revokeObjectURL(url), 60000);
         } catch (error) {
             console.error(error);
-            alert('Gagal membuat pratinjau PDF. Pastikan semua field wajib telah diisi.');
+            alert('Gagal membuat pratinjau PDF. Periksa koneksi lalu coba lagi.');
         } finally {
             setPdfLoading(false);
         }
@@ -240,7 +255,7 @@ export default function LetterForm({ letter, settings }: { letter: any | null; s
                                             <div className="flex items-center justify-between">
                                                 <Label>Pratinjau Dokumen</Label>
                                                 <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${data.status === 'Final' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300' : 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300'}`}>
-                                                    {data.status === 'Final' ? 'Tampilan Final + Cap Resmi' : 'Watermark DRAFT'}
+                                                    {data.status === 'Final' ? 'Watermark CTECH' : 'Watermark DRAFT'}
                                                 </span>
                                             </div>
                                             <div className="max-h-[600px] overflow-auto rounded-lg border bg-muted/30 p-4">

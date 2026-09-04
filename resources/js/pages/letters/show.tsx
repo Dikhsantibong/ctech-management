@@ -91,7 +91,7 @@ export default function LetterShow({
                                     {letter.content && (
                                         <span className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${letter.status === 'Final' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300' : 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300'}`}>
                                             <ShieldCheck className="h-3.5 w-3.5" />
-                                            {letter.status === 'Final' ? 'Final — Cap Resmi' : 'Draft — Watermark'}
+                                            {letter.status === 'Final' ? 'Final — Watermark CTECH' : 'Draft — Watermark'}
                                         </span>
                                     )}
                                 </div>

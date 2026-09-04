@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     LayoutGrid, Briefcase, ListTodo, Receipt, Mail, MailOpen, FileStack, Files, Users, Activity,
     Settings, Megaphone, Building2, Calendar, Newspaper, Bell, ClipboardList, Gauge, ShieldCheck, Share2, Circle,
+    FileSpreadsheet,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -22,6 +23,7 @@ import type { NavItem } from '@/types';
 const ICONS: Record<string, any> = {
     LayoutGrid, Briefcase, ListTodo, Receipt, Mail, MailOpen, FileStack, Files, Users, Activity,
     Settings, Megaphone, Building2, Calendar, Newspaper, Bell, ClipboardList, Gauge, ShieldCheck, Share2,
+    FileSpreadsheet,
 };
 
 /** Menu yang selalu tersedia untuk semua orang. */
