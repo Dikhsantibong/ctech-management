@@ -2,7 +2,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import {
     ArrowLeft, Calendar, Users, Briefcase, FileText, Globe, Github, Figma, Server, Code, Edit, Plus,
     Target, ListChecks, RefreshCw, MessageSquare, CalendarClock, LayoutDashboard, Clock, AlertTriangle,
-    CheckCircle2, TrendingUp, Link2, ExternalLink,
+    CheckCircle2, TrendingUp, Link2, ExternalLink, Workflow, Database, Share2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -195,6 +195,7 @@ export default function ProjectShow({ project }: { project: any }) {
         { value: 'overview', label: 'Ringkasan', icon: LayoutDashboard, count: null },
         { value: 'milestones', label: 'Milestone', icon: Target, count: milestones.length },
         { value: 'documents', label: 'Dokumen', icon: FileText, count: documents.length },
+        { value: 'canvas', label: 'Canvas', icon: Workflow, count: null },
         { value: 'meetings', label: 'Meeting', icon: CalendarClock, count: meetings.length },
         { value: 'activity', label: 'Aktivitas', icon: TrendingUp, count: null },
         { value: 'revisions', label: 'Revisi', icon: RefreshCw, count: revisions.length },
@@ -206,104 +207,63 @@ export default function ProjectShow({ project }: { project: any }) {
             <Head title={project.project_name} />
             <div className="flex flex-1 flex-col gap-6 p-6">
                 {/* ===== Header ===== */}
-                <div className="overflow-hidden rounded-lg border bg-muted/10 to-card">
-                    <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="flex items-start gap-4">
-                            <Button variant="outline" size="icon" asChild className="mt-0.5 shrink-0">
-                                <Link href="/projects">
-                                    <ArrowLeft className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <div className="min-w-0">
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <h2 className="text-2xl font-bold tracking-tight">{project.project_name}</h2>
-                                    <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusStyle.chip}`}>
-                                        {statusStyle.label}
+                <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex min-w-0 items-center gap-3">
+                        <Button variant="outline" size="icon" asChild className="shrink-0">
+                            <Link href="/projects">
+                                <ArrowLeft className="h-4 w-4" />
+                            </Link>
+                        </Button>
+                        <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <h2 className="truncate text-xl font-bold tracking-tight">{project.project_name}</h2>
+                                <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusStyle.chip}`}>
+                                    {statusStyle.label}
+                                </span>
+                                {project.project_type && (
+                                    <span className="hidden rounded-full border bg-muted/60 px-2.5 py-0.5 text-xs text-muted-foreground sm:inline">
+                                        {project.project_type}
                                     </span>
-                                    {project.project_type && (
-                                        <span className="rounded-full border bg-muted/60 px-2.5 py-0.5 text-xs text-muted-foreground">
-                                            {project.project_type}
-                                        </span>
-                                    )}
-                                </div>
-                                <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-                                    <Briefcase className="h-4 w-4" /> {project.client_name}
-                                </p>
+                                )}
                             </div>
+                            <p className="mt-0.5 flex items-center gap-1.5 text-sm text-muted-foreground">
+                                <Briefcase className="h-3.5 w-3.5" /> {project.client_name}
+                            </p>
                         </div>
+                    </div>
 
-                        {/* Peringatan deadline — hanya muncul saat perlu perhatian */}
+                    <div className="flex items-center gap-3 sm:shrink-0">
                         {(isOverdue || isDueSoon) && (
                             <div
-                                className={`flex items-center gap-2 self-start rounded-lg border px-3 py-2 text-sm font-medium ${
+                                className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium ${
                                     isOverdue
                                         ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300'
                                         : 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300'
                                 }`}
                             >
-                                {isOverdue ? <AlertTriangle className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
+                                {isOverdue ? <AlertTriangle className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
                                 {deadlineHint}
                             </div>
                         )}
-                    </div>
-
-                    {/* Progress bar keseluruhan */}
-                    <div className="border-t bg-muted/20 px-5 py-3">
-                        <div className="mb-1.5 flex items-center justify-between text-xs">
-                            <span className="font-medium text-muted-foreground">Progress Keseluruhan</span>
-                            <span className="font-semibold">{progress}%</span>
+                        <div className="min-w-[132px]">
+                            <div className="mb-1 flex items-center justify-between text-xs">
+                                <span className="text-muted-foreground">Progress</span>
+                                <span className="font-semibold">{progress}%</span>
+                            </div>
+                            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                                <div
+                                    className={`h-full rounded-full transition-all duration-500 ${statusStyle.bar}`}
+                                    style={{ width: `${progress}%` }}
+                                />
+                            </div>
                         </div>
-                        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                            <div
-                                className={`h-full rounded-full transition-all duration-500 ${statusStyle.bar}`}
-                                style={{ width: `${progress}%` }}
-                            />
-                        </div>
-                        <p className="mt-1.5 text-xs text-muted-foreground">
-                            {milestones.length > 0
-                                ? `Dihitung dari rata-rata progress ${milestones.length} milestone.`
-                                : tasks.length > 0
-                                    ? `Dihitung dari ${doneTasks} dari ${tasks.length} task yang selesai.`
-                                    : 'Tambahkan milestone atau task untuk mulai melacak progress.'}
-                        </p>
                     </div>
-                </div>
-
-                {/* ===== Ringkasan angka ===== */}
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <StatCard
-                        icon={Target}
-                        label="Milestone"
-                        value={`${doneMilestones}/${milestones.length}`}
-                        hint="milestone selesai"
-                        tone="blue"
-                    />
-                    <StatCard
-                        icon={ListChecks}
-                        label="Task"
-                        value={`${doneTasks}/${tasks.length}`}
-                        hint="task selesai"
-                        tone="emerald"
-                    />
-                    <StatCard
-                        icon={RefreshCw}
-                        label="Revisi Terbuka"
-                        value={openRevisions}
-                        hint={`dari ${revisions.length} total revisi`}
-                        tone="amber"
-                    />
-                    <StatCard
-                        icon={Calendar}
-                        label="Deadline"
-                        value={<span className="text-base">{formatDate(project.deadline)}</span>}
-                        hint={deadlineHint}
-                        tone="violet"
-                    />
                 </div>
 
                 {/* ===== Tabs ===== */}
                 <Tabs defaultValue="overview" className="w-full">
-                    <TabsList className="mb-4 h-auto flex-wrap gap-1 bg-muted/50 p-1">
+                    <div className="sticky top-0 z-20 -mx-6 mb-4 border-b bg-background px-6 pb-2 pt-1">
+                    <TabsList className="h-auto flex-wrap gap-1 bg-muted/50 p-1">
                         {tabs.map((tab) => (
                             <TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 rounded-md data-[state=active]:">
                                 <tab.icon className="h-4 w-4" />
@@ -316,8 +276,39 @@ export default function ProjectShow({ project }: { project: any }) {
                             </TabsTrigger>
                         ))}
                     </TabsList>
+                    </div>
 
-                    <TabsContent value="overview">
+                    <TabsContent value="overview" className="space-y-6">
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            <StatCard
+                                icon={Target}
+                                label="Milestone"
+                                value={`${doneMilestones}/${milestones.length}`}
+                                hint="milestone selesai"
+                                tone="blue"
+                            />
+                            <StatCard
+                                icon={ListChecks}
+                                label="Task"
+                                value={`${doneTasks}/${tasks.length}`}
+                                hint="task selesai"
+                                tone="emerald"
+                            />
+                            <StatCard
+                                icon={RefreshCw}
+                                label="Revisi Terbuka"
+                                value={openRevisions}
+                                hint={`dari ${revisions.length} total revisi`}
+                                tone="amber"
+                            />
+                            <StatCard
+                                icon={Calendar}
+                                label="Deadline"
+                                value={<span className="text-base">{formatDate(project.deadline)}</span>}
+                                hint={deadlineHint}
+                                tone="violet"
+                            />
+                        </div>
                         <div className="grid gap-6 md:grid-cols-3">
                             <div className="space-y-6 md:col-span-2">
                                 {/* Deskripsi */}
@@ -629,6 +620,33 @@ export default function ProjectShow({ project }: { project: any }) {
 
                     <TabsContent value="documents">
                         <ProjectDocuments project={project} />
+                    </TabsContent>
+
+                    <TabsContent value="canvas">
+                        <Card>
+                            <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
+                                <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                    <Workflow className="h-7 w-7" />
+                                </div>
+                                <div className="max-w-lg">
+                                    <h3 className="text-lg font-semibold">Project Canvas</h3>
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        Ruang dokumentasi visual untuk project ini — business process, application flow, module structure,
+                                        ERD database, hingga system architecture dalam satu infinite canvas.
+                                    </p>
+                                </div>
+                                <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
+                                    <span className="inline-flex items-center gap-1 rounded-full border bg-muted/40 px-2.5 py-1"><Workflow className="h-3.5 w-3.5" /> Flowchart</span>
+                                    <span className="inline-flex items-center gap-1 rounded-full border bg-muted/40 px-2.5 py-1"><Database className="h-3.5 w-3.5" /> ERD / Schema</span>
+                                    <span className="inline-flex items-center gap-1 rounded-full border bg-muted/40 px-2.5 py-1"><Share2 className="h-3.5 w-3.5" /> Import Markdown</span>
+                                </div>
+                                <Button asChild className="mt-2">
+                                    <Link href={`/projects/${project.id}/canvas`}>
+                                        <Workflow className="mr-2 h-4 w-4" /> Buka Canvas
+                                    </Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
                     </TabsContent>
 
                     <TabsContent value="meetings">

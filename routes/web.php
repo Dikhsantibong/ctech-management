@@ -27,6 +27,7 @@ use App\Http\Controllers\KpiController;
 use App\Http\Controllers\LetterController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\ProjectCanvasController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\QuotationController;
@@ -304,6 +305,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/projects/{project}/feedbacks', [ProjectController::class, 'storeFeedback'])->name('projects.feedbacks.store');
             Route::put('/projects/{project}/feedbacks/{feedback}/status', [ProjectController::class, 'updateFeedbackStatus'])->name('projects.feedbacks.status');
             Route::post('/projects/{project}/feedbacks/{feedback}/convert-to-task', [ProjectController::class, 'convertFeedbackToTask'])->name('projects.feedbacks.convert');
+
+            // Project Canvas — dokumentasi visual per project (bukan menu global).
+            Route::get('/projects/{project}/canvas', [ProjectCanvasController::class, 'show'])->name('projects.canvas.show');
+            Route::put('/projects/{project}/canvas', [ProjectCanvasController::class, 'update'])->name('projects.canvas.update');
+            Route::get('/projects/{project}/canvas/template', [ProjectCanvasController::class, 'template'])->name('projects.canvas.template');
+            Route::post('/projects/{project}/canvas/import', [ProjectCanvasController::class, 'import'])->name('projects.canvas.import');
+            Route::post('/projects/{project}/canvas/versions', [ProjectCanvasController::class, 'storeVersion'])->name('projects.canvas.versions.store');
+            Route::post('/projects/{project}/canvas/versions/{version}/restore', [ProjectCanvasController::class, 'restoreVersion'])->name('projects.canvas.versions.restore');
         });
 
         Route::resource('tasks', TaskController::class)->middleware('menu:tasks');
