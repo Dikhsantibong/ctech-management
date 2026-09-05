@@ -8,11 +8,11 @@ export default function AppLogo() {
             </div>
 
             <div className="flex flex-col leading-tight">
-                <span className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
+                <span className="text-sm font-bold tracking-tight text-white">
                     CTECH
                 </span>
 
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span className="text-xs font-medium text-white">
                     Management System
                 </span>
             </div>
