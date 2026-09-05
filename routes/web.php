@@ -13,6 +13,12 @@ use App\Http\Controllers\AppSubscriptionController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContentPlanController;
+use App\Http\Controllers\Crm\ActivityController as CrmActivityController;
+use App\Http\Controllers\Crm\CrmQuotationController;
+use App\Http\Controllers\Crm\DashboardController as CrmDashboardController;
+use App\Http\Controllers\Crm\PipelineController as CrmPipelineController;
+use App\Http\Controllers\Crm\ProspectController;
+use App\Http\Controllers\Crm\ProspectImportController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\IncomingLetterController;
@@ -313,6 +319,41 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Akses ditentukan hak akses menu (diatur direktur utama), bukan daftar role tetap
+    // ===== CRM =====
+    // Lima menu (Dashboard, Prospek, Pipeline, Aktivitas, Penawaran) yang di
+    // baliknya menjalankan proses sales konsultatif lengkap. Penawaran memakai
+    // ulang modul Quotation existing (tidak ada penomoran/tabel baru).
+    Route::prefix('crm')->name('crm.')->group(function () {
+        Route::middleware('menu:crm-dashboard')->get('/', [CrmDashboardController::class, 'index'])->name('dashboard');
+
+        Route::middleware('menu:crm-prospects')->group(function () {
+            Route::get('prospek', [ProspectController::class, 'index'])->name('prospek.index');
+            // Rute statis harus sebelum wildcard {prospect} agar tidak tertangkap sebagai id.
+            Route::get('prospek/import', [ProspectImportController::class, 'create'])->name('prospek.import');
+            Route::get('prospek/import/template', [ProspectImportController::class, 'template'])->name('prospek.import.template');
+            Route::post('prospek/import/preview', [ProspectImportController::class, 'preview'])->name('prospek.import.preview');
+            Route::post('prospek/import', [ProspectImportController::class, 'store'])->name('prospek.import.store');
+            Route::get('prospek/export', [ProspectController::class, 'export'])->name('prospek.export');
+            Route::post('prospek', [ProspectController::class, 'store'])->name('prospek.store');
+            Route::get('prospek/{prospect}', [ProspectController::class, 'show'])->name('prospek.show');
+            Route::put('prospek/{prospect}', [ProspectController::class, 'update'])->name('prospek.update');
+            Route::delete('prospek/{prospect}', [ProspectController::class, 'destroy'])->name('prospek.destroy');
+            Route::put('prospek/{prospect}/stage', [ProspectController::class, 'updateStage'])->name('prospek.stage');
+            Route::post('prospek/{prospect}/convert', [ProspectController::class, 'convert'])->name('prospek.convert');
+            Route::post('prospek/{prospect}/aktivitas', [CrmActivityController::class, 'store'])->name('prospek.activities.store');
+        });
+
+        Route::middleware('menu:crm-pipeline')->get('pipeline', [CrmPipelineController::class, 'index'])->name('pipeline.index');
+
+        Route::middleware('menu:crm-activities')->group(function () {
+            Route::get('aktivitas', [CrmActivityController::class, 'index'])->name('aktivitas.index');
+            Route::put('aktivitas/{activity}/selesai', [CrmActivityController::class, 'complete'])->name('aktivitas.complete');
+            Route::delete('aktivitas/{activity}', [CrmActivityController::class, 'destroy'])->name('aktivitas.destroy');
+        });
+
+        Route::middleware('menu:crm-quotations')->get('penawaran', [CrmQuotationController::class, 'index'])->name('penawaran.index');
+    });
+
     Route::middleware('menu:invoices')->group(function () {
         Route::post('invoices/preview-draft', [InvoiceController::class, 'previewDraft'])->name('invoices.preview-draft');
         Route::resource('invoices', InvoiceController::class);

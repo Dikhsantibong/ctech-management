@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
+use App\Models\ClientFeedback;
+use App\Models\Meeting;
 use App\Models\Project;
+use App\Models\ProjectMilestone;
+use App\Models\Task;
 use App\Models\User;
 use App\Traits\LogsActivity;
-use App\Models\Meeting;
-use App\Models\ProjectMilestone;
-use App\Models\ClientFeedback;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
     use LogsActivity;
+
     public function index(Request $request)
     {
         $query = Task::with(['project', 'assignee', 'projectMilestone', 'clientFeedback', 'meeting'])->orderBy('created_at', 'desc');
@@ -25,12 +25,12 @@ class TaskController extends Controller
         }
 
         $tasks = $query->get();
-        $projects = Project::all();
+        $projects = Project::orderBy('created_at', 'desc')->get();
         $users = User::all();
         $milestones = ProjectMilestone::all();
         $feedbacks = ClientFeedback::all();
         $meetings = Meeting::all();
-        
+
         return Inertia::render('tasks/index', [
             'tasks' => $tasks,
             'projects' => $projects,
@@ -70,11 +70,11 @@ class TaskController extends Controller
                     'name' => $file->getClientOriginalName(),
                     'path' => $path,
                     'type' => $file->getClientMimeType(),
-                    'size' => $file->getSize()
+                    'size' => $file->getSize(),
                 ];
             }
         }
-        
+
         if (count($attachments) > 0) {
             $metadata['attachments'] = $attachments;
         }
@@ -118,7 +118,7 @@ class TaskController extends Controller
                     'name' => $file->getClientOriginalName(),
                     'path' => $path,
                     'type' => $file->getClientMimeType(),
-                    'size' => $file->getSize()
+                    'size' => $file->getSize(),
                 ];
             }
             $metadata['attachments'] = $attachments;
@@ -145,6 +145,7 @@ class TaskController extends Controller
     {
         $this->logActivity('deleted', 'Task', $task->id, "Menghapus task: {$task->title}");
         $task->delete();
+
         return redirect()->back()->with('success', 'Task deleted successfully.');
     }
 }

@@ -28,6 +28,28 @@ class MenuRegistry
     public static function all(): array
     {
         return [
+            // ===== CRM =====
+            'crm-dashboard' => [
+                'label' => 'Dashboard', 'href' => '/crm', 'group' => 'CRM', 'icon' => 'PieChart',
+                'defaults' => ['marketing'],
+            ],
+            'crm-prospects' => [
+                'label' => 'Prospek', 'href' => '/crm/prospek', 'group' => 'CRM', 'icon' => 'Target',
+                'defaults' => ['marketing'],
+            ],
+            'crm-pipeline' => [
+                'label' => 'Pipeline', 'href' => '/crm/pipeline', 'group' => 'CRM', 'icon' => 'KanbanSquare',
+                'defaults' => ['marketing'],
+            ],
+            'crm-activities' => [
+                'label' => 'Aktivitas', 'href' => '/crm/aktivitas', 'group' => 'CRM', 'icon' => 'CalendarClock',
+                'defaults' => ['marketing'],
+            ],
+            'crm-quotations' => [
+                'label' => 'Penawaran', 'href' => '/crm/penawaran', 'group' => 'CRM', 'icon' => 'FileSpreadsheet',
+                'defaults' => ['marketing'],
+            ],
+
             // ===== Operations =====
             'calendar' => [
                 'label' => 'Calendar', 'href' => '/calendar', 'group' => 'Operations', 'icon' => 'Calendar',
@@ -139,7 +161,7 @@ class MenuRegistry
     /** Urutan grup saat dirender di sidebar. */
     public static function groups(): array
     {
-        return ['Operations', 'Finance', 'Marketing', 'Administration', 'System'];
+        return ['CRM', 'Operations', 'Finance', 'Marketing', 'Administration', 'System'];
     }
 
     /** Pasangan role => daftar menu bawaan. */

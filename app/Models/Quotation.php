@@ -29,6 +29,7 @@ class Quotation extends Model
         'created_by',
         'verified_at',
         'verified_by',
+        'prospect_id',
     ];
 
     protected $casts = [
@@ -56,6 +57,11 @@ class Quotation extends Model
     public function verifier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function prospect(): BelongsTo
+    {
+        return $this->belongsTo(Prospect::class);
     }
 
     public function getTerbilangAttribute(): string

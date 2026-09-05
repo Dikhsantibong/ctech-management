@@ -31,18 +31,19 @@ const DEFAULT_TERMS =
 
 const emptyItem = (): RabItem => ({ id: null, category: '', description: '', unit: '', quantity: 1, price: 0 });
 
-export default function QuotationForm({ quotation, clients, settings }: { quotation: any | null; clients: ClientOption[]; settings?: CompanySettings | null }) {
+export default function QuotationForm({ quotation, clients, settings, prospectId, prefill }: { quotation: any | null; clients: ClientOption[]; settings?: CompanySettings | null; prospectId?: number | null; prefill?: { client_name?: string; client_pic?: string; client_address?: string; subject?: string } | null }) {
     const isEdit = !!quotation;
     const [mode, setMode] = useState<'edit' | 'preview'>('edit');
     const [pdfLoading, setPdfLoading] = useState(false);
 
     const { data, setData, post, put, processing, errors } = useForm({
-        client_name: quotation?.client_name || '',
-        client_pic: quotation?.client_pic || '',
-        client_address: quotation?.client_address || '',
+        client_name: quotation?.client_name || prefill?.client_name || '',
+        client_pic: quotation?.client_pic || prefill?.client_pic || '',
+        client_address: quotation?.client_address || prefill?.client_address || '',
+        prospect_id: quotation?.prospect_id ?? prospectId ?? null,
         quotation_date: quotation?.quotation_date ? quotation.quotation_date.split('T')[0] : new Date().toISOString().split('T')[0],
         valid_until: quotation?.valid_until ? quotation.valid_until.split('T')[0] : '',
-        subject: quotation?.subject || '',
+        subject: quotation?.subject || prefill?.subject || '',
         intro: quotation?.intro ?? DEFAULT_INTRO,
         terms: quotation?.terms ?? DEFAULT_TERMS,
         notes: quotation?.notes || '',

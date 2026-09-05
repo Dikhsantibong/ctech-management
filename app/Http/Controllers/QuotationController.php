@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\CompanySetting;
+use App\Models\Prospect;
 use App\Models\Quotation;
 use App\Models\QuotationItem;
 use App\Support\MenuRegistry;
@@ -53,6 +54,7 @@ class QuotationController extends Controller
             'total' => $totals['total'],
             'status' => 'Draft',
             'created_by' => Auth::id(),
+            'prospect_id' => $validated['prospect_id'] ?? null,
         ]);
 
         $this->syncItems($quotation, $validated['items']);
@@ -62,12 +64,24 @@ class QuotationController extends Controller
         return redirect()->route('quotations.index')->with('success', 'Penawaran berhasil dibuat.');
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        // Prefill dari prospek CRM bila datang lewat aksi "Buat Penawaran".
+        $prospect = $request->filled('prospect_id')
+            ? Prospect::with('client')->find($request->integer('prospect_id'))
+            : null;
+
         return Inertia::render('quotations/form', [
             'quotation' => null,
             'clients' => Client::orderBy('name')->get(['name', 'pic', 'contact', 'email']),
             'settings' => CompanySetting::first(),
+            'prospectId' => $prospect?->id,
+            'prefill' => $prospect ? [
+                'client_name' => $prospect->client?->name ?? $prospect->company_name,
+                'client_pic' => $prospect->pic_name,
+                'client_address' => $prospect->address,
+                'subject' => $prospect->products_interest ? 'Penawaran '.$prospect->products_interest : '',
+            ] : null,
         ]);
     }
 
@@ -198,6 +212,7 @@ class QuotationController extends Controller
             'client_name' => 'required|string|max:255',
             'client_pic' => 'nullable|string|max:255',
             'client_address' => 'nullable|string',
+            'prospect_id' => 'nullable|exists:crm_prospects,id',
             'quotation_date' => 'required|date',
             'valid_until' => 'nullable|date',
             'subject' => 'required|string|max:255',
