@@ -278,7 +278,7 @@
                             </tr>
                             <tr>
                                 <td class="k">Tanggal Terbit</td>
-                                <td class="v">{{ \Carbon\Carbon::parse($invoice->created_at)->locale('id')->translatedFormat('d F Y') }}</td>
+                                <td class="v">{{ \Carbon\Carbon::parse($invoice->issue_date ?? $invoice->created_at)->locale('id')->translatedFormat('d F Y') }}</td>
                             </tr>
                             <tr>
                                 <td class="k">Jatuh Tempo</td>

@@ -150,7 +150,7 @@ export default function InvoiceShow({ invoice }: { invoice: any }) {
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Date Issued</p>
-                                    <p className="font-medium">{new Date(invoice.created_at).toLocaleDateString()}</p>
+                                    <p className="font-medium">{new Date(invoice.issue_date || invoice.created_at).toLocaleDateString()}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Due Date</p>

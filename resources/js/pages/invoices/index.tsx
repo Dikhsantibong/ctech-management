@@ -70,6 +70,7 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
                                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nomor Invoice</th>
                                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Klien</th>
                                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
+                                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tanggal Terbit</th>
                                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Jatuh Tempo</th>
                                     <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Total</th>
                                     <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Aksi</th>
@@ -86,6 +87,7 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
                                         </td>
                                         <td className="p-4 align-middle">{inv.client_name}</td>
                                         <td className="p-4 align-middle"><Badge variant={statusBadgeColor(inv.status)}>{inv.status}</Badge></td>
+                                        <td className="p-4 align-middle text-muted-foreground">{inv.issue_date ? new Date(inv.issue_date).toLocaleDateString('id-ID') : new Date(inv.created_at).toLocaleDateString('id-ID')}</td>
                                         <td className="p-4 align-middle text-muted-foreground">{inv.due_date ? new Date(inv.due_date).toLocaleDateString('id-ID') : '-'}</td>
                                         <td className="p-4 text-right align-middle font-medium">{formatCurrency(Number(inv.total))}</td>
                                         <td className="p-4 text-right align-middle">

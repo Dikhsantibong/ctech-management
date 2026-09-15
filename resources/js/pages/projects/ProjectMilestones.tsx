@@ -75,6 +75,37 @@ const emptyForm = {
     status: 'Not Started',
 };
 
+const APP_TEMPLATES = [
+    {
+        name: 'Analisis & Perencanaan',
+        description: '• Tujuan: Menentukan fitur dan arsitektur dasar\n• Deliverable: Dokumen Kebutuhan (BRD/FSD), Timeline Proyek, ERD\n• Kriteria Selesai: Klien menyetujui daftar fitur'
+    },
+    {
+        name: 'Desain UI/UX',
+        description: '• Tujuan: Merancang visual dan alur aplikasi\n• Deliverable: Wireframe, Mockup (Figma), Prototype, Asset grafis\n• Kriteria Selesai: Desain disetujui klien'
+    },
+    {
+        name: 'Pengembangan Backend',
+        description: '• Tujuan: Membangun logika aplikasi & database\n• Deliverable: Struktur Database (Migration), API Endpoints, Dokumentasi API\n• Kriteria Selesai: Semua API merespon dengan benar'
+    },
+    {
+        name: 'Pengembangan Frontend',
+        description: '• Tujuan: Slicing UI & integrasi API\n• Deliverable: Source code (Web/APK/iOS)\n• Kriteria Selesai: Semua fitur interaktif berfungsi'
+    },
+    {
+        name: 'Pengujian & QA',
+        description: '• Tujuan: Memastikan aplikasi bebas bug\n• Deliverable: Laporan Test Case, Daftar Bug\n• Kriteria Selesai: Lulus uji fungsi dan bug kritikal diperbaiki'
+    },
+    {
+        name: 'UAT & Revisi',
+        description: '• Tujuan: Klien mencoba aplikasi langsung\n• Deliverable: Berita Acara UAT, Daftar Revisi\n• Kriteria Selesai: Klien menyatakan aplikasi sesuai'
+    },
+    {
+        name: 'Deployment & Go Live',
+        description: '• Tujuan: Publikasi aplikasi ke server/store\n• Deliverable: Aplikasi Live (Production), Source code, User Manual\n• Kriteria Selesai: Serah terima selesai'
+    }
+];
+
 export default function ProjectMilestones({ project }: { project: any }) {
     const { users } = usePage().props as any;
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -89,6 +120,16 @@ export default function ProjectMilestones({ project }: { project: any }) {
     const openCreate = () => {
         setEditingId(null);
         setFormData({ ...emptyForm });
+        setIsFormOpen(true);
+    };
+
+    const openTemplate = (template: { name: string; description: string }) => {
+        setEditingId(null);
+        setFormData({
+            ...emptyForm,
+            name: template.name,
+            description: template.description
+        });
         setIsFormOpen(true);
     };
 
@@ -242,9 +283,27 @@ export default function ProjectMilestones({ project }: { project: any }) {
                         Bagi proyek menjadi tahapan. Geser status lewat menu titik tiga pada tiap kartu.
                     </p>
                 </div>
-                <Button onClick={openCreate} className="shrink-0">
-                    <Plus className="mr-2 h-4 w-4" /> Tambah Milestone
-                </Button>
+                <div className="flex shrink-0 items-center gap-2">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="shrink-0 bg-background hover:bg-muted">
+                                <Plus className="mr-2 h-4 w-4" /> Template Aplikasi
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-64">
+                            <DropdownMenuLabel>Pilih Template Milestone</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {APP_TEMPLATES.map((t, i) => (
+                                <DropdownMenuItem key={i} onClick={() => openTemplate(t)}>
+                                    {t.name}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button onClick={openCreate} className="shrink-0">
+                        <Plus className="mr-2 h-4 w-4" /> Tambah Manual
+                    </Button>
+                </div>
             </div>
 
             {milestones.length === 0 ? (
@@ -254,9 +313,27 @@ export default function ProjectMilestones({ project }: { project: any }) {
                     <p className="mb-4 text-sm text-muted-foreground">
                         Buat milestone pertama untuk mulai melacak progress proyek ini.
                     </p>
-                    <Button onClick={openCreate}>
-                        <Plus className="mr-2 h-4 w-4" /> Tambah Milestone
-                    </Button>
+                    <div className="flex justify-center gap-2">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="bg-background hover:bg-muted">
+                                    <Plus className="mr-2 h-4 w-4" /> Template Aplikasi
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="center" className="w-64">
+                                <DropdownMenuLabel>Pilih Template Milestone</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {APP_TEMPLATES.map((t, i) => (
+                                    <DropdownMenuItem key={i} onClick={() => openTemplate(t)}>
+                                        {t.name}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <Button onClick={openCreate}>
+                            <Plus className="mr-2 h-4 w-4" /> Tambah Manual
+                        </Button>
+                    </div>
                 </div>
             ) : (
                 <div className="flex gap-4 overflow-x-auto pb-4">
@@ -449,11 +526,14 @@ export default function ProjectMilestones({ project }: { project: any }) {
                         <div className="space-y-1.5">
                             <Label>Deskripsi</Label>
                             <Textarea
-                                rows={3}
-                                placeholder="Deliverable apa saja yang harus selesai pada tahap ini?"
+                                rows={4}
+                                placeholder="Contoh pengisian:&#10;- Tujuan: Menyelesaikan desain antarmuka&#10;- Deliverable: File Figma, Assets, Prototype&#10;- Kriteria Selesai: Disetujui oleh klien"
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             />
+                            <p className="text-[11px] text-muted-foreground">
+                                Tuliskan poin-poin yang terstruktur agar target pencapaian milestone lebih jelas.
+                            </p>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">

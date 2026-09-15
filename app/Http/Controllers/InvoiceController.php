@@ -48,6 +48,7 @@ class InvoiceController extends Controller
     {
         $validated = $request->validate([
             'client_name' => 'required|string|max:255',
+            'issue_date' => 'required|date',
             'due_date' => 'required|date',
             'use_tax' => 'required|boolean',
             'tax_rate' => 'nullable|required_if:use_tax,true|numeric|min:0|max:100',
@@ -86,6 +87,7 @@ class InvoiceController extends Controller
         $invoice = Invoice::create([
             'invoice_number' => $invoiceNumber,
             'client_name' => $validated['client_name'],
+            'issue_date' => $validated['issue_date'],
             'due_date' => $validated['due_date'],
             'subtotal' => $subtotal,
             'tax' => $tax,
@@ -119,6 +121,7 @@ class InvoiceController extends Controller
     {
         $validated = $request->validate([
             'client_name' => 'required|string|max:255',
+            'issue_date' => 'required|date',
             'due_date' => 'required|date',
             'use_tax' => 'required|boolean',
             'tax_rate' => 'nullable|required_if:use_tax,true|numeric|min:0|max:100',
@@ -139,6 +142,7 @@ class InvoiceController extends Controller
 
         $invoice->update([
             'client_name' => $validated['client_name'],
+            'issue_date' => $validated['issue_date'],
             'due_date' => $validated['due_date'],
             'subtotal' => $subtotal,
             'tax' => $tax,
@@ -198,6 +202,7 @@ class InvoiceController extends Controller
     {
         $validated = $request->validate([
             'client_name' => 'nullable|string|max:255',
+            'issue_date' => 'nullable|date',
             'due_date' => 'nullable|date',
             'use_tax' => 'required|boolean',
             'tax_rate' => 'nullable|numeric|min:0|max:100',
@@ -217,6 +222,7 @@ class InvoiceController extends Controller
 
         $invoice = new Invoice([
             'client_name' => $validated['client_name'] ?? '-',
+            'issue_date' => $validated['issue_date'] ?? now()->toDateString(),
             'due_date' => $validated['due_date'] ?? now()->toDateString(),
             'subtotal' => $subtotal,
             'tax' => $tax,

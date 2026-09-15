@@ -28,6 +28,7 @@ export default function InvoiceForm({ invoice, clients, settings }: { invoice: a
 
     const { data, setData, post, put, processing, errors } = useForm({
         client_name: invoice?.client_name || '',
+        issue_date: invoice?.issue_date ? invoice.issue_date.split('T')[0] : (invoice?.created_at ? invoice.created_at.split('T')[0] : new Date().toISOString().split('T')[0]),
         due_date: invoice?.due_date ? invoice.due_date.split('T')[0] : new Date().toISOString().split('T')[0],
         use_tax: invoice ? parseFloat(invoice.tax) > 0 : true,
         tax_rate: invoice && invoice.subtotal > 0 ? Math.round((invoice.tax / invoice.subtotal) * 100) : 11,
@@ -141,7 +142,7 @@ export default function InvoiceForm({ invoice, clients, settings }: { invoice: a
                                     <CardTitle>Data Klien & Invoice</CardTitle>
                                     <CardDescription>Informasi tujuan dan tanggal jatuh tempo.</CardDescription>
                                 </CardHeader>
-                                <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                     <div className="space-y-2">
                                         <Label>Nama Klien / Perusahaan</Label>
                                         <Input list="client-list" value={data.client_name} onChange={(e) => setData('client_name', e.target.value)} required />
@@ -149,11 +150,16 @@ export default function InvoiceForm({ invoice, clients, settings }: { invoice: a
                                         {errors.client_name && <p className="text-sm text-destructive">{errors.client_name}</p>}
                                     </div>
                                     <div className="space-y-2">
+                                        <Label>Tanggal Terbit</Label>
+                                        <Input type="date" value={data.issue_date} onChange={(e) => setData('issue_date', e.target.value)} required />
+                                        {errors.issue_date && <p className="text-sm text-destructive">{errors.issue_date}</p>}
+                                    </div>
+                                    <div className="space-y-2">
                                         <Label>Tanggal Jatuh Tempo</Label>
                                         <Input type="date" value={data.due_date} onChange={(e) => setData('due_date', e.target.value)} required />
                                         {errors.due_date && <p className="text-sm text-destructive">{errors.due_date}</p>}
                                     </div>
-                                    <div className="sm:col-span-2 flex items-center justify-between rounded-md border p-3">
+                                    <div className="sm:col-span-3 flex items-center justify-between rounded-md border p-3">
                                         <div className="space-y-0.5">
                                             <Label>Gunakan PPN</Label>
                                             <p className="text-xs text-muted-foreground">Dihitung dari subtotal.</p>
