@@ -30,6 +30,8 @@ export default function InvoiceForm({ invoice, clients, settings }: { invoice: a
         client_name: invoice?.client_name || '',
         issue_date: invoice?.issue_date ? invoice.issue_date.split('T')[0] : (invoice?.created_at ? invoice.created_at.split('T')[0] : new Date().toISOString().split('T')[0]),
         due_date: invoice?.due_date ? invoice.due_date.split('T')[0] : new Date().toISOString().split('T')[0],
+        kwitansi_date: invoice?.kwitansi_date ? invoice.kwitansi_date.split('T')[0] : '',
+        kwitansi_signatory: invoice?.kwitansi_signatory || settings?.leader_name || 'Manajemen',
         use_tax: invoice ? parseFloat(invoice.tax) > 0 : true,
         tax_rate: invoice && invoice.subtotal > 0 ? Math.round((invoice.tax / invoice.subtotal) * 100) : 11,
         items: (invoice?.items?.length
@@ -142,7 +144,7 @@ export default function InvoiceForm({ invoice, clients, settings }: { invoice: a
                                     <CardTitle>Data Klien & Invoice</CardTitle>
                                     <CardDescription>Informasi tujuan dan tanggal jatuh tempo.</CardDescription>
                                 </CardHeader>
-                                <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div className="space-y-2">
                                         <Label>Nama Klien / Perusahaan</Label>
                                         <Input list="client-list" value={data.client_name} onChange={(e) => setData('client_name', e.target.value)} required />
@@ -150,7 +152,12 @@ export default function InvoiceForm({ invoice, clients, settings }: { invoice: a
                                         {errors.client_name && <p className="text-sm text-destructive">{errors.client_name}</p>}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>Tanggal Terbit</Label>
+                                        <Label>Penandatangan Kwitansi</Label>
+                                        <Input value={data.kwitansi_signatory} onChange={(e) => setData('kwitansi_signatory', e.target.value)} placeholder="Nama penandatangan" />
+                                        {errors.kwitansi_signatory && <p className="text-sm text-destructive">{errors.kwitansi_signatory}</p>}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Tanggal Terbit Invoice</Label>
                                         <Input type="date" value={data.issue_date} onChange={(e) => setData('issue_date', e.target.value)} required />
                                         {errors.issue_date && <p className="text-sm text-destructive">{errors.issue_date}</p>}
                                     </div>
@@ -159,7 +166,13 @@ export default function InvoiceForm({ invoice, clients, settings }: { invoice: a
                                         <Input type="date" value={data.due_date} onChange={(e) => setData('due_date', e.target.value)} required />
                                         {errors.due_date && <p className="text-sm text-destructive">{errors.due_date}</p>}
                                     </div>
-                                    <div className="sm:col-span-3 flex items-center justify-between rounded-md border p-3">
+                                    <div className="space-y-2">
+                                        <Label>Tanggal Terima Kwitansi</Label>
+                                        <Input type="date" value={data.kwitansi_date} onChange={(e) => setData('kwitansi_date', e.target.value)} />
+                                        <p className="text-[10px] text-muted-foreground">Kosongkan jika otomatis saat dicetak</p>
+                                        {errors.kwitansi_date && <p className="text-sm text-destructive">{errors.kwitansi_date}</p>}
+                                    </div>
+                                    <div className="sm:col-span-2 flex items-center justify-between rounded-md border p-3 mt-2">
                                         <div className="space-y-0.5">
                                             <Label>Gunakan PPN</Label>
                                             <p className="text-xs text-muted-foreground">Dihitung dari subtotal.</p>

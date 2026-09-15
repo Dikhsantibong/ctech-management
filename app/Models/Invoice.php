@@ -12,6 +12,8 @@ class Invoice extends Model
         'client_name',
         'issue_date',
         'due_date',
+        'kwitansi_date',
+        'kwitansi_signatory',
         'subtotal',
         'tax',
         'total',

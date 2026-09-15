@@ -225,10 +225,10 @@
                     </div>
                 </td>
                 <td style="text-align: center; vertical-align: bottom; width: 40%;">
-                    {{ $settings->city ?? 'Kendari' }}, {{ \Carbon\Carbon::now()->locale('id')->translatedFormat('d F Y') }}<br>
+                    {{ $settings->city ?? 'Kendari' }}, {{ \Carbon\Carbon::parse($invoice->kwitansi_date ?? now())->locale('id')->translatedFormat('d F Y') }}<br>
                     Penerima,
                     <div class="sign-area"></div>
-                    <div class="sign-name">{{ $settings->leader_name ?? 'Manajemen' }}</div>
+                    <div class="sign-name">{{ $invoice->kwitansi_signatory ?: ($settings->leader_name ?? 'Manajemen') }}</div>
                     <div class="sign-title">{{ $settings->company_name ?? 'PT Kreatif Teknologi Maju Bersama' }}</div>
                 </td>
             </tr>
