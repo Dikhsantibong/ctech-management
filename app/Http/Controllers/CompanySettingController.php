@@ -40,6 +40,17 @@ class CompanySettingController extends Controller
             'website' => 'nullable|string|max:255',
         ]);
 
+        // Kolom tunggal lama selalu diselaraskan dengan rekening utama, supaya
+        // bagian mana pun yang masih membacanya tidak mencetak rekening yang usang.
+        if (array_key_exists('bank_accounts', $validated)) {
+            $validated['bank_accounts'] = CompanySetting::normalizeBankAccounts($validated['bank_accounts'] ?? []);
+            $active = collect($validated['bank_accounts'])->firstWhere('is_active', true);
+
+            $validated['bank_name'] = $active['bank_name'] ?? null;
+            $validated['bank_account_number'] = $active['account_number'] ?? null;
+            $validated['bank_account_name'] = $active['account_name'] ?? null;
+        }
+
         $settings = CompanySetting::first();
 
         if ($settings) {

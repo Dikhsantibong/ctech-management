@@ -320,9 +320,10 @@
                 <td style="width: 52%; vertical-align: top; padding-right: 24px;">
                     <div class="payment-box">
                         <h4>Informasi Pembayaran</h4>
-                        <p><strong>Bank:</strong> {{ $settings->bank_name ?? '-' }}</p>
-                        <p><strong>No. Rekening:</strong> {{ $settings->bank_account_number ?? '-' }}</p>
-                        <p><strong>Atas Nama:</strong> {{ $settings->bank_account_name ?? '-' }}</p>
+                        @php($bank = $settings?->activeBankAccount() ?? [])
+                        <p><strong>Bank:</strong> {{ $bank['bank_name'] ?? '-' }}</p>
+                        <p><strong>No. Rekening:</strong> {{ $bank['account_number'] ?? '-' }}</p>
+                        <p><strong>Atas Nama:</strong> {{ $bank['account_name'] ?? '-' }}</p>
                     </div>
                 </td>
                 <td style="width: 48%; vertical-align: top;">

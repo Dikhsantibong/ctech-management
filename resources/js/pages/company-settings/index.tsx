@@ -7,14 +7,42 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
+type BankAccount = {
+    bank_name: string;
+    account_number: string;
+    account_name: string;
+    is_active: boolean;
+};
+
+const initialAccounts = (settings: any): BankAccount[] => {
+    const stored = Array.isArray(settings?.bank_accounts) ? settings.bank_accounts : [];
+
+    if (stored.length === 0) {
+        // Data sebelum fitur multi rekening masih di kolom tunggal
+        return [{
+            bank_name: settings?.bank_name || '',
+            account_number: settings?.bank_account_number || '',
+            account_name: settings?.bank_account_name || '',
+            is_active: true,
+        }];
+    }
+
+    const hasActive = stored.some((b: any) => b.is_active);
+
+    return stored.map((b: any, i: number) => ({
+        bank_name: b.bank_name || '',
+        account_number: b.account_number || '',
+        account_name: b.account_name || '',
+        is_active: hasActive ? Boolean(b.is_active) : i === 0,
+    }));
+};
+
 export default function CompanySettingsIndex({ settings }: { settings: any }) {
+    // Kolom tunggal bank_name dkk. tidak dikirim lagi — server mengisinya dari rekening utama
     const { data, setData, post, processing, errors } = useForm({
         company_name: settings?.company_name || '',
         leader_name: settings?.leader_name || '',
-        bank_accounts: Array.isArray(settings?.bank_accounts) && settings.bank_accounts.length > 0 ? settings.bank_accounts.map((b: any, i: number) => ({...b, is_active: b.is_active !== undefined ? b.is_active : i === 0})) : [{ bank_name: settings?.bank_name || '', account_number: settings?.bank_account_number || '', account_name: settings?.bank_account_name || '', is_active: true }],
-        bank_name: settings?.bank_name || '',
-        bank_account_number: settings?.bank_account_number || '',
-        bank_account_name: settings?.bank_account_name || '',
+        bank_accounts: initialAccounts(settings),
         address: settings?.address || '',
         phone: settings?.phone || '',
         email: settings?.email || '',
@@ -23,8 +51,26 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/settings');
+        post('/settings', { preserveScroll: true });
     };
+
+    /** Perbarui satu rekening tanpa memutasi objek state lama. */
+    const updateAccount = (index: number, field: keyof BankAccount, value: string) => {
+        setData('bank_accounts', data.bank_accounts.map((b, i) => (i === index ? { ...b, [field]: value } : b)));
+    };
+
+    const setPrimary = (index: number) => {
+        setData('bank_accounts', data.bank_accounts.map((b, i) => ({ ...b, is_active: i === index })));
+    };
+
+    const removeAccount = (index: number) => {
+        const remaining = data.bank_accounts.filter((_, i) => i !== index);
+        const stillHasActive = remaining.some((b) => b.is_active);
+
+        setData('bank_accounts', remaining.map((b, i) => ({ ...b, is_active: stillHasActive ? b.is_active : i === 0 })));
+    };
+
+    const activeAccount = data.bank_accounts.find((b) => b.is_active);
 
     return (
         <>
@@ -89,13 +135,14 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
                                     variant="outline" 
                                     size="sm" 
                                     onClick={() => setData('bank_accounts', [...data.bank_accounts, { bank_name: '', account_number: '', account_name: '', is_active: data.bank_accounts.length === 0 }])}
+                                    aria-label="Tambah rekening"
                                 >
                                     <Plus className="h-4 w-4 mr-2" /> Tambah Rekening
                                 </Button>
                             </CardHeader>
                             <CardContent>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-                                {data.bank_accounts.map((bank: any, index: number) => (
+                                {data.bank_accounts.map((bank, index) => (
                                     <div key={index} className={`space-y-4 p-4 border rounded-lg relative transition-all duration-200 ${bank.is_active ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'bg-slate-50/50 dark:bg-slate-900/50'}`}>
                                         
                                         <div className="absolute top-2 right-2 flex items-center gap-1">
@@ -109,13 +156,7 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
                                                     variant="ghost"
                                                     size="sm"
                                                     className="text-xs h-7 mr-1"
-                                                    onClick={() => {
-                                                        const newAccounts = data.bank_accounts.map((b: any, i: number) => ({
-                                                            ...b,
-                                                            is_active: i === index
-                                                        }));
-                                                        setData('bank_accounts', newAccounts);
-                                                    }}
+                                                    onClick={() => setPrimary(index)}
                                                 >
                                                     Jadikan Utama
                                                 </Button>
@@ -127,14 +168,7 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
                                                     variant="ghost" 
                                                     size="icon" 
                                                     className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                    onClick={() => {
-                                                        const newAccounts = [...data.bank_accounts];
-                                                        newAccounts.splice(index, 1);
-                                                        if (bank.is_active && newAccounts.length > 0) {
-                                                            newAccounts[0].is_active = true;
-                                                        }
-                                                        setData('bank_accounts', newAccounts);
-                                                    }}
+                                                    onClick={() => removeAccount(index)}
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
@@ -143,42 +177,51 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
 
                                         <div className="space-y-2 pr-20">
                                             <Label>Nama Bank</Label>
-                                            <Input 
-                                                value={bank.bank_name} 
-                                                onChange={e => {
-                                                    const newAccounts = [...data.bank_accounts];
-                                                    newAccounts[index].bank_name = e.target.value;
-                                                    setData('bank_accounts', newAccounts);
-                                                }} 
+                                            <Input
+                                                value={bank.bank_name}
+                                                onChange={e => updateAccount(index, 'bank_name', e.target.value)}
                                                 placeholder="BCA / Mandiri / BRI"
                                             />
                                         </div>
                                         <div className="space-y-2">
                                             <Label>Nomor Rekening</Label>
-                                            <Input 
-                                                value={bank.account_number} 
-                                                onChange={e => {
-                                                    const newAccounts = [...data.bank_accounts];
-                                                    newAccounts[index].account_number = e.target.value;
-                                                    setData('bank_accounts', newAccounts);
-                                                }} 
+                                            <Input
+                                                value={bank.account_number}
+                                                onChange={e => updateAccount(index, 'account_number', e.target.value)}
                                                 placeholder="1234567890"
                                             />
                                         </div>
                                         <div className="space-y-2">
                                             <Label>Atas Nama</Label>
-                                            <Input 
-                                                value={bank.account_name} 
-                                                onChange={e => {
-                                                    const newAccounts = [...data.bank_accounts];
-                                                    newAccounts[index].account_name = e.target.value;
-                                                    setData('bank_accounts', newAccounts);
-                                                }} 
+                                            <Input
+                                                value={bank.account_name}
+                                                onChange={e => updateAccount(index, 'account_name', e.target.value)}
                                                 placeholder="PT C-Tech Solutions"
                                             />
                                         </div>
                                     </div>
                                 ))}
+                                </div>
+
+                                {/* Pratinjau yang akan tercetak di dokumen */}
+                                <div className="mt-4 rounded-lg border bg-muted/30 p-3 text-sm">
+                                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                        Tercetak di Invoice & Kwitansi
+                                    </p>
+                                    {activeAccount && (activeAccount.bank_name || activeAccount.account_number) ? (
+                                        <p className="mt-1">
+                                            <span className="font-semibold">{activeAccount.bank_name || '-'}</span>
+                                            {' · '}
+                                            {activeAccount.account_number || '-'}
+                                            {' · a.n. '}
+                                            {activeAccount.account_name || '-'}
+                                        </p>
+                                    ) : (
+                                        <p className="mt-1 text-muted-foreground">Rekening utama belum diisi.</p>
+                                    )}
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        Berlaku untuk dokumen yang diunduh setelah pengaturan disimpan.
+                                    </p>
                                 </div>
                             </CardContent>
                         </Card>

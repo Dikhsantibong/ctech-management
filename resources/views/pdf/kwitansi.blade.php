@@ -219,9 +219,10 @@
                     
                     <div style="font-size: 10px; color: #4b5563; line-height: 1.4; padding-left: 2px;">
                         <strong style="color: #374151;">Catatan Pembayaran:</strong><br>
-                        Bank: {{ $settings->bank_name ?? '-' }}<br>
-                        No. Rekening: {{ $settings->bank_account_number ?? '-' }}<br>
-                        Atas Nama: {{ $settings->bank_account_name ?? '-' }}
+                        @php($bank = $settings?->activeBankAccount() ?? [])
+                        Bank: {{ $bank['bank_name'] ?? '-' }}<br>
+                        No. Rekening: {{ $bank['account_number'] ?? '-' }}<br>
+                        Atas Nama: {{ $bank['account_name'] ?? '-' }}
                     </div>
                 </td>
                 <td style="text-align: center; vertical-align: bottom; width: 40%;">
