@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\ContentPlan;
 use App\Models\User;
+use App\Services\MenuAccess;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -14,9 +15,9 @@ class ContentPlanTest extends TestCase
     private function actor(string $role): User
     {
         try {
-            $user = User::first();
+            $user = User::first() ?? User::factory()->create();
         } catch (\Throwable $e) {
-            $this->markTestSkipped('Database belum tersedia: ' . $e->getMessage());
+            $this->markTestSkipped('Database belum tersedia: '.$e->getMessage());
         }
 
         if (! $user) {
@@ -68,7 +69,7 @@ class ContentPlanTest extends TestCase
 
         // Role ini normalnya tidak punya menu content-plans; diberikan agar yang
         // diuji murni perilaku penugasan di controller, bukan penjagaan menu.
-        app(\App\Services\MenuAccess::class)->sync('operation', ['content-plans']);
+        app(MenuAccess::class)->sync('operation', ['content-plans']);
 
         $this->actingAs($user)
             ->post('/content-plans', $this->payload(['assigned_to' => $other?->id]))

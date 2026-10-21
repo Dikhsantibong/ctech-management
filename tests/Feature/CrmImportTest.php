@@ -18,7 +18,7 @@ class CrmImportTest extends TestCase
     private function actor(): User
     {
         try {
-            $user = User::first();
+            $user = User::first() ?? User::factory()->create();
         } catch (\Throwable $e) {
             $this->markTestSkipped('Database belum tersedia: '.$e->getMessage());
         }

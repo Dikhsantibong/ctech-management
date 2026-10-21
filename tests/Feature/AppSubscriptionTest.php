@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\AppCategory;
 use App\Models\AppSubscription;
 use App\Models\User;
+use App\Services\MenuAccess;
 use App\Support\MenuRegistry;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -17,9 +18,9 @@ class AppSubscriptionTest extends TestCase
     private function actor(): User
     {
         try {
-            $user = User::first();
+            $user = User::first() ?? User::factory()->create();
         } catch (\Throwable $e) {
-            $this->markTestSkipped('Database belum tersedia: ' . $e->getMessage());
+            $this->markTestSkipped('Database belum tersedia: '.$e->getMessage());
         }
 
         if (! $user) {
@@ -27,7 +28,7 @@ class AppSubscriptionTest extends TestCase
         }
 
         $user->forceFill(['role' => MenuRegistry::SUPER_ROLE])->save();
-        app(\App\Services\MenuAccess::class)->forget();
+        app(MenuAccess::class)->forget();
 
         return $user;
     }

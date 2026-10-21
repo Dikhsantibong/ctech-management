@@ -15,7 +15,7 @@ class CompanySettingBankAccountTest extends TestCase
     private function director(): User
     {
         try {
-            $user = User::first();
+            $user = User::first() ?? User::factory()->create();
         } catch (\Throwable $e) {
             $this->markTestSkipped('Database belum tersedia: '.$e->getMessage());
         }

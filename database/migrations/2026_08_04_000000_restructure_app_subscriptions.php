@@ -29,6 +29,13 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Tanggal migrasi ini lebih awal dari create_app_subscriptions. Pada database
+        // baru tabelnya belum ada, jadi perombakan dijalankan ulang oleh migrasi
+        // 2026_08_27_000000. Bila sudah pernah diterapkan, jangan diulang.
+        if (! Schema::hasTable('app_subscriptions') || Schema::hasTable('app_categories')) {
+            return;
+        }
+
         // ===== Kategori aplikasi =====
         Schema::create('app_categories', function (Blueprint $table) {
             $table->id();
@@ -74,7 +81,7 @@ return new class extends Migration
         $categories = DB::table('app_categories')->pluck('id', 'slug');
 
         // ===== Kolom baru pada langganan =====
-        Schema::table('app_subscriptions', function (Blueprint $table) use ($categories) {
+        Schema::table('app_subscriptions', function (Blueprint $table) {
             $table->foreignId('app_category_id')->nullable()->after('id')->constrained('app_categories')->nullOnDelete();
             $table->decimal('monthly_price', 15, 2)->default(0)->after('app_name');
             $table->unsignedTinyInteger('billing_cycle_months')->default(1)->after('monthly_price');
@@ -146,6 +153,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('app_categories')) {
+            return;
+        }
+
         Schema::dropIfExists('subscription_payments');
 
         Schema::table('app_subscriptions', function (Blueprint $table) {

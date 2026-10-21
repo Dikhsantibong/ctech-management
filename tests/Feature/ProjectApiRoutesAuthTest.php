@@ -20,9 +20,9 @@ class ProjectApiRoutesAuthTest extends TestCase
     private function actor(): User
     {
         try {
-            $user = User::where('role', 'direktur_utama')->first() ?? User::first();
+            $user = User::where('role', 'direktur_utama')->first() ?? User::first() ?? User::factory()->create(['role' => 'direktur_utama']);
         } catch (\Throwable $e) {
-            $this->markTestSkipped('Database belum tersedia/termigrasi: ' . $e->getMessage());
+            $this->markTestSkipped('Database belum tersedia/termigrasi: '.$e->getMessage());
         }
 
         if (! $user) {
@@ -37,7 +37,7 @@ class ProjectApiRoutesAuthTest extends TestCase
         try {
             $project = Project::first();
         } catch (\Throwable $e) {
-            $this->markTestSkipped('Database belum tersedia/termigrasi: ' . $e->getMessage());
+            $this->markTestSkipped('Database belum tersedia/termigrasi: '.$e->getMessage());
         }
 
         if (! $project) {

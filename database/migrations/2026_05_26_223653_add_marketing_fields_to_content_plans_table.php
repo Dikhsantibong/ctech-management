@@ -11,6 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Migrasi ini bertanggal sebelum create_content_plans. Pada database baru
+        // tabelnya belum ada; kolom-kolom ini lalu ditambahkan oleh migrasi create.
+        if (! Schema::hasTable('content_plans')) {
+            return;
+        }
+
         Schema::table('content_plans', function (Blueprint $table) {
             $table->string('campaign_name')->nullable()->after('status');
             $table->text('brief')->nullable()->after('campaign_name');
@@ -26,6 +32,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('content_plans') || ! Schema::hasColumn('content_plans', 'campaign_name')) {
+            return;
+        }
+
         Schema::table('content_plans', function (Blueprint $table) {
             $table->dropColumn([
                 'campaign_name',
@@ -33,7 +43,7 @@ return new class extends Migration
                 'reference_links',
                 'visual_assets_url',
                 'target_audience',
-                'keywords'
+                'keywords',
             ]);
         });
     }

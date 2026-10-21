@@ -7,6 +7,8 @@ use App\Models\ContentPlan;
 use App\Models\SocialAccount;
 use App\Models\SocialPost;
 use App\Models\User;
+use App\Services\MenuAccess;
+use App\Services\Social\Publishers\SimulationPublisher;
 use App\Services\Social\SocialPublishingService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
@@ -21,9 +23,9 @@ class SocialPublishingTest extends TestCase
     private function actor(): User
     {
         try {
-            $user = User::first();
+            $user = User::first() ?? User::factory()->create();
         } catch (\Throwable $e) {
-            $this->markTestSkipped('Database belum tersedia: ' . $e->getMessage());
+            $this->markTestSkipped('Database belum tersedia: '.$e->getMessage());
         }
 
         if (! $user) {
@@ -31,7 +33,7 @@ class SocialPublishingTest extends TestCase
         }
 
         $user->forceFill(['role' => 'marketing'])->save();
-        app(\App\Services\MenuAccess::class)->forget();
+        app(MenuAccess::class)->forget();
 
         return $user;
     }
@@ -180,7 +182,7 @@ class SocialPublishingTest extends TestCase
 
         $publisher = app(SocialPublishingService::class)->resolvePublisher($account);
 
-        $this->assertInstanceOf(\App\Services\Social\Publishers\SimulationPublisher::class, $publisher);
+        $this->assertInstanceOf(SimulationPublisher::class, $publisher);
     }
 
     /** Instagram wajib media — kegagalan ini tidak boleh diulang terus-menerus. */

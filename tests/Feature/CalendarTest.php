@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\CalendarController;
 use App\Models\Project;
 use App\Models\User;
 use App\Support\MenuRegistry;
@@ -15,9 +16,9 @@ class CalendarTest extends TestCase
     private function actor(): User
     {
         try {
-            $user = User::first();
+            $user = User::first() ?? User::factory()->create();
         } catch (\Throwable $e) {
-            $this->markTestSkipped('Database belum tersedia: ' . $e->getMessage());
+            $this->markTestSkipped('Database belum tersedia: '.$e->getMessage());
         }
 
         if (! $user) {
@@ -60,7 +61,7 @@ class CalendarTest extends TestCase
     {
         $this->actor();
 
-        $controller = new \App\Http\Controllers\CalendarController();
+        $controller = new CalendarController;
         $reflection = new \ReflectionClass($controller);
 
         foreach (['projectEvents', 'taskEvents', 'meetingEvents', 'contentEvents', 'invoiceEvents'] as $method) {

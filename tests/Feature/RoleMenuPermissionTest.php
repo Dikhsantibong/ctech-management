@@ -15,9 +15,9 @@ class RoleMenuPermissionTest extends TestCase
     private function user(string $role): User
     {
         try {
-            $user = User::first();
+            $user = User::first() ?? User::factory()->create();
         } catch (\Throwable $e) {
-            $this->markTestSkipped('Database belum tersedia: ' . $e->getMessage());
+            $this->markTestSkipped('Database belum tersedia: '.$e->getMessage());
         }
 
         if (! $user) {

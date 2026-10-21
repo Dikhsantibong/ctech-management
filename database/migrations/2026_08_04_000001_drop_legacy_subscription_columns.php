@@ -18,6 +18,12 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Lihat catatan pada 2026_08_04_000000: dilewati bila tabel belum ada
+        // atau kolom lama sudah dibuang.
+        if (! Schema::hasTable('app_subscriptions') || ! Schema::hasColumn('app_subscriptions', 'billing_amount')) {
+            return;
+        }
+
         Schema::table('app_subscriptions', function (Blueprint $table) {
             $table->dropColumn(['billing_amount', 'siklus_tagihan']);
         });
@@ -25,6 +31,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('app_subscriptions') || Schema::hasColumn('app_subscriptions', 'billing_amount')) {
+            return;
+        }
+
         Schema::table('app_subscriptions', function (Blueprint $table) {
             $table->decimal('billing_amount', 15, 2)->default(0)->after('app_name');
             $table->integer('siklus_tagihan')->default(12)->after('billing_amount');

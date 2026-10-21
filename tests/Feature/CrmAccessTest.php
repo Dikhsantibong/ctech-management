@@ -14,7 +14,7 @@ class CrmAccessTest extends TestCase
     private function userWithRole(string $role): User
     {
         try {
-            $user = User::first();
+            $user = User::first() ?? User::factory()->create();
         } catch (\Throwable $e) {
             $this->markTestSkipped('Database belum tersedia: '.$e->getMessage());
         }
