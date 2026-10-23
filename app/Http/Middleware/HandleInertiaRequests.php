@@ -49,7 +49,16 @@ class HandleInertiaRequests extends Middleware
             'navMenus' => $request->user()
                 ? app(\App\Services\MenuAccess::class)->sidebarFor($request->user())
                 : [],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            // Badge chat & konfigurasi realtime. Kunci Pusher (key) memang publik;
+            // secret tidak pernah dikirim ke browser.
+            'chatState' => fn () => $request->user() ? [
+                'unread' => \App\Models\ChatMessage::unreadFor($request->user())->count(),
+                'realtime' => config('broadcasting.default') === 'pusher' ? [
+                    'key' => config('broadcasting.connections.pusher.key'),
+                    'cluster' => config('broadcasting.connections.pusher.options.cluster'),
+                ] : null,
+            ] : null,
+            'sidebarOpen' =>! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
 }

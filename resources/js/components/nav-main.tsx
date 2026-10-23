@@ -3,6 +3,7 @@ import {
     SidebarGroup,
     SidebarGroupLabel,
     SidebarMenu,
+    SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
@@ -28,6 +29,11 @@ export function NavMain({ items = [], label = 'Platform' }: { items: NavItem[], 
                                 <span>{item.title}</span>
                             </Link>
                         </SidebarMenuButton>
+                        {!!item.badge && item.badge > 0 && (
+                            <SidebarMenuBadge className="bg-primary text-primary-foreground peer-hover/menu-button:text-primary-foreground peer-data-[active=true]/menu-button:text-primary-foreground">
+                                {item.badge > 99 ? '99+' : item.badge}
+                            </SidebarMenuBadge>
+                        )}
                     </SidebarMenuItem>
                 ))}
             </SidebarMenu>

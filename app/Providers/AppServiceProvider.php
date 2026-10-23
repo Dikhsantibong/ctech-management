@@ -17,7 +17,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // routes/channels.php membuat broadcaster saat aplikasi dimuat. Bila kunci
+        // Pusher belum diisi, broadcaster Pusher gagal dibuat dan SELURUH aplikasi
+        // ikut error. Jatuhkan ke "log" agar aplikasi tetap jalan; chat lalu
+        // otomatis memakai polling.
+        if (config('broadcasting.default') === 'pusher' && blank(config('broadcasting.connections.pusher.key'))) {
+            config(['broadcasting.default' => 'log']);
+        }
     }
 
     /**

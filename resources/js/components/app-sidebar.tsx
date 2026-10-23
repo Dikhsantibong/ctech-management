@@ -2,7 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     LayoutGrid, Briefcase, ListTodo, Receipt, Mail, MailOpen, FileStack, Files, Users, Activity,
     Settings, Megaphone, Building2, Calendar, Newspaper, Bell, ClipboardList, Gauge, ShieldCheck, Share2, Circle,
-    FileSpreadsheet, PieChart, Target, KanbanSquare, CalendarClock,
+    FileSpreadsheet, PieChart, Target, KanbanSquare, CalendarClock, MessagesSquare,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -16,6 +16,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useChatUnread } from '@/hooks/use-chat-unread';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
@@ -47,6 +48,13 @@ export function AppSidebar() {
     // role di frontend — jadi perubahan langsung berlaku tanpa build ulang.
     const groups: SharedMenuGroup[] = Array.isArray(navMenus) ? navMenus : [];
 
+    // Chat tersedia untuk semua akun; badge = pesan belum dibaca
+    const chatUnread = useChatUnread();
+    const communicationNav: NavItem[] = [
+        ...announcementsNav,
+        { title: 'Pesan', href: '/chat', icon: MessagesSquare, badge: chatUnread },
+    ];
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -63,7 +71,7 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={dashboardNav} label="Overview" />
-                <NavMain items={announcementsNav} label="Pengumuman" />
+                <NavMain items={communicationNav} label="Komunikasi" />
 
                 {groups.map((group) => (
                     <NavMain

@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\ProjectMilestoneController;
 use App\Http\Controllers\Api\V1\ProjectRevisionController;
 use App\Http\Controllers\AppSubscriptionController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContentPlanController;
 use App\Http\Controllers\Crm\ActivityController as CrmActivityController;
@@ -491,6 +492,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:direktur_utama')->group(function () {
         Route::resource('announcements', AnnouncementController::class)->except(['index', 'show']);
     });
+    // Chat pribadi antar rekan kerja — terbuka untuk semua akun, isinya hanya untuk dua peserta
+    Route::prefix('chat')->name('chat.')->controller(ChatController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('unread', 'unread')->middleware('throttle:120,1')->name('unread');
+        Route::get('sync', 'sync')->middleware('throttle:150,1')->name('sync');
+        Route::post('conversations', 'start')->middleware('throttle:30,1')->name('start');
+        Route::get('conversations/{conversation}/messages', 'messages')->whereNumber('conversation')->name('messages');
+        Route::post('conversations/{conversation}/messages', 'send')->whereNumber('conversation')->middleware('throttle:40,1')->name('send');
+        Route::post('conversations/{conversation}/read', 'read')->whereNumber('conversation')->middleware('throttle:120,1')->name('read');
+        Route::post('conversations/{conversation}/typing', 'typing')->whereNumber('conversation')->middleware('throttle:40,1')->name('typing');
+        Route::get('attachments/{message}', 'attachment')->name('attachment');
+    });
+
     Route::get('announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
     Route::get('announcements/{announcement}', [AnnouncementController::class, 'show'])->name('announcements.show');
 });
