@@ -11,7 +11,7 @@ use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 
 #[IsReadOnly]
-#[Description('Menampilkan field dan aturan validasi sebuah aksi, diambil langsung dari aplikasi. Panggil sebelum simpan-data atau hapus-data agar data yang dikirim benar.')]
+#[Description('Menampilkan field dan aturan validasi sebuah aksi, diambil langsung dari aplikasi. Panggil sebelum simpan-data atau hapus-data agar nama field yang dikirim tepat.')]
 class DescribeActionTool extends ActionTool
 {
     protected string $name = 'detail-aksi';
@@ -38,7 +38,7 @@ class DescribeActionTool extends ActionTool
         $detail = $action->summary();
 
         if (in_array($action->kind, [McpAction::WRITE, McpAction::DELETE], true)) {
-            $rules = $this->runner->rules($user, $action, $this->arrayArgument($request, 'ids'));
+            $rules = $this->runner->rules($user, $action, $this->idsArgument($request, $action));
 
             $detail['field'] = $rules ?? 'Aksi ini tidak membutuhkan data tambahan, atau aturannya diperiksa saat dijalankan.';
 
@@ -57,6 +57,7 @@ class DescribeActionTool extends ActionTool
     {
         return [
             'action' => $this->actionSchema($schema),
+            'id' => $this->idSchema($schema),
             'ids' => $this->idsSchema($schema),
         ];
     }

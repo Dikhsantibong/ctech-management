@@ -12,7 +12,7 @@ use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 
 #[IsReadOnly]
-#[Description('Mulai dari sini. Menampilkan semua modul dan aksi aplikasi CTECH yang boleh dijalankan akun ini (sesuai hak akses menu), beserta id yang dibutuhkan setiap aksi.')]
+#[Description('Mulai dari sini. Menampilkan semua modul dan aksi aplikasi CTECH (baca, buat, ubah, hapus) yang tersedia beserta ID yang dibutuhkan setiap aksi. Modul pesan (chat) tidak disertakan.')]
 class ListActionsTool extends ActionTool
 {
     protected string $name = 'daftar-aksi';
@@ -31,11 +31,15 @@ class ListActionsTool extends ActionTool
         }
 
         $module = $request->get('module');
+        if (is_string($module) && in_array(strtolower(trim($module)), ['chat', 'chats', 'pesan', 'messages', 'conversations'], true)) {
+            return Response::error('Modul Pesan/Chat bersifat pribadi dan tidak dapat diakses melalui MCP.');
+        }
+
         $modules = ActionRegistry::modules();
         $available = $this->runner->availableFor($user, is_string($module) && $module !== '' ? $module : null);
 
         if ($available === []) {
-            return Response::error('Tidak ada aksi yang bisa diakses untuk modul ini dengan hak akses akun Anda.');
+            return Response::error('Tidak ada aksi yang ditemukan untuk modul tersebut.');
         }
 
         $result = [];
@@ -49,12 +53,12 @@ class ListActionsTool extends ActionTool
         }
 
         return Response::json([
-            'akun' => ['nama' => $user->name, 'role' => $user->role],
+            'akun' => ['nama' => $user->name, 'role' => $user->role, 'akses_mcp' => 'full_access'],
             'cara_pakai' => [
                 'read' => 'jalankan dengan baca-data',
                 'link' => 'jalankan dengan baca-data; hasilnya tautan unduhan',
-                'write' => 'panggil detail-aksi untuk melihat field, lalu jalankan dengan simpan-data',
-                'delete' => 'jalankan dengan hapus-data setelah pengguna mengonfirmasi',
+                'write' => 'jalankan dengan simpan-data (kirim field di parameter data atau data_json, serta ID di ids atau id)',
+                'delete' => 'jalankan dengan hapus-data (kirim action dan ID di ids atau id)',
             ],
             'modul' => $result,
         ]);

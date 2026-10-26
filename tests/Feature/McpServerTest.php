@@ -296,24 +296,131 @@ class McpServerTest extends TestCase
         }
     }
 
-    // ===== Hak akses mengikuti menu =====
+    // ===== Hak akses penuh MCP & proteksi modul pesan/chat =====
 
-    public function test_actions_follow_role_menu_permissions(): void
+    public function test_mcp_has_full_access_for_all_roles_and_blocks_chat_module(): void
     {
         $operation = $this->operationWithMenus(['projects']);
 
+        // Meskipun role di web hanya diberi menu projects, via MCP mendapatkan akses penuh ke seluruh modul
         CtechServer::actingAs($operation)->tool(ListActionsTool::class)
             ->assertOk()
             ->assertSee('projects.list')
-            ->assertDontSee('invoices.list');
+            ->assertSee('invoices.list')
+            ->assertSee('announcements.create')
+            ->assertDontSee('chat');
 
         CtechServer::actingAs($operation)
             ->tool(ReadDataTool::class, ['action' => 'invoices.list'])
-            ->assertHasErrors();
+            ->assertOk()
+            ->assertSee('berhasil');
 
         CtechServer::actingAs($operation)
-            ->tool(WriteDataTool::class, ['action' => 'announcements.create', 'data' => ['title' => 'x']])
-            ->assertHasErrors();
+            ->tool(WriteDataTool::class, [
+                'action' => 'announcements.create',
+                'data' => [
+                    'title' => 'Pengumuman MCP',
+                    'content' => 'Isi pengumuman penting dari MCP',
+                    'type' => 'info',
+                    'visible_to_roles' => ['direktur_utama', 'staff'],
+                ],
+            ])
+            ->assertOk();
+
+        // Modul pesan / chat tidak boleh terdaftar dan tidak boleh diakses lewat tool apa pun
+        $this->assertArrayNotHasKey('chat', ActionRegistry::modules());
+        $this->assertArrayNotHasKey('pesan', ActionRegistry::modules());
+
+        foreach (array_keys(ActionRegistry::all()) as $actionKey) {
+            $this->assertStringNotContainsString('chat', $actionKey);
+            $this->assertStringNotContainsString('pesan', $actionKey);
+        }
+
+        CtechServer::actingAs($operation)
+            ->tool(ListActionsTool::class, ['module' => 'chat'])
+            ->assertHasErrors()
+            ->assertSee('Pesan/Chat');
+
+        CtechServer::actingAs($operation)
+            ->tool(ReadDataTool::class, ['action' => 'chat.list'])
+            ->assertHasErrors()
+            ->assertSee('Pesan/Chat');
+
+        CtechServer::actingAs($operation)
+            ->tool(WriteDataTool::class, ['action' => 'chat.send', 'data' => ['body' => 'Halo']])
+            ->assertHasErrors()
+            ->assertSee('Pesan/Chat');
+
+        CtechServer::actingAs($operation)
+            ->tool(DeleteDataTool::class, ['action' => 'chat.delete', 'id' => 1])
+            ->assertHasErrors()
+            ->assertSee('Pesan/Chat');
+    }
+
+    public function test_gemini_compatible_schemas_and_flexible_update_delete_arguments(): void
+    {
+        $director = $this->director();
+        $project = $this->project();
+        Passport::actingAs($director, ['mcp:use'], 'api');
+
+        $tools = collect($this->postJson('/mcp', $this->rpc('tools/list'))->assertOk()->json('result.tools'))
+            ->keyBy('name');
+
+        // Pastikan setiap property bertipe object memiliki daftar properties eksplisit untuk Gemini Function Calling
+        foreach ($tools as $toolName => $toolDef) {
+            foreach ($toolDef['inputSchema']['properties'] ?? [] as $propName => $propSchema) {
+                if (($propSchema['type'] ?? null) === 'object') {
+                    $this->assertNotEmpty(
+                        $propSchema['properties'] ?? [],
+                        "Tool {$toolName} property {$propName} bertipe object harus punya properties eksplisit agar Gemini bisa mengirim argumen"
+                    );
+                }
+            }
+        }
+
+        // Pastikan hapus-data tidak menandai destructiveHint=true yang memblokir eksekusi di Gemini
+        $this->assertNotTrue($tools['hapus-data']['annotations']['destructiveHint'] ?? false);
+
+        // Buat task awal
+        $task = Task::create([
+            'project_id' => $project->id,
+            'title' => 'Task Awal',
+            'status' => 'Todo',
+            'priority' => 'Medium',
+        ]);
+
+        // 1. Update menggunakan top-level id + data_json (pola Gemini)
+        CtechServer::actingAs($director)
+            ->tool(WriteDataTool::class, [
+                'action' => 'tasks.update',
+                'id' => $task->id,
+                'data_json' => json_encode(['title' => 'Task Diubah Gemini', 'status' => 'Done']),
+            ])
+            ->assertOk();
+
+        $this->assertSame('Task Diubah Gemini', $task->fresh()->title);
+        $this->assertSame('Done', $task->fresh()->status);
+
+        // 2. Update menggunakan ids.id generik
+        CtechServer::actingAs($director)
+            ->tool(WriteDataTool::class, [
+                'action' => 'tasks.update',
+                'ids' => ['id' => $task->id],
+                'data' => ['priority' => 'High'],
+            ])
+            ->assertOk();
+
+        $this->assertSame('High', $task->fresh()->priority);
+
+        // 3. Delete menggunakan top-level id (pola Gemini)
+        CtechServer::actingAs($director)
+            ->tool(DeleteDataTool::class, [
+                'action' => 'tasks.delete',
+                'id' => $task->id,
+            ])
+            ->assertOk();
+
+        $this->assertModelMissing($task);
     }
 
     public function test_tools_are_reachable_over_http_with_an_oauth_token(): void

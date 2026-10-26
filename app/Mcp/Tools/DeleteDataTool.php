@@ -8,10 +8,8 @@ use Illuminate\JsonSchema\Types\Type;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
-use Laravel\Mcp\Server\Tools\Annotations\IsDestructive;
 
-#[IsDestructive]
-#[Description('Menghapus data lewat aksi berjenis delete (mis. tasks.delete). Tidak bisa dibatalkan — selalu minta konfirmasi pengguna dan sebutkan data yang akan dihapus sebelum memanggil.')]
+#[Description('Menghapus data lewat aksi berjenis delete (mis. tasks.delete, projects.delete, invoices.delete, content-plans.delete, dll.) berdasarkan parameter action dan ids (atau id).')]
 class DeleteDataTool extends ActionTool
 {
     protected string $name = 'hapus-data';
@@ -38,8 +36,8 @@ class DeleteDataTool extends ActionTool
         return $this->respond($this->runner->run(
             $user,
             $action,
-            $this->arrayArgument($request, 'ids'),
-            $this->arrayArgument($request, 'data'),
+            $this->idsArgument($request, $action),
+            $this->dataArgument($request, $action),
         ));
     }
 
@@ -50,8 +48,13 @@ class DeleteDataTool extends ActionTool
     {
         return [
             'action' => $this->actionSchema($schema),
+            'id' => $this->idSchema($schema),
             'ids' => $this->idsSchema($schema),
-            'data' => $schema->object()->description('Hanya untuk aksi yang butuh data, mis. kpi.reset-target.'),
+            'data' => $schema->object([
+                'role' => $schema->string()->description('Role untuk aksi kpi.reset-target.'),
+                'metric_key' => $schema->string()->description('Metric key untuk aksi kpi.reset-target.'),
+            ])->description('Opsional, hanya untuk aksi yang butuh data tambahan seperti kpi.reset-target.'),
+            'data_json' => $schema->string()->description('Opsional, alternatif data dalam bentuk JSON string.'),
         ];
     }
 }

@@ -2,8 +2,10 @@
 
 namespace App\Mcp\Support;
 
+use App\Http\Controllers\ChatController;
 use App\Models\User;
 use App\Services\MenuAccess;
+use App\Support\MenuRegistry;
 use BackedEnum;
 use Closure;
 use DateTimeInterface;
@@ -15,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ViewErrorBag;
@@ -27,23 +30,25 @@ use Throwable;
 /**
  * Menjalankan aksi MCP dengan memanggil method controller yang sama dengan halaman web.
  *
- * Controller menerima Request internal berisi data dari Claude dan pengguna yang
- * menyetujui koneksi OAuth, sehingga validasi, log aktivitas, perhitungan total,
- * notifikasi, dan publikasi berjalan persis seperti saat dipakai lewat browser.
+ * MCP diberikan akses penuh (full access) ke seluruh modul kecuali modul Pesan (Chat).
  * Penulisan dibungkus transaksi: bila gagal, tidak ada data yang setengah tersimpan.
  */
 class ActionRunner
 {
-    /** Batas kasar ukuran hasil agar tidak membanjiri percakapan Claude. */
+    /** Batas kasar ukuran hasil agar tidak membanjiri percakapan Claude/Gemini. */
     private const MAX_OUTPUT_BYTES = 120_000;
 
     /** Atribut yang tidak boleh ikut dijadikan nilai awal update. */
     private const NEVER_PREFILL = ['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes', 'credentials'];
 
+    /** Daftar modul/menu pesan pribadi yang dilarang diakses lewat MCP. */
+    private const FORBIDDEN_CHAT_KEYS = ['chat', 'chats', 'pesan', 'messages', 'conversation', 'conversations'];
+
     public function __construct(private MenuAccess $menus) {}
 
     /**
      * Alasan penolakan, atau null bila pengguna boleh menjalankan aksi.
+     * MCP mendapat akses penuh ke seluruh fitur, namun dilarang membaca modul pesan (chat).
      */
     public function denialReason(?User $user, McpAction $action): ?string
     {
@@ -51,15 +56,34 @@ class ActionRunner
             return 'Koneksi belum terautentikasi.';
         }
 
-        if ($action->role !== null && $user->role !== $action->role) {
-            return "Aksi {$action->key} khusus untuk role {$action->role}.";
-        }
-
-        if (! $this->menus->allows($user->role, $action->menu)) {
-            return "Role Anda tidak memiliki akses ke menu \"{$action->menu}\". Minta direktur utama membukanya di Hak Akses Menu.";
+        if (self::isForbiddenChatAction($action)) {
+            return 'Modul pesan (chat) bersifat pribadi dan tidak dapat diakses melalui MCP.';
         }
 
         return null;
+    }
+
+    public static function isForbiddenChatAction(McpAction $action): bool
+    {
+        $module = strtolower($action->module);
+        $menu = strtolower($action->menu);
+        $key = strtolower($action->key);
+
+        if (in_array($module, self::FORBIDDEN_CHAT_KEYS, true) || in_array($menu, self::FORBIDDEN_CHAT_KEYS, true)) {
+            return true;
+        }
+
+        foreach (self::FORBIDDEN_CHAT_KEYS as $forbidden) {
+            if (str_starts_with($key, $forbidden.'.') || str_starts_with($key, $forbidden.'-')) {
+                return true;
+            }
+        }
+
+        if (is_array($action->handler) && ($action->handler[0] ?? null) === ChatController::class) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -116,6 +140,8 @@ class ActionRunner
         if ($reason = $this->denialReason($user, $action)) {
             return ['ok' => false, 'message' => $reason];
         }
+
+        $ids = $this->normalizeIds($action, $ids);
 
         try {
             $bindings = $this->resolveBindings($action, $ids);
@@ -203,9 +229,16 @@ class ActionRunner
     private function invoke(McpAction $action, Request $request, array $bindings): mixed
     {
         $original = app('request');
+        $user = $request->user();
+        $originalRole = $user instanceof User ? $user->role : null;
 
         app()->instance('request', $request);
         Facade::clearResolvedInstance('request');
+
+        if ($user instanceof User) {
+            $user->role = MenuRegistry::SUPER_ROLE;
+            Auth::setUser($user);
+        }
 
         try {
             if ($action->handler instanceof Closure) {
@@ -216,9 +249,35 @@ class ActionRunner
 
             return app()->call([app($controller), $method], $bindings + ['request' => $request]);
         } finally {
+            if ($user instanceof User && $originalRole !== null) {
+                $user->role = $originalRole;
+            }
+
             app()->instance('request', $original);
             Facade::clearResolvedInstance('request');
         }
+    }
+
+    /**
+     * Bila aksi hanya membutuhkan satu ID dan klien mengirim kunci generik "id",
+     * petakan otomatis ke nama parameter binding aksi tersebut.
+     *
+     * @param  array<string, mixed>  $ids
+     * @return array<string, mixed>
+     */
+    private function normalizeIds(McpAction $action, array $ids): array
+    {
+        $bindingNames = array_keys($action->bindings);
+
+        if (count($bindingNames) === 1) {
+            $primary = $bindingNames[0];
+
+            if ((! isset($ids[$primary]) || $ids[$primary] === '') && isset($ids['id']) && $ids['id'] !== '') {
+                $ids[$primary] = $ids['id'];
+            }
+        }
+
+        return $ids;
     }
 
     /**
@@ -317,6 +376,10 @@ class ActionRunner
             // Halaman Inertia: yang berguna hanya props-nya
             if (is_array($data) && isset($data['component'], $data['props'])) {
                 $data = $data['props'];
+            }
+
+            if (is_array($data)) {
+                unset($data['chatState']);
             }
 
             return ['ok' => true] + $this->compact($data, $only, $limit);
