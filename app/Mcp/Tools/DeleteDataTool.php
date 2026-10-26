@@ -29,8 +29,14 @@ class DeleteDataTool extends ActionTool
             return $action;
         }
 
+        $user = $this->resolveUser($request);
+
+        if (! $user) {
+            return Response::error('Koneksi belum terautentikasi.');
+        }
+
         return $this->respond($this->runner->run(
-            $request->user(),
+            $user,
             $action,
             $this->arrayArgument($request, 'ids'),
             $this->arrayArgument($request, 'data'),

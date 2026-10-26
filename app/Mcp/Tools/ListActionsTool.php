@@ -24,9 +24,15 @@ class ListActionsTool extends ActionTool
 
     public function handle(Request $request): Response
     {
+        $user = $this->resolveUser($request);
+
+        if (! $user) {
+            return Response::error('Koneksi belum terautentikasi.');
+        }
+
         $module = $request->get('module');
         $modules = ActionRegistry::modules();
-        $available = $this->runner->availableFor($request->user(), is_string($module) && $module !== '' ? $module : null);
+        $available = $this->runner->availableFor($user, is_string($module) && $module !== '' ? $module : null);
 
         if ($available === []) {
             return Response::error('Tidak ada aksi yang bisa diakses untuk modul ini dengan hak akses akun Anda.');
@@ -43,7 +49,7 @@ class ListActionsTool extends ActionTool
         }
 
         return Response::json([
-            'akun' => ['nama' => $request->user()->name, 'role' => $request->user()->role],
+            'akun' => ['nama' => $user->name, 'role' => $user->role],
             'cara_pakai' => [
                 'read' => 'jalankan dengan baca-data',
                 'link' => 'jalankan dengan baca-data; hasilnya tautan unduhan',

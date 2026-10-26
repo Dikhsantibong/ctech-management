@@ -227,6 +227,19 @@ class ChatTest extends TestCase
         $this->assertSame(1, ChatConversation::count());
     }
 
+    public function test_every_role_can_open_chat_and_message_anyone(): void
+    {
+        foreach (['direktur_utama', 'operation', 'marketing', 'administrasi'] as $role) {
+            $user = User::factory()->create(['role' => $role]);
+
+            $this->actingAs($user)->get('/chat')->assertOk()
+                ->assertInertia(fn (AssertableInertia $page) => $page->component('chat/index')->has('contacts', User::count() - 1));
+
+            $this->actingAs($user)->postJson('/chat/conversations', ['user_id' => $this->alice->id])->assertOk();
+            $this->actingAs($user)->postJson('/chat/conversations', ['user_id' => $this->bob->id])->assertOk();
+        }
+    }
+
     public function test_cannot_start_a_conversation_with_yourself(): void
     {
         $this->actingAs($this->alice)

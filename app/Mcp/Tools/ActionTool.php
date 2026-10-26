@@ -5,6 +5,7 @@ namespace App\Mcp\Tools;
 use App\Mcp\Support\ActionRegistry;
 use App\Mcp\Support\ActionRunner;
 use App\Mcp\Support\McpAction;
+use App\Models\User;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\JsonSchema\Types\Type;
 use Laravel\Mcp\Request;
@@ -27,7 +28,36 @@ abstract class ActionTool extends Tool
 
     public function shouldRegister(Request $request): bool
     {
-        return $request->user() !== null;
+        return $this->resolveUser($request) !== null;
+    }
+
+    /**
+     * Ambil user dari koneksi OAuth/Bearer atau dari konfigurasi `mcp.local_user`
+     * saat dijalankan lewat STDIO lokal (`php artisan mcp:start ctech`).
+     */
+    protected function resolveUser(Request $request): ?User
+    {
+        $user = $request->user();
+
+        if ($user instanceof User) {
+            return $user;
+        }
+
+        $localUser = config('mcp.local_user');
+
+        if (! is_string($localUser) && ! is_int($localUser)) {
+            return null;
+        }
+
+        $identifier = trim((string) $localUser);
+
+        if ($identifier === '') {
+            return null;
+        }
+
+        return ctype_digit($identifier)
+            ? User::find((int) $identifier)
+            : User::where('email', $identifier)->first();
     }
 
     /**

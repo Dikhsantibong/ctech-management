@@ -29,14 +29,16 @@ class DescribeActionTool extends ActionTool
             return $action;
         }
 
-        if ($reason = $this->runner->denialReason($request->user(), $action)) {
+        $user = $this->resolveUser($request);
+
+        if ($reason = $this->runner->denialReason($user, $action)) {
             return Response::error($reason);
         }
 
         $detail = $action->summary();
 
         if (in_array($action->kind, [McpAction::WRITE, McpAction::DELETE], true)) {
-            $rules = $this->runner->rules($request->user(), $action, $this->arrayArgument($request, 'ids'));
+            $rules = $this->runner->rules($user, $action, $this->arrayArgument($request, 'ids'));
 
             $detail['field'] = $rules ?? 'Aksi ini tidak membutuhkan data tambahan, atau aturannya diperiksa saat dijalankan.';
 

@@ -96,6 +96,16 @@ class McpServerTest extends TestCase
             'client_name' => 'Claude',
             'redirect_uris' => ['https://claude.ai/api/mcp/auth_callback'],
         ])->assertCreated()->assertJsonStructure(['client_id']);
+
+        $this->postJson('/oauth/register', [
+            'client_name' => 'Gemini Enterprise',
+            'redirect_uris' => ['https://vertexaisearch.cloud.google.com/oauth-redirect'],
+        ])->assertCreated()->assertJsonStructure(['client_id']);
+
+        $this->postJson('/oauth/register', [
+            'client_name' => 'Gemini CLI',
+            'redirect_uris' => ['http://localhost:7777/oauth/callback'],
+        ])->assertCreated()->assertJsonStructure(['client_id']);
     }
 
     public function test_claude_client_command_creates_confidential_client(): void
@@ -109,6 +119,39 @@ class McpServerTest extends TestCase
         $this->assertTrue($client->confidential());
         $this->assertContains('https://claude.ai/api/mcp/auth_callback', $client->redirect_uris);
         $this->assertTrue($client->hasScope('mcp:use'));
+    }
+
+    public function test_gemini_client_command_creates_oauth_client_and_optional_bearer_token(): void
+    {
+        $director = $this->director();
+
+        $this->artisan('mcp:gemini-client', [
+            '--name' => 'Gemini Uji',
+            '--user' => $director->email,
+        ])
+            ->expectsOutputToContain('OAuth Client Secret')
+            ->expectsOutputToContain('Bearer Token')
+            ->assertSuccessful();
+
+        $client = Client::where('name', 'Gemini Uji')->firstOrFail();
+
+        $this->assertTrue($client->confidential());
+        $this->assertContains('https://vertexaisearch.cloud.google.com/oauth-redirect', $client->redirect_uris);
+        $this->assertContains('https://gemini.google.com/api/mcp/auth_callback', $client->redirect_uris);
+        $this->assertContains('http://localhost:7777/oauth/callback', $client->redirect_uris);
+        $this->assertTrue($client->hasScope('mcp:use'));
+        $this->assertSame(1, $director->tokens()->where('name', 'Gemini Uji')->count());
+    }
+
+    public function test_local_stdio_user_config_allows_tools_without_http_session(): void
+    {
+        $director = $this->director();
+        config(['mcp.local_user' => $director->email]);
+
+        CtechServer::tool(ListActionsTool::class)
+            ->assertOk()
+            ->assertSee($director->name)
+            ->assertSee('projects.list');
     }
 
     // ===== Registri: setiap aksi menunjuk ke kode yang benar-benar ada =====

@@ -15,12 +15,26 @@ return [
     |
     */
 
-    // Hanya connector Claude (claude.ai / claude.com, termasuk Cowork) yang boleh
-    // mendaftar sebagai client OAuth. Tambahkan domain lain bila perlu.
+    // Connector Claude (claude.ai / claude.com, termasuk Cowork) dan Gemini
+    // (Gemini Enterprise/Vertex AI, Gemini Web, AI Studio, serta Gemini CLI/lokal)
+    // yang boleh mendaftar sebagai client OAuth. Tambahkan domain lain bila perlu.
     'redirect_domains' => array_filter(array_map('trim', explode(',', env(
         'MCP_REDIRECT_DOMAINS',
-        'https://claude.ai,https://claude.com',
+        'https://claude.ai,https://claude.com,https://gemini.google.com,https://aistudio.google.com,https://vertexaisearch.cloud.google.com,http://localhost,http://127.0.0.1',
     )))),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Local STDIO User
+    |--------------------------------------------------------------------------
+    |
+    | Email atau ID user yang dipakai saat server MCP dijalankan secara lokal
+    | lewat STDIO (`php artisan mcp:start ctech`), misalnya dari Gemini CLI,
+    | Antigravity, atau Claude Code.
+    |
+    */
+
+    'local_user' => env('MCP_USER_EMAIL', env('MCP_USER_ID')),
 
     /*
     |--------------------------------------------------------------------------

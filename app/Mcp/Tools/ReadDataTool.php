@@ -29,11 +29,17 @@ class ReadDataTool extends ActionTool
             return $action;
         }
 
+        $user = $this->resolveUser($request);
+
+        if (! $user) {
+            return Response::error('Koneksi belum terautentikasi.');
+        }
+
         $only = array_values(array_filter($this->arrayArgument($request, 'only'), 'is_string'));
         $limit = max(5, min(200, (int) ($request->get('limit') ?? 50)));
 
         return $this->respond($this->runner->run(
-            $request->user(),
+            $user,
             $action,
             $this->arrayArgument($request, 'ids'),
             $this->arrayArgument($request, 'query'),
