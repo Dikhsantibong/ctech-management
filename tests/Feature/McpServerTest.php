@@ -207,17 +207,20 @@ class McpServerTest extends TestCase
             $tokenResponse->assertOk()->assertJsonStructure(['access_token', 'token_type']);
         }
 
-        // 3. Auto-provision bila client_id belum ada di DB tetapi redirect_uri berasal dari domain resmi Gemini
+        // 3. Simulasi production di mana .env lama hanya berisi claude.ai & client_id UUID berasal dari local
+        config(['mcp.redirect_domains' => ['https://claude.ai', 'https://claude.com']]);
+        $unregisteredUuid = '01a17915-cfe7-727a-9ede-9e63f2ca69a8';
+
         $autoAuthorize = $this->actingAs($director)->get('/oauth/authorize?'.http_build_query([
             'response_type' => 'code',
-            'client_id' => 'gemini-custom-connector',
-            'redirect_uri' => 'https://vertexaisearch.cloud.google.com/oauth-redirect',
+            'client_id' => $unregisteredUuid,
+            'redirect_uri' => 'https://eu-vertexaisearch.cloud.google.com/oauth-redirect',
             'scope' => 'mcp:use',
             'state' => 'gemini-state',
         ]));
 
         $autoAuthorize->assertOk();
-        $autoClient = Client::where('name', 'gemini-custom-connector')->firstOrFail();
+        $autoClient = Client::findOrFail($unregisteredUuid);
 
         $autoApprove = $this->actingAs($director)->post('/oauth/authorize', [
             'state' => 'gemini-state',
@@ -227,12 +230,20 @@ class McpServerTest extends TestCase
         $autoApprove->assertRedirect();
         parse_str((string) parse_url((string) $autoApprove->headers->get('Location'), PHP_URL_QUERY), $autoQuery);
 
-        $this->postJson('/oauth/token', [
+        $this->withHeaders([
+            'Authorization' => 'Basic '.base64_encode($unregisteredUuid.':VBlNSqOepL2kot8qUkniWC6hrxsKLSHmiR3uC0vL'),
+        ])->postJson('/oauth/token', [
             'grant_type' => 'authorization_code',
-            'client_id' => 'gemini-custom-connector',
-            'client_secret' => 'custom-secret',
-            'redirect_uri' => 'https://vertexaisearch.cloud.google.com/oauth-redirect',
+            'redirect_uri' => 'https://eu-vertexaisearch.cloud.google.com/oauth-redirect',
             'code' => $autoQuery['code'],
+        ])->assertOk()->assertJsonStructure(['access_token']);
+
+        // 4. Client credentials grant juga tidak gagal invalid_client di production
+        $this->postJson('/oauth/token', [
+            'grant_type' => 'client_credentials',
+            'client_id' => 'gemini-service-client',
+            'client_secret' => 'any-production-secret',
+            'scope' => 'mcp:use',
         ])->assertOk()->assertJsonStructure(['access_token']);
 
         // 4. Redirect URI asing tetap ditolak dengan invalid_client
