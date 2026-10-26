@@ -2,12 +2,16 @@
 
 namespace App\Providers;
 
+use App\Mcp\Support\McpBridgeClientRepository;
+use App\Mcp\Support\McpOAuthRegisterController;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Mcp\Server\Http\Controllers\OAuthRegisterController;
 use Laravel\Mcp\Server\Registrar;
+use Laravel\Passport\Bridge\ClientRepository as BridgeClientRepository;
 use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
@@ -17,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(BridgeClientRepository::class, McpBridgeClientRepository::class);
+        $this->app->bind(OAuthRegisterController::class, McpOAuthRegisterController::class);
+
         // routes/channels.php membuat broadcaster saat aplikasi dimuat. Bila kunci
         // Pusher belum diisi, broadcaster Pusher gagal dibuat dan SELURUH aplikasi
         // ikut error. Jatuhkan ke "log" agar aplikasi tetap jalan; chat lalu

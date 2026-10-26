@@ -154,6 +154,96 @@ class McpServerTest extends TestCase
             ->assertSee('projects.list');
     }
 
+    public function test_oauth_flow_works_for_both_claude_and_gemini_without_invalid_client(): void
+    {
+        $director = $this->director();
+
+        // 1. Buat client lewat mcp:claude-client
+        $this->artisan('mcp:claude-client', ['--name' => 'Claude Utama'])->assertSuccessful();
+        $claudeClient = Client::where('name', 'Claude Utama')->firstOrFail();
+
+        // 2. Client yang sama dipakai untuk callback Claude maupun callback Gemini & localhost port dinamis
+        foreach ([
+            'https://claude.ai/api/mcp/auth_callback',
+            'https://vertexaisearch.cloud.google.com/oauth-redirect',
+            'https://gemini.google.com/api/mcp/auth_callback',
+            'http://localhost:54321/oauth/callback',
+        ] as $redirectUri) {
+            $authorizeResponse = $this->actingAs($director)->get('/oauth/authorize?'.http_build_query([
+                'response_type' => 'code',
+                'client_id' => '...'.$claudeClient->id.' ',
+                'redirect_uri' => $redirectUri,
+                'scope' => 'mcp:use',
+                'state' => 'state-123',
+                'prompt' => 'consent',
+            ]));
+
+            $authorizeResponse->assertOk();
+            $authToken = session('authToken');
+            $this->assertNotEmpty($authToken);
+
+            $approveResponse = $this->actingAs($director)->post('/oauth/authorize', [
+                'state' => 'state-123',
+                'client_id' => $claudeClient->id,
+                'auth_token' => $authToken,
+            ]);
+
+            $approveResponse->assertRedirect();
+            $location = (string) $approveResponse->headers->get('Location');
+            $this->assertStringStartsWith($redirectUri, $location);
+
+            parse_str((string) parse_url($location, PHP_URL_QUERY), $query);
+            $this->assertArrayHasKey('code', $query);
+            $this->assertSame('state-123', $query['state'] ?? null);
+
+            $tokenResponse = $this->postJson('/oauth/token', [
+                'grant_type' => 'authorization_code',
+                'client_id' => ' '.$claudeClient->id.'...',
+                'client_secret' => 'secret-bebas-atau-terformat',
+                'redirect_uri' => $redirectUri,
+                'code' => $query['code'],
+            ]);
+
+            $tokenResponse->assertOk()->assertJsonStructure(['access_token', 'token_type']);
+        }
+
+        // 3. Auto-provision bila client_id belum ada di DB tetapi redirect_uri berasal dari domain resmi Gemini
+        $autoAuthorize = $this->actingAs($director)->get('/oauth/authorize?'.http_build_query([
+            'response_type' => 'code',
+            'client_id' => 'gemini-custom-connector',
+            'redirect_uri' => 'https://vertexaisearch.cloud.google.com/oauth-redirect',
+            'scope' => 'mcp:use',
+            'state' => 'gemini-state',
+        ]));
+
+        $autoAuthorize->assertOk();
+        $autoClient = Client::where('name', 'gemini-custom-connector')->firstOrFail();
+
+        $autoApprove = $this->actingAs($director)->post('/oauth/authorize', [
+            'state' => 'gemini-state',
+            'client_id' => $autoClient->id,
+            'auth_token' => session('authToken'),
+        ]);
+        $autoApprove->assertRedirect();
+        parse_str((string) parse_url((string) $autoApprove->headers->get('Location'), PHP_URL_QUERY), $autoQuery);
+
+        $this->postJson('/oauth/token', [
+            'grant_type' => 'authorization_code',
+            'client_id' => 'gemini-custom-connector',
+            'client_secret' => 'custom-secret',
+            'redirect_uri' => 'https://vertexaisearch.cloud.google.com/oauth-redirect',
+            'code' => $autoQuery['code'],
+        ])->assertOk()->assertJsonStructure(['access_token']);
+
+        // 4. Redirect URI asing tetap ditolak dengan invalid_client
+        $this->actingAs($director)->get('/oauth/authorize?'.http_build_query([
+            'response_type' => 'code',
+            'client_id' => $claudeClient->id,
+            'redirect_uri' => 'https://evil.example.com/callback',
+            'scope' => 'mcp:use',
+        ]))->assertStatus(401)->assertJsonPath('error', 'invalid_client');
+    }
+
     // ===== Registri: setiap aksi menunjuk ke kode yang benar-benar ada =====
 
     public function test_every_action_points_to_an_existing_controller_method_and_menu(): void
