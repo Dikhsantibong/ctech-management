@@ -165,6 +165,13 @@ export default function ChatIndex({ conversations: initialConversations, contact
     const [pickerOpen, setPickerOpen] = useState(false);
     const [contactQuery, setContactQuery] = useState('');
 
+    // Touch swipe-to-reply state for mobile
+    const [swipingId, setSwipingId] = useState<number | null>(null);
+    const [swipeDistance, setSwipeDistance] = useState(0);
+    const touchStartX = useRef<number | null>(null);
+    const touchStartY = useRef<number | null>(null);
+    const isSwipingHorizontal = useRef(false);
+
     const activeRef = useRef<Summary | null>(null);
     const messagesRef = useRef<Message[]>([]);
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -205,6 +212,55 @@ export default function ChatIndex({ conversations: initialConversations, contact
             textareaRef.current?.focus();
         });
     }, []);
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX;
+        touchStartY.current = e.touches[0].clientY;
+        isSwipingHorizontal.current = false;
+    };
+
+    const handleTouchMove = (e: React.TouchEvent, msgId: number, isMine: boolean) => {
+        if (touchStartX.current === null || touchStartY.current === null) return;
+        const deltaX = e.touches[0].clientX - touchStartX.current;
+        const deltaY = e.touches[0].clientY - touchStartY.current;
+
+        if (!isSwipingHorizontal.current) {
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 8) {
+                isSwipingHorizontal.current = true;
+            } else if (Math.abs(deltaY) > 8) {
+                touchStartX.current = null;
+                touchStartY.current = null;
+                return;
+            }
+        }
+
+        if (isSwipingHorizontal.current) {
+            const valid = isMine ? deltaX < 0 : deltaX > 0;
+            if (valid) {
+                const dist = Math.min(50, Math.max(0, isMine ? -deltaX : deltaX));
+                setSwipingId(msgId);
+                setSwipeDistance(dist);
+            }
+        }
+    };
+
+    const handleTouchEnd = (msg: Message) => {
+        if (swipingId === msg.id && swipeDistance >= 35) {
+            startReply(msg);
+            if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                try {
+                    navigator.vibrate(15);
+                } catch {
+                    // Ignore if vibration not allowed
+                }
+            }
+        }
+        touchStartX.current = null;
+        touchStartY.current = null;
+        isSwipingHorizontal.current = false;
+        setSwipingId(null);
+        setSwipeDistance(0);
+    };
 
     /** Simpan percakapan yang sedang dibuka di daftar walau belum punya pesan. */
     const applySummaries = useCallback((list: Summary[]) => {
@@ -470,7 +526,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
         <>
             <Head title="Pesan" />
 
-            <div className="flex h-[calc(100svh-5rem)] min-h-[480px] p-2 sm:p-4 pt-0">
+            <div className="flex h-[calc(100svh-5rem)] min-h-[480px] p-1 sm:p-4 pt-0">
                 <div className="flex w-full overflow-hidden rounded-xl border bg-background shadow-xs">
                     {/* ===== Daftar percakapan ===== */}
                     <aside className={cn('flex w-full flex-col border-r bg-card md:w-80 md:shrink-0 lg:w-96', active && 'hidden md:flex')}>
@@ -561,7 +617,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                             </div>
                         ) : (
                             <>
-                                <header className="flex h-16 shrink-0 items-center gap-3 border-b bg-card/90 px-4 py-3 backdrop-blur-xs sm:px-6">
+                                <header className="flex h-14 sm:h-16 shrink-0 items-center gap-2.5 sm:gap-3 border-b bg-card/90 px-3 sm:px-6 py-2.5 backdrop-blur-xs">
                                     <Button
                                         variant="ghost"
                                         size="icon"
@@ -571,7 +627,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                     >
                                         <ArrowLeft className="h-4 w-4" />
                                     </Button>
-                                    <PersonAvatar person={other} className="h-9 w-9" />
+                                    <PersonAvatar person={other} className="h-8 w-8 sm:h-9 sm:w-9" />
                                     <div className="min-w-0">
                                         <p className="truncate text-sm font-semibold">{other?.name ?? 'Pengguna dihapus'}</p>
                                         <p className="truncate text-xs text-muted-foreground">
@@ -591,7 +647,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                         const el = e.currentTarget;
                                         stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
                                     }}
-                                    className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 md:px-8"
+                                    className="flex-1 overflow-y-auto px-2.5 py-4 sm:px-6 md:px-8"
                                 >
                                     <div className="mx-auto flex w-full max-w-3xl flex-col">
                                         <div className="mx-auto mb-4 flex w-fit max-w-full items-center gap-1.5 rounded-full border border-border/60 bg-background/90 px-3.5 py-1 text-[11px] text-muted-foreground shadow-xs backdrop-blur-xs">
@@ -629,6 +685,8 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                                 const showDay = !previous || dayLabel(previous.created_at) !== dayLabel(message.created_at);
                                                 const read = message.mine && message.id <= otherReadUpTo;
                                                 const isSameSender = previous && previous.sender_id === message.sender_id && !showDay;
+                                                const isSwipingThis = swipingId === message.id;
+                                                const currentSwipeX = isSwipingThis ? (message.mine ? -swipeDistance : swipeDistance) : 0;
 
                                                 return (
                                                     <div key={message.id} className={cn(!showDay && (isSameSender ? 'mt-1' : 'mt-3.5'))}>
@@ -643,7 +701,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                                         <div
                                                             id={`msg-${message.id}`}
                                                             className={cn(
-                                                                'group relative flex items-end gap-1.5 rounded-2xl p-0.5 transition-all duration-300',
+                                                                'group relative flex items-end gap-1.5 rounded-2xl p-0.5 transition-colors duration-300',
                                                                 message.mine ? 'justify-end' : 'justify-start',
                                                                 highlightedMessageId === message.id && 'bg-primary/15 ring-2 ring-primary ring-offset-2 ring-offset-background',
                                                             )}
@@ -655,7 +713,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                                                     variant="ghost"
                                                                     size="icon"
                                                                     onClick={() => startReply(message)}
-                                                                    className="h-7 w-7 shrink-0 rounded-full text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted hover:text-foreground"
+                                                                    className="h-7 w-7 shrink-0 rounded-full text-muted-foreground opacity-80 transition-all hover:bg-muted hover:text-foreground hover:opacity-100 active:scale-90 sm:opacity-0 sm:group-hover:opacity-100 bg-muted/40 sm:bg-transparent"
                                                                     title="Balas pesan ini"
                                                                     aria-label="Balas"
                                                                 >
@@ -665,8 +723,16 @@ export default function ChatIndex({ conversations: initialConversations, contact
 
                                                             {/* Gelembung Pesan */}
                                                             <div
+                                                                onTouchStart={handleTouchStart}
+                                                                onTouchMove={(e) => handleTouchMove(e, message.id, message.mine)}
+                                                                onTouchEnd={() => handleTouchEnd(message)}
+                                                                onDoubleClick={() => startReply(message)}
+                                                                style={{
+                                                                    transform: currentSwipeX !== 0 ? `translateX(${currentSwipeX}px)` : undefined,
+                                                                    transition: isSwipingThis ? 'none' : 'transform 0.2s ease-out',
+                                                                }}
                                                                 className={cn(
-                                                                    'relative max-w-[85%] px-3.5 py-2 shadow-xs transition-shadow sm:max-w-[72%]',
+                                                                    'relative max-w-[80%] px-3.5 py-2 shadow-xs transition-shadow sm:max-w-[72%] select-text',
                                                                     message.mine
                                                                         ? 'rounded-2xl rounded-tr-xs bg-primary text-primary-foreground'
                                                                         : 'rounded-2xl rounded-tl-xs border border-border/70 bg-card text-card-foreground',
@@ -676,7 +742,10 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                                                 {message.reply_to && (
                                                                     <button
                                                                         type="button"
-                                                                        onClick={() => scrollToMessage(message.reply_to!.id)}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            scrollToMessage(message.reply_to!.id);
+                                                                        }}
                                                                         className={cn(
                                                                             'mb-1.5 flex w-full flex-col gap-0.5 rounded-lg border-l-[3px] px-2.5 py-1.5 text-left text-xs transition-opacity hover:opacity-90',
                                                                             message.mine
@@ -766,7 +835,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                                                     variant="ghost"
                                                                     size="icon"
                                                                     onClick={() => startReply(message)}
-                                                                    className="h-7 w-7 shrink-0 rounded-full text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted hover:text-foreground"
+                                                                    className="h-7 w-7 shrink-0 rounded-full text-muted-foreground opacity-80 transition-all hover:bg-muted hover:text-foreground hover:opacity-100 active:scale-90 sm:opacity-0 sm:group-hover:opacity-100 bg-muted/40 sm:bg-transparent"
                                                                     title="Balas pesan ini"
                                                                     aria-label="Balas"
                                                                 >
@@ -782,16 +851,16 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                 </div>
 
                                 {/* Bagian Input Bawah */}
-                                <footer className="border-t bg-card/90 p-3 backdrop-blur-xs">
+                                <footer className="border-t bg-card/90 p-2 sm:p-3 backdrop-blur-xs">
                                     <div className="mx-auto max-w-3xl">
                                         {error && <p className="mb-2 text-xs font-medium text-destructive">{error}</p>}
 
                                         {/* Banner Balas Pesan */}
                                         {replyingTo && (
-                                            <div className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-primary/25 bg-primary/5 px-3 py-2 text-xs transition-all animate-in fade-in slide-in-from-bottom-2">
-                                                <div className="flex min-w-0 items-center gap-2.5">
-                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
-                                                        <Reply className="h-3.5 w-3.5" />
+                                            <div className="mb-2 flex items-center justify-between gap-2.5 rounded-lg border border-primary/25 bg-primary/5 px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs transition-all animate-in fade-in slide-in-from-bottom-2">
+                                                <div className="flex min-w-0 items-center gap-2">
+                                                    <div className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+                                                        <Reply className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                                                     </div>
                                                     <div className="min-w-0 flex-1">
                                                         <p className="text-[11px] font-semibold text-primary">
@@ -808,7 +877,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => setReplyingTo(null)}
-                                                    className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                                                    className="h-6 w-6 rounded-full text-muted-foreground hover:text-foreground shrink-0"
                                                     aria-label="Batal balas"
                                                 >
                                                     <X className="h-3.5 w-3.5" />
@@ -818,7 +887,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
 
                                         {/* Banner Lampiran File */}
                                         {file && (
-                                            <div className="mb-2 flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-2 text-xs">
+                                            <div className="mb-2 flex items-center gap-2 rounded-lg border bg-muted/50 px-2.5 sm:px-3 py-1.5 text-xs">
                                                 <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                                                 <span className="min-w-0 flex-1 truncate font-medium">{file.name}</span>
                                                 <span className="text-[11px] text-muted-foreground">{formatSize(file.size)}</span>
@@ -827,7 +896,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => pickFile(null)}
-                                                    className="h-5 w-5 text-muted-foreground hover:text-foreground"
+                                                    className="h-5 w-5 rounded-full text-muted-foreground hover:text-foreground shrink-0"
                                                     aria-label="Batal lampirkan"
                                                 >
                                                     <X className="h-3.5 w-3.5" />
@@ -835,7 +904,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                             </div>
                                         )}
 
-                                        <div className="flex items-end gap-2">
+                                        <div className="flex items-end gap-1.5 sm:gap-2">
                                             <input
                                                 ref={fileInputRef}
                                                 type="file"
@@ -850,7 +919,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                                 onClick={() => fileInputRef.current?.click()}
                                                 aria-label="Lampirkan file"
                                                 disabled={sending}
-                                                className="h-10 w-10 shrink-0 rounded-full text-muted-foreground shadow-xs hover:text-foreground"
+                                                className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-full text-muted-foreground shadow-xs hover:text-foreground"
                                             >
                                                 <Paperclip className="h-4 w-4" />
                                             </Button>
@@ -872,8 +941,8 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                                     }}
                                                     rows={1}
                                                     maxLength={5000}
-                                                    placeholder={replyingTo ? 'Tulis balasan… (Enter kirim, Esc batal)' : 'Tulis pesan… (Enter kirim, Shift+Enter baris baru)'}
-                                                    className="max-h-32 min-h-10 w-full resize-none rounded-2xl border border-input bg-background px-4 py-2.5 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                                                    placeholder={replyingTo ? 'Tulis balasan…' : 'Tulis pesan…'}
+                                                    className="max-h-32 min-h-9 sm:min-h-10 w-full resize-none rounded-2xl border border-input bg-background px-3.5 sm:px-4 py-2 sm:py-2.5 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                                                 />
                                             </div>
                                             <Button
@@ -881,7 +950,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                                 onClick={send}
                                                 disabled={sending || (!draft.trim() && !file)}
                                                 aria-label="Kirim"
-                                                className="h-10 w-10 shrink-0 rounded-full shadow-xs"
+                                                className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-full shadow-xs"
                                             >
                                                 {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                                             </Button>
