@@ -25,6 +25,7 @@ class ChatMessage extends Model
     protected $fillable = [
         'conversation_id',
         'sender_id',
+        'reply_to_id',
         'body',
         'attachment_path',
         'attachment_name',
@@ -69,6 +70,12 @@ class ChatMessage extends Model
         return $this->belongsTo(User::class, 'sender_id');
     }
 
+    /** @return BelongsTo<ChatMessage, $this> */
+    public function replyTo(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'reply_to_id');
+    }
+
     public function hasAttachment(): bool
     {
         return $this->attachment_path !== null;
@@ -101,6 +108,15 @@ class ChatMessage extends Model
             'conversation_id' => $this->conversation_id,
             'sender_id' => $this->sender_id,
             'mine' => (int) $this->sender_id === (int) $viewer->id,
+            'reply_to' => $this->replyTo ? [
+                'id' => $this->replyTo->id,
+                'sender_id' => $this->replyTo->sender_id,
+                'sender_name' => $this->replyTo->sender?->name ?? 'Pengguna',
+                'mine' => (int) $this->replyTo->sender_id === (int) $viewer->id,
+                'body' => $this->replyTo->body ? Str::limit((string) $this->replyTo->body, 120) : null,
+                'attachment_name' => $this->replyTo->attachment_name,
+                'is_image' => $this->replyTo->isInlineImage(),
+            ] : null,
             'body' => $this->body,
             'attachment' => $this->hasAttachment() ? [
                 'name' => $this->attachment_name,

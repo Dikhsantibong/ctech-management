@@ -1,6 +1,18 @@
 import { Head, usePage } from '@inertiajs/react';
 import {
-    ArrowLeft, Check, CheckCheck, Download, FileText, Loader2, Lock, MessageSquarePlus, Paperclip, Search, Send, X,
+    ArrowLeft,
+    Check,
+    CheckCheck,
+    Download,
+    FileText,
+    Loader2,
+    Lock,
+    MessageSquarePlus,
+    Paperclip,
+    Reply,
+    Search,
+    Send,
+    X,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -25,12 +37,23 @@ type Summary = {
 
 type Attachment = { name: string; mime: string | null; size: number | null; is_image: boolean; url: string };
 
+type ReplyTo = {
+    id: number;
+    sender_id: number;
+    sender_name: string;
+    mine: boolean;
+    body: string | null;
+    attachment_name: string | null;
+    is_image: boolean;
+};
+
 type Message = {
     id: number;
     conversation_id: number;
     sender_id: number;
     mine: boolean;
     body: string | null;
+    reply_to?: ReplyTo | null;
     attachment: Attachment | null;
     read_at: string | null;
     created_at: string | null;
@@ -110,7 +133,7 @@ function PersonAvatar({ person, className }: { person: Person | null; className?
     const getInitials = useInitials();
 
     return (
-        <Avatar className={cn('h-10 w-10 shrink-0 overflow-hidden rounded-full', className)}>
+        <Avatar className={cn('h-10 w-10 shrink-0 overflow-hidden rounded-full ring-1 ring-border/50', className)}>
             {person?.avatar && <AvatarImage src={person.avatar} alt={person.name} />}
             <AvatarFallback className="rounded-full bg-neutral-200 text-sm font-medium text-neutral-700 dark:bg-neutral-700 dark:text-neutral-100">
                 {getInitials(person?.name ?? '?')}
@@ -134,6 +157,8 @@ export default function ChatIndex({ conversations: initialConversations, contact
     const [otherTyping, setOtherTyping] = useState(false);
     const [draft, setDraft] = useState('');
     const [file, setFile] = useState<File | null>(null);
+    const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+    const [highlightedMessageId, setHighlightedMessageId] = useState<number | null>(null);
     const [sending, setSending] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [listQuery, setListQuery] = useState('');
@@ -144,6 +169,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
     const messagesRef = useRef<Message[]>([]);
     const scrollRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
     const stickToBottom = useRef(true);
     const lastTypingSent = useRef(0);
     const typingTimer = useRef<number | undefined>(undefined);
@@ -159,6 +185,24 @@ export default function ChatIndex({ conversations: initialConversations, contact
         requestAnimationFrame(() => {
             const el = scrollRef.current;
             if (el) el.scrollTop = el.scrollHeight;
+        });
+    }, []);
+
+    const scrollToMessage = useCallback((id: number) => {
+        const el = document.getElementById(`msg-${id}`);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setHighlightedMessageId(id);
+            window.setTimeout(() => {
+                setHighlightedMessageId((current) => (current === id ? null : current));
+            }, 2000);
+        }
+    }, []);
+
+    const startReply = useCallback((message: Message) => {
+        setReplyingTo(message);
+        requestAnimationFrame(() => {
+            textareaRef.current?.focus();
         });
     }, []);
 
@@ -236,6 +280,8 @@ export default function ChatIndex({ conversations: initialConversations, contact
         setError(null);
         setDraft('');
         setFile(null);
+        setReplyingTo(null);
+        setHighlightedMessageId(null);
         setLoadingThread(true);
         stickToBottom.current = true;
 
@@ -313,6 +359,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
         const form = new FormData();
         if (body) form.append('body', body);
         if (file) form.append('file', file);
+        if (replyingTo) form.append('reply_to_id', String(replyingTo.id));
 
         setSending(true);
         setError(null);
@@ -329,6 +376,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
 
             setDraft('');
             setFile(null);
+            setReplyingTo(null);
             if (fileInputRef.current) fileInputRef.current.value = '';
             stickToBottom.current = true;
             setMessages((list) => mergeMessages(list, [data.message]));
@@ -339,7 +387,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
         } finally {
             setSending(false);
         }
-    }, [draft, file, sending, scrollToBottom, scheduleSync]);
+    }, [draft, file, replyingTo, sending, scrollToBottom, scheduleSync]);
 
     const notifyTyping = useCallback(() => {
         const current = activeRef.current;
@@ -422,35 +470,40 @@ export default function ChatIndex({ conversations: initialConversations, contact
         <>
             <Head title="Pesan" />
 
-            <div className="flex h-[calc(100svh-5rem)] min-h-[480px] p-4 pt-0">
-                <div className="flex w-full overflow-hidden rounded-lg border bg-background">
+            <div className="flex h-[calc(100svh-5rem)] min-h-[480px] p-2 sm:p-4 pt-0">
+                <div className="flex w-full overflow-hidden rounded-xl border bg-background shadow-xs">
                     {/* ===== Daftar percakapan ===== */}
-                    <aside className={cn('flex w-full flex-col border-r md:w-80 md:shrink-0', active && 'hidden md:flex')}>
+                    <aside className={cn('flex w-full flex-col border-r bg-card md:w-80 md:shrink-0 lg:w-96', active && 'hidden md:flex')}>
                         <div className="flex items-center justify-between gap-2 border-b px-4 py-3">
                             <div>
                                 <h1 className="text-base font-semibold">Pesan</h1>
                                 <p className="text-xs text-muted-foreground">Percakapan pribadi dengan rekan kerja</p>
                             </div>
-                            <Button size="sm" onClick={() => setPickerOpen(true)}>
-                                <MessageSquarePlus className="mr-1.5 h-4 w-4" />
+                            <Button size="sm" onClick={() => setPickerOpen(true)} className="gap-1.5 shadow-xs">
+                                <MessageSquarePlus className="h-4 w-4" />
                                 Baru
                             </Button>
                         </div>
 
-                        <div className="border-b p-3">
+                        <div className="border-b p-3 bg-muted/20">
                             <div className="relative">
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input value={listQuery} onChange={(e) => setListQuery(e.target.value)} placeholder="Cari percakapan" className="pl-8" />
+                                <Input
+                                    value={listQuery}
+                                    onChange={(e) => setListQuery(e.target.value)}
+                                    placeholder="Cari percakapan"
+                                    className="h-9 pl-8 bg-background"
+                                />
                             </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto">
+                        <div className="flex-1 overflow-y-auto divide-y divide-border/40">
                             {filteredConversations.length === 0 ? (
                                 <div className="px-6 py-12 text-center text-sm text-muted-foreground">
                                     {conversations.length === 0 ? (
                                         <>
                                             <p className="font-medium text-foreground">Belum ada percakapan</p>
-                                            <p className="mt-1">Klik "Baru" untuk mengirim pesan ke rekan kerja.</p>
+                                            <p className="mt-1 text-xs">Klik "Baru" untuk mengirim pesan ke rekan kerja.</p>
                                         </>
                                     ) : (
                                         'Tidak ada percakapan yang cocok.'
@@ -463,24 +516,24 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                         type="button"
                                         onClick={() => openConversation(item)}
                                         className={cn(
-                                            'flex w-full items-center gap-3 border-b px-4 py-3 text-left transition-colors hover:bg-muted/60',
-                                            active?.id === item.id && 'bg-muted',
+                                            'flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/60',
+                                            active?.id === item.id && 'bg-muted/80',
                                         )}
                                     >
                                         <PersonAvatar person={item.other} />
                                         <div className="min-w-0 flex-1">
                                             <div className="flex items-baseline justify-between gap-2">
-                                                <span className={cn('truncate text-sm', item.unread_count > 0 ? 'font-semibold' : 'font-medium')}>
+                                                <span className={cn('truncate text-sm', item.unread_count > 0 ? 'font-semibold text-foreground' : 'font-medium text-foreground/90')}>
                                                     {item.other?.name ?? 'Pengguna dihapus'}
                                                 </span>
                                                 <span className="shrink-0 text-[11px] text-muted-foreground">{formatListDate(item.last_message_at)}</span>
                                             </div>
                                             <div className="mt-0.5 flex items-center justify-between gap-2">
-                                                <span className={cn('truncate text-xs', item.unread_count > 0 ? 'text-foreground' : 'text-muted-foreground')}>
+                                                <span className={cn('truncate text-xs', item.unread_count > 0 ? 'font-medium text-foreground' : 'text-muted-foreground')}>
                                                     {item.last_message ? `${item.last_message.mine ? 'Anda: ' : ''}${item.last_message.preview}` : 'Belum ada pesan'}
                                                 </span>
                                                 {item.unread_count > 0 && (
-                                                    <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-medium text-primary-foreground">
+                                                    <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground shadow-xs">
                                                         {item.unread_count > 99 ? '99+' : item.unread_count}
                                                     </span>
                                                 )}
@@ -493,169 +546,346 @@ export default function ChatIndex({ conversations: initialConversations, contact
                     </aside>
 
                     {/* ===== Isi percakapan ===== */}
-                    <section className={cn('flex min-w-0 flex-1 flex-col', !active && 'hidden md:flex')}>
+                    <section className={cn('flex min-w-0 flex-1 flex-col bg-muted/15', !active && 'hidden md:flex')}>
                         {!active ? (
-                            <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-                                <Lock className="h-8 w-8 text-muted-foreground" />
-                                <p className="font-medium">Pilih percakapan</p>
-                                <p className="max-w-sm text-sm text-muted-foreground">
-                                    Pesan tersimpan terenkripsi dan hanya bisa dibaca oleh Anda dan lawan bicara.
-                                </p>
+                            <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center bg-card/40">
+                                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted shadow-xs">
+                                    <Lock className="h-6 w-6 text-muted-foreground" />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-base font-medium">Pilih percakapan</p>
+                                    <p className="max-w-sm text-xs text-muted-foreground">
+                                        Pesan tersimpan terenkripsi dan hanya bisa dibaca oleh Anda dan lawan bicara.
+                                    </p>
+                                </div>
                             </div>
                         ) : (
                             <>
-                                <header className="flex items-center gap-3 border-b px-4 py-3">
-                                    <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setActive(null)} aria-label="Kembali">
+                                <header className="flex h-16 shrink-0 items-center gap-3 border-b bg-card/90 px-4 py-3 backdrop-blur-xs sm:px-6">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 md:hidden -ml-1 text-muted-foreground"
+                                        onClick={() => setActive(null)}
+                                        aria-label="Kembali"
+                                    >
                                         <ArrowLeft className="h-4 w-4" />
                                     </Button>
                                     <PersonAvatar person={other} className="h-9 w-9" />
                                     <div className="min-w-0">
                                         <p className="truncate text-sm font-semibold">{other?.name ?? 'Pengguna dihapus'}</p>
                                         <p className="truncate text-xs text-muted-foreground">
-                                            {otherTyping ? 'sedang mengetik…' : roleLabel(other?.role ?? null)}
+                                            {otherTyping ? (
+                                                <span className="font-medium text-primary">sedang mengetik…</span>
+                                            ) : (
+                                                roleLabel(other?.role ?? null)
+                                            )}
                                         </p>
                                     </div>
                                 </header>
 
+                                {/* Pesan Chat Stream */}
                                 <div
                                     ref={scrollRef}
                                     onScroll={(e) => {
                                         const el = e.currentTarget;
                                         stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
                                     }}
-                                    className="flex-1 overflow-y-auto bg-muted/30 px-4 py-4"
+                                    className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 md:px-8"
                                 >
-                                    <div className="mx-auto mb-4 flex w-fit max-w-full items-center gap-1.5 rounded-md border bg-background px-3 py-1.5 text-[11px] text-muted-foreground">
-                                        <Lock className="h-3 w-3 shrink-0" />
-                                        <span>Pesan terenkripsi. Hanya Anda dan {other?.name ?? 'lawan bicara'} yang dapat membacanya.</span>
-                                    </div>
-
-                                    {hasMore && (
-                                        <div className="mb-4 text-center">
-                                            <Button variant="outline" size="sm" onClick={loadOlder} disabled={loadingOlder}>
-                                                {loadingOlder && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
-                                                Muat pesan sebelumnya
-                                            </Button>
+                                    <div className="mx-auto flex w-full max-w-3xl flex-col">
+                                        <div className="mx-auto mb-4 flex w-fit max-w-full items-center gap-1.5 rounded-full border border-border/60 bg-background/90 px-3.5 py-1 text-[11px] text-muted-foreground shadow-xs backdrop-blur-xs">
+                                            <Lock className="h-3 w-3 shrink-0 text-muted-foreground/80" />
+                                            <span>Pesan terenkripsi. Hanya Anda dan {other?.name ?? 'lawan bicara'} yang dapat membacanya.</span>
                                         </div>
-                                    )}
 
-                                    {loadingThread && (
-                                        <div className="flex justify-center py-10 text-muted-foreground">
-                                            <Loader2 className="h-5 w-5 animate-spin" />
-                                        </div>
-                                    )}
+                                        {hasMore && (
+                                            <div className="mb-4 text-center">
+                                                <Button variant="outline" size="sm" onClick={loadOlder} disabled={loadingOlder} className="h-7 text-xs">
+                                                    {loadingOlder && <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />}
+                                                    Muat pesan sebelumnya
+                                                </Button>
+                                            </div>
+                                        )}
 
-                                    {!loadingThread && messages.length === 0 && (
-                                        <p className="py-10 text-center text-sm text-muted-foreground">
-                                            Mulai percakapan dengan {other?.name ?? 'rekan kerja'}.
-                                        </p>
-                                    )}
+                                        {loadingThread && (
+                                            <div className="flex justify-center py-10 text-muted-foreground">
+                                                <Loader2 className="h-5 w-5 animate-spin" />
+                                            </div>
+                                        )}
 
-                                    <div className="space-y-1.5">
-                                        {messages.map((message, index) => {
-                                            const previous = messages[index - 1];
-                                            const showDay = !previous || dayLabel(previous.created_at) !== dayLabel(message.created_at);
-                                            const read = message.mine && message.id <= otherReadUpTo;
+                                        {!loadingThread && messages.length === 0 && (
+                                            <div className="py-16 text-center">
+                                                <p className="text-sm font-medium text-foreground">Belum ada percakapan</p>
+                                                <p className="mt-1 text-xs text-muted-foreground">
+                                                    Mulai percakapan dengan {other?.name ?? 'rekan kerja'}.
+                                                </p>
+                                            </div>
+                                        )}
 
-                                            return (
-                                                <div key={message.id}>
-                                                    {showDay && (
-                                                        <div className="my-4 text-center text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                                                            {dayLabel(message.created_at)}
-                                                        </div>
-                                                    )}
-                                                    <div className={cn('flex', message.mine ? 'justify-end' : 'justify-start')}>
+                                        <div>
+                                            {messages.map((message, index) => {
+                                                const previous = messages[index - 1];
+                                                const showDay = !previous || dayLabel(previous.created_at) !== dayLabel(message.created_at);
+                                                const read = message.mine && message.id <= otherReadUpTo;
+                                                const isSameSender = previous && previous.sender_id === message.sender_id && !showDay;
+
+                                                return (
+                                                    <div key={message.id} className={cn(!showDay && (isSameSender ? 'mt-1' : 'mt-3.5'))}>
+                                                        {showDay && (
+                                                            <div className="my-4 flex items-center justify-center">
+                                                                <span className="rounded-full border border-border/60 bg-background/90 px-3.5 py-0.5 text-[11px] font-medium text-muted-foreground shadow-xs backdrop-blur-xs">
+                                                                    {dayLabel(message.created_at)}
+                                                                </span>
+                                                            </div>
+                                                        )}
+
                                                         <div
+                                                            id={`msg-${message.id}`}
                                                             className={cn(
-                                                                'max-w-[85%] rounded-lg px-3 py-2 text-sm shadow-sm sm:max-w-[70%]',
-                                                                message.mine ? 'bg-primary text-primary-foreground' : 'border bg-background',
+                                                                'group relative flex items-end gap-1.5 rounded-2xl p-0.5 transition-all duration-300',
+                                                                message.mine ? 'justify-end' : 'justify-start',
+                                                                highlightedMessageId === message.id && 'bg-primary/15 ring-2 ring-primary ring-offset-2 ring-offset-background',
                                                             )}
                                                         >
-                                                            {message.attachment && (
-                                                                message.attachment.is_image ? (
-                                                                    <a href={`${message.attachment.url}?inline=1`} target="_blank" rel="noopener noreferrer" className="mb-1 block">
-                                                                        <img
-                                                                            src={`${message.attachment.url}?inline=1`}
-                                                                            alt={message.attachment.name}
-                                                                            loading="lazy"
-                                                                            className="max-h-64 rounded-md object-contain"
-                                                                        />
-                                                                    </a>
-                                                                ) : (
-                                                                    <a
-                                                                        href={message.attachment.url}
-                                                                        className={cn(
-                                                                            'mb-1 flex items-center gap-2 rounded-md border px-2.5 py-2',
-                                                                            message.mine ? 'border-primary-foreground/30' : 'bg-muted/40',
-                                                                        )}
-                                                                    >
-                                                                        <FileText className="h-5 w-5 shrink-0" />
-                                                                        <span className="min-w-0 flex-1">
-                                                                            <span className="block truncate font-medium">{message.attachment.name}</span>
-                                                                            <span className="block text-[11px] opacity-75">{formatSize(message.attachment.size)}</span>
-                                                                        </span>
-                                                                        <Download className="h-4 w-4 shrink-0" />
-                                                                    </a>
-                                                                )
+                                                            {/* Tombol balas untuk pesan saya (posisi di sebelah kiri bubble) */}
+                                                            {message.mine && (
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    onClick={() => startReply(message)}
+                                                                    className="h-7 w-7 shrink-0 rounded-full text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted hover:text-foreground"
+                                                                    title="Balas pesan ini"
+                                                                    aria-label="Balas"
+                                                                >
+                                                                    <Reply className="h-3.5 w-3.5" />
+                                                                </Button>
                                                             )}
-                                                            {message.body && <p className="whitespace-pre-wrap break-words">{message.body}</p>}
-                                                            <div className={cn('mt-1 flex items-center justify-end gap-1 text-[10px]', message.mine ? 'text-primary-foreground/75' : 'text-muted-foreground')}>
-                                                                <span>{formatTime(message.created_at)}</span>
-                                                                {message.mine && (read
-                                                                    ? <CheckCheck className="h-3.5 w-3.5" aria-label="Dibaca" />
-                                                                    : <Check className="h-3.5 w-3.5" aria-label="Terkirim" />)}
+
+                                                            {/* Gelembung Pesan */}
+                                                            <div
+                                                                className={cn(
+                                                                    'relative max-w-[85%] px-3.5 py-2 shadow-xs transition-shadow sm:max-w-[72%]',
+                                                                    message.mine
+                                                                        ? 'rounded-2xl rounded-tr-xs bg-primary text-primary-foreground'
+                                                                        : 'rounded-2xl rounded-tl-xs border border-border/70 bg-card text-card-foreground',
+                                                                )}
+                                                            >
+                                                                {/* Kutipan Balasan Pesan */}
+                                                                {message.reply_to && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => scrollToMessage(message.reply_to!.id)}
+                                                                        className={cn(
+                                                                            'mb-1.5 flex w-full flex-col gap-0.5 rounded-lg border-l-[3px] px-2.5 py-1.5 text-left text-xs transition-opacity hover:opacity-90',
+                                                                            message.mine
+                                                                                ? 'border-white/90 bg-black/15 text-primary-foreground'
+                                                                                : 'border-primary bg-muted/70 text-foreground',
+                                                                        )}
+                                                                        title="Lihat pesan asli"
+                                                                    >
+                                                                        <div className="flex items-center gap-1 text-[11px] font-semibold">
+                                                                            <Reply className="h-3 w-3 shrink-0" />
+                                                                            <span className="truncate">
+                                                                                {message.reply_to.mine ? 'Anda' : message.reply_to.sender_name}
+                                                                            </span>
+                                                                        </div>
+                                                                        <p className="line-clamp-2 text-[11px] opacity-85 leading-snug">
+                                                                            {message.reply_to.body ||
+                                                                                (message.reply_to.is_image
+                                                                                    ? '📷 Gambar'
+                                                                                    : message.reply_to.attachment_name
+                                                                                      ? `📎 ${message.reply_to.attachment_name}`
+                                                                                      : 'Pesan')}
+                                                                        </p>
+                                                                    </button>
+                                                                )}
+
+                                                                {/* Lampiran Pesan */}
+                                                                {message.attachment && (
+                                                                    message.attachment.is_image ? (
+                                                                        <a
+                                                                            href={`${message.attachment.url}?inline=1`}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="mb-1 block overflow-hidden rounded-lg"
+                                                                        >
+                                                                            <img
+                                                                                src={`${message.attachment.url}?inline=1`}
+                                                                                alt={message.attachment.name}
+                                                                                loading="lazy"
+                                                                                className="max-h-64 rounded-lg object-contain transition-transform hover:scale-[1.01]"
+                                                                            />
+                                                                        </a>
+                                                                    ) : (
+                                                                        <a
+                                                                            href={message.attachment.url}
+                                                                            className={cn(
+                                                                                'mb-1 flex items-center gap-2 rounded-lg border px-2.5 py-2 transition-colors',
+                                                                                message.mine
+                                                                                    ? 'border-primary-foreground/30 hover:bg-white/10'
+                                                                                    : 'bg-muted/40 hover:bg-muted/70',
+                                                                            )}
+                                                                        >
+                                                                            <FileText className="h-5 w-5 shrink-0" />
+                                                                            <span className="min-w-0 flex-1">
+                                                                                <span className="block truncate font-medium">{message.attachment.name}</span>
+                                                                                <span className="block text-[11px] opacity-75">{formatSize(message.attachment.size)}</span>
+                                                                            </span>
+                                                                            <Download className="h-4 w-4 shrink-0" />
+                                                                        </a>
+                                                                    )
+                                                                )}
+
+                                                                {/* Teks Pesan */}
+                                                                {message.body && (
+                                                                    <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">{message.body}</p>
+                                                                )}
+
+                                                                {/* Waktu & Tanda Dibaca */}
+                                                                <div
+                                                                    className={cn(
+                                                                        'mt-1 flex items-center justify-end gap-1 text-[10px] select-none',
+                                                                        message.mine ? 'text-primary-foreground/75' : 'text-muted-foreground',
+                                                                    )}
+                                                                >
+                                                                    <span>{formatTime(message.created_at)}</span>
+                                                                    {message.mine && (read ? (
+                                                                        <CheckCheck className="h-3.5 w-3.5 text-primary-foreground" aria-label="Dibaca" />
+                                                                    ) : (
+                                                                        <Check className="h-3.5 w-3.5 text-primary-foreground/75" aria-label="Terkirim" />
+                                                                    ))}
+                                                                </div>
                                                             </div>
+
+                                                            {/* Tombol balas untuk pesan lawan bicara (posisi di sebelah kanan bubble) */}
+                                                            {!message.mine && (
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    onClick={() => startReply(message)}
+                                                                    className="h-7 w-7 shrink-0 rounded-full text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted hover:text-foreground"
+                                                                    title="Balas pesan ini"
+                                                                    aria-label="Balas"
+                                                                >
+                                                                    <Reply className="h-3.5 w-3.5" />
+                                                                </Button>
+                                                            )}
                                                         </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        })}
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                 </div>
 
-                                <footer className="border-t p-3">
-                                    {error && <p className="mb-2 text-xs text-destructive">{error}</p>}
-                                    {file && (
-                                        <div className="mb-2 flex items-center gap-2 rounded-md border bg-muted/40 px-2.5 py-1.5 text-xs">
-                                            <Paperclip className="h-3.5 w-3.5 shrink-0" />
-                                            <span className="min-w-0 flex-1 truncate">{file.name}</span>
-                                            <span className="text-muted-foreground">{formatSize(file.size)}</span>
-                                            <button type="button" onClick={() => pickFile(null)} aria-label="Batal lampirkan" className="text-muted-foreground hover:text-foreground">
-                                                <X className="h-3.5 w-3.5" />
-                                            </button>
+                                {/* Bagian Input Bawah */}
+                                <footer className="border-t bg-card/90 p-3 backdrop-blur-xs">
+                                    <div className="mx-auto max-w-3xl">
+                                        {error && <p className="mb-2 text-xs font-medium text-destructive">{error}</p>}
+
+                                        {/* Banner Balas Pesan */}
+                                        {replyingTo && (
+                                            <div className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-primary/25 bg-primary/5 px-3 py-2 text-xs transition-all animate-in fade-in slide-in-from-bottom-2">
+                                                <div className="flex min-w-0 items-center gap-2.5">
+                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+                                                        <Reply className="h-3.5 w-3.5" />
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-[11px] font-semibold text-primary">
+                                                            Membalas {replyingTo.mine ? 'diri sendiri' : (other?.name ?? 'lawan bicara')}
+                                                        </p>
+                                                        <p className="truncate text-xs text-muted-foreground">
+                                                            {replyingTo.body ||
+                                                                (replyingTo.attachment ? (replyingTo.attachment.is_image ? '📷 Gambar' : `📎 ${replyingTo.attachment.name}`) : 'Pesan')}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => setReplyingTo(null)}
+                                                    className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                                                    aria-label="Batal balas"
+                                                >
+                                                    <X className="h-3.5 w-3.5" />
+                                                </Button>
+                                            </div>
+                                        )}
+
+                                        {/* Banner Lampiran File */}
+                                        {file && (
+                                            <div className="mb-2 flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-2 text-xs">
+                                                <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                                                <span className="min-w-0 flex-1 truncate font-medium">{file.name}</span>
+                                                <span className="text-[11px] text-muted-foreground">{formatSize(file.size)}</span>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => pickFile(null)}
+                                                    className="h-5 w-5 text-muted-foreground hover:text-foreground"
+                                                    aria-label="Batal lampirkan"
+                                                >
+                                                    <X className="h-3.5 w-3.5" />
+                                                </Button>
+                                            </div>
+                                        )}
+
+                                        <div className="flex items-end gap-2">
+                                            <input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                accept={acceptAttribute}
+                                                className="hidden"
+                                                onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() => fileInputRef.current?.click()}
+                                                aria-label="Lampirkan file"
+                                                disabled={sending}
+                                                className="h-10 w-10 shrink-0 rounded-full text-muted-foreground shadow-xs hover:text-foreground"
+                                            >
+                                                <Paperclip className="h-4 w-4" />
+                                            </Button>
+                                            <div className="relative flex-1">
+                                                <textarea
+                                                    ref={textareaRef}
+                                                    value={draft}
+                                                    onChange={(e) => {
+                                                        setDraft(e.target.value);
+                                                        if (e.target.value.trim()) notifyTyping();
+                                                    }}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                                            e.preventDefault();
+                                                            send();
+                                                        } else if (e.key === 'Escape' && replyingTo) {
+                                                            setReplyingTo(null);
+                                                        }
+                                                    }}
+                                                    rows={1}
+                                                    maxLength={5000}
+                                                    placeholder={replyingTo ? 'Tulis balasan… (Enter kirim, Esc batal)' : 'Tulis pesan… (Enter kirim, Shift+Enter baris baru)'}
+                                                    className="max-h-32 min-h-10 w-full resize-none rounded-2xl border border-input bg-background px-4 py-2.5 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                                                />
+                                            </div>
+                                            <Button
+                                                size="icon"
+                                                onClick={send}
+                                                disabled={sending || (!draft.trim() && !file)}
+                                                aria-label="Kirim"
+                                                className="h-10 w-10 shrink-0 rounded-full shadow-xs"
+                                            >
+                                                {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                                            </Button>
                                         </div>
-                                    )}
-                                    <div className="flex items-end gap-2">
-                                        <input
-                                            ref={fileInputRef}
-                                            type="file"
-                                            accept={acceptAttribute}
-                                            className="hidden"
-                                            onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
-                                        />
-                                        <Button variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} aria-label="Lampirkan file" disabled={sending}>
-                                            <Paperclip className="h-4 w-4" />
-                                        </Button>
-                                        <textarea
-                                            value={draft}
-                                            onChange={(e) => {
-                                                setDraft(e.target.value);
-                                                if (e.target.value.trim()) notifyTyping();
-                                            }}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' && !e.shiftKey) {
-                                                    e.preventDefault();
-                                                    send();
-                                                }
-                                            }}
-                                            rows={1}
-                                            maxLength={5000}
-                                            placeholder="Tulis pesan… (Enter kirim, Shift+Enter baris baru)"
-                                            className="max-h-32 min-h-9 flex-1 resize-none rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                                        />
-                                        <Button size="icon" onClick={send} disabled={sending || (!draft.trim() && !file)} aria-label="Kirim">
-                                            {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                                        </Button>
                                     </div>
                                 </footer>
                             </>
@@ -664,7 +894,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                 </div>
             </div>
 
-            {/* ===== Pilih rekan kerja ===== */}
+            {/* ===== Dialog Pilih rekan kerja ===== */}
             <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
@@ -675,7 +905,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input autoFocus value={contactQuery} onChange={(e) => setContactQuery(e.target.value)} placeholder="Cari nama" className="pl-8" />
                     </div>
-                    <div className="max-h-80 overflow-y-auto rounded-md border">
+                    <div className="max-h-80 overflow-y-auto rounded-md border divide-y divide-border/40">
                         {filteredContacts.length === 0 ? (
                             <p className="p-6 text-center text-sm text-muted-foreground">Tidak ada rekan kerja yang cocok.</p>
                         ) : (
@@ -684,7 +914,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                     key={contact.id}
                                     type="button"
                                     onClick={() => startWith(contact.id)}
-                                    className="flex w-full items-center gap-3 border-b px-3 py-2.5 text-left last:border-b-0 hover:bg-muted/60"
+                                    className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-muted/60 transition-colors"
                                 >
                                     <PersonAvatar person={contact} className="h-9 w-9" />
                                     <span className="min-w-0">

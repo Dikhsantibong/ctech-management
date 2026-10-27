@@ -247,4 +247,30 @@ class ChatTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors('user_id');
     }
+    public function test_can_reply_to_a_message(): void
+    {
+        $original = ChatMessage::factory()->for($this->conversation, 'conversation')->create([
+            'sender_id' => $this->alice->id,
+            'body' => 'Mau makan siang di mana?',
+        ]);
+
+        $response = $this->actingAs($this->bob)->postJson("/chat/conversations/{$this->conversation->id}/messages", [
+            'body' => 'Di kantin seberang aja',
+            'reply_to_id' => $original->id,
+        ])->assertCreated();
+
+        $response->assertJsonPath('message.reply_to.id', $original->id)
+            ->assertJsonPath('message.reply_to.body', 'Mau makan siang di mana?')
+            ->assertJsonPath('message.reply_to.sender_name', $this->alice->name)
+            ->assertJsonPath('message.reply_to.mine', false);
+
+        $reply = ChatMessage::latest('id')->first();
+        $this->assertSame($original->id, $reply->reply_to_id);
+
+        $this->actingAs($this->alice)
+            ->getJson("/chat/conversations/{$this->conversation->id}/messages")
+            ->assertOk()
+            ->assertJsonPath('messages.1.reply_to.id', $original->id)
+            ->assertJsonPath('messages.1.reply_to.mine', true);
+    }
 }

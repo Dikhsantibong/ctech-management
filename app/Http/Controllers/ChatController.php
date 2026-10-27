@@ -84,6 +84,7 @@ class ChatController extends Controller
             $payload['thread'] = [
                 'conversation_id' => $conversation->id,
                 'messages' => $conversation->messages()
+                    ->with(['replyTo.sender'])
                     ->where('id', '>', (int) ($validated['after'] ?? 0))
                     ->orderBy('id')
                     ->limit(100)
@@ -120,6 +121,7 @@ class ChatController extends Controller
         $before = $request->integer('before');
 
         $messages = $conversation->messages()
+            ->with(['replyTo.sender'])
             ->when($before > 0, fn ($query) => $query->where('id', '<', $before))
             ->orderByDesc('id')
             ->limit(self::MESSAGES_PER_PAGE + 1)
@@ -143,14 +145,24 @@ class ChatController extends Controller
         $request->validate([
             'body' => 'nullable|required_without:file|string|max:5000',
             'file' => 'nullable|file|max:10240|mimes:'.self::ALLOWED_FILES,
+            'reply_to_id' => 'nullable|integer',
         ], [
             'body.required_without' => 'Tulis pesan atau pilih file untuk dikirim.',
             'file.max' => 'Ukuran file maksimal 10 MB.',
             'file.mimes' => 'Jenis file tidak didukung.',
         ]);
 
+        $replyToId = null;
+        if ($request->filled('reply_to_id')) {
+            $replyTarget = $conversation->messages()->find((int) $request->input('reply_to_id'));
+            if ($replyTarget) {
+                $replyToId = $replyTarget->id;
+            }
+        }
+
         $attributes = [
             'sender_id' => $user->id,
+            'reply_to_id' => $replyToId,
             'body' => filled($request->input('body')) ? $request->input('body') : null,
         ];
 
@@ -169,6 +181,7 @@ class ChatController extends Controller
         }
 
         $message = $conversation->messages()->create($attributes);
+        $message->load('replyTo.sender');
         $conversation->update(['last_message_at' => $message->created_at]);
         Cache::forget($this->typingKey($conversation, $user->id));
 
