@@ -1,6 +1,8 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { Plus, MoreVertical, Newspaper, Trash2, Edit2, Image as ImageIcon } from 'lucide-react';
+import { Plus, MoreVertical, Newspaper, Trash2, Edit2, Image as ImageIcon, Share2 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { SharePreviewDialog } from '@/components/news/SharePreviewDialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -39,13 +41,54 @@ export default function NewsIndex({ news, filters }: { news: any, filters?: any 
         return () => clearTimeout(timeoutId);
     }, [searchQuery]);
 
+    const [previewNewsId, setPreviewNewsId] = useState<number | null>(null);
+
+    const emptySeo = { excerpt: '', seo_title: '', seo_description: '', story_image: null as File | null, remove_story_image: false };
+
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         title: '',
         content: '',
         category: '',
         status: 'Draft',
         image: null as File | null,
+        ...emptySeo,
     });
+
+    const seoFields = (idPrefix: string) => (
+        <div className="space-y-4 rounded-lg border p-4">
+            <div>
+                <p className="text-sm font-semibold">SEO & Social Sharing</p>
+                <p className="text-xs text-muted-foreground">Dipakai untuk preview link di WhatsApp, Telegram, Facebook, LinkedIn, dan X. Kosongkan untuk memakai judul & isi artikel.</p>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor={`${idPrefix}seo_title`}>SEO Title <span className="text-xs text-muted-foreground">({data.seo_title.length}/60)</span></Label>
+                <Input id={`${idPrefix}seo_title`} value={data.seo_title} maxLength={90} onChange={e => setData('seo_title', e.target.value)} placeholder={data.title} />
+                {errors.seo_title && <p className="text-sm text-destructive">{errors.seo_title}</p>}
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor={`${idPrefix}seo_description`}>Meta Description <span className="text-xs text-muted-foreground">({data.seo_description.length}/160)</span></Label>
+                <Textarea id={`${idPrefix}seo_description`} value={data.seo_description} maxLength={300} rows={2} onChange={e => setData('seo_description', e.target.value)} />
+                {errors.seo_description && <p className="text-sm text-destructive">{errors.seo_description}</p>}
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor={`${idPrefix}excerpt`}>Ringkasan (Excerpt)</Label>
+                <Textarea id={`${idPrefix}excerpt`} value={data.excerpt} maxLength={500} rows={2} onChange={e => setData('excerpt', e.target.value)} />
+                {errors.excerpt && <p className="text-sm text-destructive">{errors.excerpt}</p>}
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor={`${idPrefix}story_image`}>Story Image Portrait (Opsional)</Label>
+                <Input id={`${idPrefix}story_image`} type="file" accept="image/jpeg,image/png,image/webp" onChange={e => setData('story_image', e.target.files?.[0] || null)} />
+                {errors.story_image && <p className="text-sm text-destructive">{errors.story_image}</p>}
+                <p className="text-xs text-muted-foreground">Rekomendasi 1080 × 1920 px. Jika kosong, story image dibuat otomatis dari featured image, judul, dan branding CTECH.</p>
+                {selectedNews?.story_image && idPrefix === 'edit-' && (
+                    <label className="flex items-center gap-2 text-xs">
+                        <input type="checkbox" checked={data.remove_story_image} onChange={e => setData('remove_story_image', e.target.checked)} />
+                        Hapus story image unggahan (kembali ke versi otomatis)
+                    </label>
+                )}
+            </div>
+        </div>
+    );
 
     const quillModules = {
         toolbar: [
@@ -75,7 +118,9 @@ export default function NewsIndex({ news, filters }: { news: any, filters?: any 
             category: 'Pengumuman',
             status: 'Draft',
             image: null,
+            ...emptySeo,
         });
+        setSelectedNews(null);
         setIsCreateModalOpen(true);
     };
 
@@ -87,6 +132,11 @@ export default function NewsIndex({ news, filters }: { news: any, filters?: any 
             category: item.category || '',
             status: item.status,
             image: null, // Don't preset the file input
+            excerpt: item.excerpt || '',
+            seo_title: item.seo_title || '',
+            seo_description: item.seo_description || '',
+            story_image: null,
+            remove_story_image: false,
         });
         setIsEditModalOpen(true);
     };
@@ -209,6 +259,9 @@ export default function NewsIndex({ news, filters }: { news: any, filters?: any 
                                                         <DropdownMenuItem onClick={() => openEditModal(item)}>
                                                             <Edit2 className="mr-2 h-4 w-4" /> Edit
                                                         </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => setPreviewNewsId(item.id)}>
+                                                            <Share2 className="mr-2 h-4 w-4" /> Preview Sosial Media
+                                                        </DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => openDeleteModal(item)} className="text-destructive">
                                                             <Trash2 className="mr-2 h-4 w-4" /> Hapus
                                                         </DropdownMenuItem>
@@ -271,8 +324,10 @@ export default function NewsIndex({ news, filters }: { news: any, filters?: any 
                                 <Label htmlFor="image">Gambar/Thumbnail</Label>
                                 <Input id="image" type="file" accept="image/*" onChange={e => setData('image', e.target.files?.[0] || null)} />
                                 {errors.image && <p className="text-sm text-destructive">{errors.image}</p>}
-                                <p className="text-xs text-muted-foreground">Format gambar (JPG, PNG). Maks 5MB.</p>
+                                <p className="text-xs text-muted-foreground">JPG, PNG, atau WebP. Maks 5MB. Rekomendasi 1200 × 630 px (1.91:1); thumbnail sosial dibuat otomatis.</p>
                             </div>
+
+                            {seoFields('')}
 
                             <div className="space-y-2">
                                 <Label htmlFor="content">Isi Berita</Label>
@@ -343,6 +398,8 @@ export default function NewsIndex({ news, filters }: { news: any, filters?: any 
                                 )}
                             </div>
 
+                            {seoFields('edit-')}
+
                             <div className="space-y-2">
                                 <Label htmlFor="edit-content">Isi Berita</Label>
                                 <div className="bg-white rounded-md border border-input">
@@ -366,6 +423,8 @@ export default function NewsIndex({ news, filters }: { news: any, filters?: any 
                     </form>
                 </DialogContent>
             </Dialog>
+
+            <SharePreviewDialog newsId={previewNewsId} open={previewNewsId !== null} onOpenChange={(open) => !open && setPreviewNewsId(null)} />
 
             {/* Delete Modal */}
             <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>

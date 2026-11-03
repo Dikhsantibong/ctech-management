@@ -1,26 +1,28 @@
-import { Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { User, Calendar, Tag, ArrowLeft } from 'lucide-react';
 import { PremiumNavbar } from '@/components/ui/PremiumNavbar';
 import { Footer } from '@/components/public/sections/Footer';
 import { useLenis } from '@/hooks/use-lenis';
-import { SEO } from '@/components/SEO';
+import { ShareButtons } from '@/components/public/ShareButtons';
 
 import 'react-quill-new/dist/quill.core.css';
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-export default function PublicNewsShow({ news, relatedNews }: { news: any; relatedNews: any[] }) {
+interface ShareProps {
+    url: string;
+    title: string;
+    storyImageUrl: string;
+}
+
+export default function PublicNewsShow({ news, relatedNews, share }: { news: any; relatedNews: any[]; share: ShareProps }) {
     useLenis();
 
     return (
         <div className="min-h-screen bg-white flex flex-col font-body text-[var(--premium-text)] selection:bg-[var(--premium-gold)] selection:text-white">
-            <SEO
-                title={`${news.title} | Berita CTECH`}
-                description={news.excerpt || news.content?.replace(/(<([^>]+)>)/gi, '').substring(0, 160)}
-                image={news.image ? (news.image.startsWith('http') ? news.image : `/storage/${news.image}`) : undefined}
-                url={`/berita/${news.slug}`}
-            />
+            {/* Open Graph, Twitter Card, canonical & JSON-LD dirender server-side (partials/share-meta.blade.php). */}
+            <Head title={`${share.title} | CTECH`} />
 
             <PremiumNavbar />
 
@@ -98,6 +100,8 @@ export default function PublicNewsShow({ news, relatedNews }: { news: any; relat
                         <p className="text-gray-400 italic">Tidak ada isi berita.</p>
                     )}
                 </article>
+
+                <ShareButtons url={share.url} title={share.title} storyImageUrl={share.storyImageUrl} />
             </main>
 
             {relatedNews.length > 0 && (

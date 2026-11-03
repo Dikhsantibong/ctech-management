@@ -63,6 +63,7 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 
 Route::get('/berita', [PublicController::class, 'newsIndex'])->name('public.news.index');
 Route::get('/berita/{slug}', [PublicController::class, 'newsShow'])->name('public.news.show');
+Route::get('/berita/{slug}/story.jpg', [PublicController::class, 'newsStory'])->name('public.news.story');
 
 Route::get('/tentang', [PublicController::class, 'about'])->name('public.about');
 
@@ -323,6 +324,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('content-plans/{content_plan}/status', [ContentPlanController::class, 'updateStatus'])->middleware('menu:content-plans')->name('content-plans.status');
         Route::post('content-plans/{content_plan}/publish', [ContentPlanController::class, 'publishNow'])->middleware('menu:content-plans')->name('content-plans.publish');
         Route::resource('content-plans', ContentPlanController::class)->except(['create', 'edit', 'show'])->middleware('menu:content-plans');
+        Route::get('news/{news}/share-preview', [NewsController::class, 'sharePreview'])->middleware('menu:news')->name('news.share-preview');
         Route::resource('news', NewsController::class)->except(['create', 'edit', 'show'])->middleware('menu:news');
         Route::resource('portfolios', PortfolioController::class)->except(['create', 'edit', 'show'])->middleware('menu:portfolios');
         Route::get('calendar', [CalendarController::class, 'index'])->middleware('menu:calendar')->name('calendar.index');

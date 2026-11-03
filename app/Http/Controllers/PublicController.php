@@ -2,10 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
+use App\Models\CompanySetting;
 use App\Models\News;
 use App\Models\Portfolio;
+use App\Models\Project;
+use App\Services\News\NewsShareMeta;
+use App\Services\News\SocialImageGenerator;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PublicController extends Controller
 {
@@ -16,7 +24,7 @@ class PublicController extends Controller
      */
     private function companyProfile(): array
     {
-        $settings = \App\Models\CompanySetting::first();
+        $settings = CompanySetting::first();
 
         return [
             'legal_name' => $settings->company_name ?? 'PT Kreatif Teknologi Maju Bersama',
@@ -36,14 +44,14 @@ class PublicController extends Controller
      */
     private function companyMetrics(): array
     {
-        $firstProject = \App\Models\Project::min('created_at');
+        $firstProject = Project::min('created_at');
 
         return collect([
-            ['value' => \App\Models\Project::where('status', 'Completed')->count(), 'label' => 'Proyek Diselesaikan'],
-            ['value' => \App\Models\Client::count(), 'label' => 'Klien Terlayani'],
-            ['value' => \App\Models\Portfolio::count(), 'label' => 'Karya Terdokumentasi'],
+            ['value' => Project::where('status', 'Completed')->count(), 'label' => 'Proyek Diselesaikan'],
+            ['value' => Client::count(), 'label' => 'Klien Terlayani'],
+            ['value' => Portfolio::count(), 'label' => 'Karya Terdokumentasi'],
             [
-                'value' => $firstProject ? max(1, now()->year - \Carbon\Carbon::parse($firstProject)->year + 1) : null,
+                'value' => $firstProject ? max(1, now()->year - Carbon::parse($firstProject)->year + 1) : null,
                 'label' => 'Tahun Beroperasi',
             ],
         ])->filter(fn ($m) => ! empty($m['value']))->values()->all();
@@ -52,7 +60,7 @@ class PublicController extends Controller
     /** Kategori pekerjaan yang benar-benar ada di portofolio. */
     private function capabilities(): array
     {
-        return \App\Models\Portfolio::select('category')
+        return Portfolio::select('category')
             ->whereNotNull('category')
             ->distinct()
             ->pluck('category')
@@ -62,8 +70,8 @@ class PublicController extends Controller
     public function home()
     {
         return inertia('welcome', [
-            'news' => \App\Models\News::where('status', 'Published')->latest()->take(3)->get(),
-            'portfolios' => \App\Models\Portfolio::latest()->take(6)->get(),
+            'news' => News::where('status', 'Published')->latest()->take(3)->get(),
+            'portfolios' => Portfolio::latest()->take(6)->get(),
             'company' => $this->companyProfile(),
             'metrics' => $this->companyMetrics(),
             'capabilities' => $this->capabilities(),
@@ -101,17 +109,15 @@ class PublicController extends Controller
             ->paginate(12);
 
         return Inertia::render('public/news/index', [
-            'news' => $news
+            'news' => $news,
         ]);
     }
-    
-    public function newsShow($slug)
+
+    public function newsShow(string $slug, NewsShareMeta $shareMeta)
     {
-        $news = News::with('author')
-            ->where('slug', $slug)
-            ->where('status', 'Published')
-            ->firstOrFail();
-            
+        $news = $this->publishedNews($slug);
+        $meta = $shareMeta->build($news);
+
         $relatedNews = News::where('status', 'Published')
             ->where('id', '!=', $news->id)
             ->latest()
@@ -120,17 +126,52 @@ class PublicController extends Controller
 
         return Inertia::render('public/news/show', [
             'news' => $news,
-            'relatedNews' => $relatedNews
+            'relatedNews' => $relatedNews,
+            'share' => [
+                'url' => $meta['url'],
+                'title' => $meta['title'],
+                'storyImageUrl' => $meta['story_image_url'],
+            ],
+        ])->withViewData(['shareMeta' => $meta]);
+    }
+
+    /**
+     * Story image portrait 1080 × 1920: hasil unggahan terpisah, atau dibuat otomatis
+     * dari featured image + judul + branding CTECH + URL artikel.
+     */
+    public function newsStory(string $slug, NewsShareMeta $shareMeta, SocialImageGenerator $images): BinaryFileResponse
+    {
+        $news = $this->publishedNews($slug);
+        $disk = Storage::disk('public');
+
+        $path = $news->story_image && $disk->exists($news->story_image)
+            ? $news->story_image
+            : $images->makeStoryImage($news, $shareMeta->canonicalUrl($news));
+
+        return response()->file($disk->path($path), [
+            'Cache-Control' => 'public, max-age=3600',
+            'Content-Disposition' => 'inline; filename="ctech-story-'.$news->id.'.'.pathinfo($path, PATHINFO_EXTENSION).'"',
         ]);
+    }
+
+    /**
+     * Hanya artikel Published yang boleh diakses publik (termasuk oleh crawler preview).
+     */
+    private function publishedNews(string $slug): News
+    {
+        return News::with('author')
+            ->where('slug', $slug)
+            ->where('status', 'Published')
+            ->firstOrFail();
     }
 
     public function portfolioIndex(Request $request)
     {
         $category = $request->input('category');
-        
-        $portfolios = Portfolio::when($category, function($query, $category) {
-                return $query->where('category', $category);
-            })
+
+        $portfolios = Portfolio::when($category, function ($query, $category) {
+            return $query->where('category', $category);
+        })
             ->latest()
             ->paginate(12)
             ->withQueryString();
@@ -148,7 +189,7 @@ class PublicController extends Controller
     public function portfolioShow($id)
     {
         $portfolio = Portfolio::findOrFail($id);
-        
+
         $relatedPortfolios = Portfolio::where('category', $portfolio->category)
             ->where('id', '!=', $portfolio->id)
             ->latest()
@@ -157,7 +198,7 @@ class PublicController extends Controller
 
         return Inertia::render('public/portfolio/show', [
             'portfolio' => $portfolio,
-            'relatedPortfolios' => $relatedPortfolios
+            'relatedPortfolios' => $relatedPortfolios,
         ]);
     }
 }
