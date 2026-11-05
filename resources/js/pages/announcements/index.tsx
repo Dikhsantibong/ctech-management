@@ -75,8 +75,8 @@ export default function AnnouncementsIndex({ announcements, canManage }: Props) 
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Pengumuman</h2>
-                        <p className="text-muted-foreground">Kelola pengumuman untuk tim Anda.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Pengumuman</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Kelola pengumuman untuk tim Anda.</p>
                     </div>
                     {canManage && (
                         <Link href="/announcements/create">
@@ -92,7 +92,7 @@ export default function AnnouncementsIndex({ announcements, canManage }: Props) 
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <tr className="border-b transition-colors hover:bg-muted data-[state=selected]:bg-muted">
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Judul</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tipe</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Visible To</th>
@@ -105,7 +105,7 @@ export default function AnnouncementsIndex({ announcements, canManage }: Props) 
                                 </thead>
                                 <tbody>
                                     {announcements.map((announcement) => (
-                                        <tr key={announcement.id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                        <tr key={announcement.id} className="border-b transition-colors hover:bg-muted data-[state=selected]:bg-muted">
                                             <td className="p-4 align-middle">
                                                 <div className="flex items-center gap-3">
                                                     <div className="flex-shrink-0">

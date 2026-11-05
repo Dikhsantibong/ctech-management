@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { SignatureAssetsCard } from '@/components/signature-assets-card';
 
 type BankAccount = {
     bank_name: string;
@@ -77,8 +78,8 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
             <Head title="Company Settings" />
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex flex-col gap-2">
-                    <h2 className="text-2xl font-bold tracking-tight">Company Settings</h2>
-                    <p className="text-muted-foreground">Manage your company profile, billing details, and contact information used across the system.</p>
+                    <h2 className="text-2xl font-semibold tracking-tight">Company Settings</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">Manage your company profile, billing details, and contact information used across the system.</p>
                 </div>
 
                 <form onSubmit={submit} className="space-y-6">
@@ -303,6 +304,10 @@ export default function CompanySettingsIndex({ settings }: { settings: any }) {
                         </Button>
                     </div>
                 </form>
+
+                <div className="mt-6 grid gap-6 md:grid-cols-2">
+                    <SignatureAssetsCard settings={settings} />
+                </div>
             </div>
         </>
     );

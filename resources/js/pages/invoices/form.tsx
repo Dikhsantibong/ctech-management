@@ -122,8 +122,8 @@ export default function InvoiceForm({ invoice, clients, settings }: { invoice: a
                             <Link href="/invoices"><ArrowLeft className="h-5 w-5" /></Link>
                         </Button>
                         <div>
-                            <h2 className="text-2xl font-bold tracking-tight">{isEdit ? 'Edit Invoice' : 'Buat Invoice'}</h2>
-                            <p className="text-muted-foreground">{isEdit ? invoice.invoice_number : 'Buat invoice baru dengan rincian item.'}</p>
+                            <h2 className="text-2xl font-semibold tracking-tight">{isEdit ? 'Edit Invoice' : 'Buat Invoice'}</h2>
+                            <p className="mt-1 text-sm text-muted-foreground">{isEdit ? invoice.invoice_number : 'Buat invoice baru dengan rincian item.'}</p>
                         </div>
                     </div>
                     <div className="flex shrink-0 items-center rounded-lg border bg-muted/40 p-0.5">
@@ -228,7 +228,7 @@ export default function InvoiceForm({ invoice, clients, settings }: { invoice: a
                                     <div className="space-y-2 rounded-lg border bg-muted/30 p-4">
                                         <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span className="font-medium">{formatCurrency(subtotal)}</span></div>
                                         {data.use_tax && <div className="flex justify-between text-sm"><span className="text-muted-foreground">PPN ({data.tax_rate || 0}%)</span><span className="font-medium">{formatCurrency(tax)}</span></div>}
-                                        <div className="flex justify-between border-t pt-2 text-base"><span className="font-bold">Grand Total</span><span className="font-bold text-primary">{formatCurrency(total)}</span></div>
+                                        <div className="flex justify-between border-t pt-2 text-base"><span className="font-semibold">Grand Total</span><span className="font-semibold text-primary">{formatCurrency(total)}</span></div>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -247,7 +247,7 @@ export default function InvoiceForm({ invoice, clients, settings }: { invoice: a
                                     {/* Document-like preview */}
                                     <div className="mx-auto max-w-2xl space-y-6">
                                         <div className="text-center space-y-1">
-                                            <h3 className="text-xl font-bold">{settings?.company_name || 'CTECH'}</h3>
+                                            <h3 className="text-xl font-semibold">{settings?.company_name || 'CTECH'}</h3>
                                             {settings?.address && <p className="text-xs text-muted-foreground">{settings.address}</p>}
                                             {(settings?.phone || settings?.email) && <p className="text-xs text-muted-foreground">{[settings?.phone, settings?.email].filter(Boolean).join(' | ')}</p>}
                                         </div>
@@ -295,16 +295,16 @@ export default function InvoiceForm({ invoice, clients, settings }: { invoice: a
                                                     </tr>
                                                 )}
                                                 <tr className="bg-muted/50">
-                                                    <td colSpan={4} className="p-2 text-right font-bold">Grand Total</td>
-                                                    <td className="p-2 text-right font-bold text-lg">{formatCurrency(total)}</td>
+                                                    <td colSpan={4} className="p-2 text-right font-semibold">Grand Total</td>
+                                                    <td className="p-2 text-right font-semibold text-lg">{formatCurrency(total)}</td>
                                                 </tr>
                                             </tfoot>
                                         </table>
                                         <div className="text-right text-sm mt-8">
                                             <p>Hormat kami,</p>
-                                            <p className="font-bold">{settings?.company_name || 'CTECH'}</p>
+                                            <p className="font-semibold">{settings?.company_name || 'CTECH'}</p>
                                             <div className="h-16" />
-                                            <p className="font-bold underline">{settings?.leader_name || '-'}</p>
+                                            <p className="font-semibold underline">{settings?.leader_name || '-'}</p>
                                             <p>Direktur Utama</p>
                                         </div>
                                     </div>

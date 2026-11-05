@@ -129,10 +129,10 @@ export default function SocialAccountsIndex({
             <Head title="Akun Media Sosial" />
             <div className="flex flex-1 flex-col gap-5 p-6">
                 <div>
-                    <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-                        <Share2 className="h-6 w-6 text-muted-foreground" /> Akun Media Sosial
+                    <h2 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+                        <Share2 className="h-5 w-5 text-muted-foreground" /> Akun Media Sosial
                     </h2>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="mt-1 text-sm text-muted-foreground">
                         Sambungkan akun agar konten dari Content Planning bisa diposting otomatis saat statusnya menjadi Tayang.
                     </p>
                 </div>

@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, ExternalLink, Loader2, XCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { LinkPreviews } from './LinkPreviews';
 
 interface ShareCheck {
     key: string;
@@ -25,42 +26,33 @@ const statusIcon = {
     fail: <XCircle className="h-4 w-4 shrink-0 text-destructive" />,
 };
 
-function PreviewFrame({ label, children }: { label: string; children: React.ReactNode }) {
-    return (
-        <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
-            {children}
-        </div>
-    );
-}
-
 /**
  * Pratinjau link preview berdasarkan metadata yang sama persis dengan yang dirender server untuk crawler.
  */
 export function SharePreviewDialog({ newsId, open, onOpenChange }: { newsId: number | null; open: boolean; onOpenChange: (open: boolean) => void }) {
-    const [result, setResult] = useState<{ meta: ShareMeta; checks: ShareCheck[] } | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    // Hasil disimpan per newsId agar data artikel lain tidak ikut tampil saat dialog dibuka ulang.
+    const [loaded, setLoaded] = useState<{ newsId: number; data?: { meta: ShareMeta; checks: ShareCheck[] }; error?: string } | null>(null);
+    const result = loaded?.newsId === newsId ? (loaded.data ?? null) : null;
+    const error = loaded?.newsId === newsId ? (loaded.error ?? null) : null;
 
     useEffect(() => {
         if (!open || !newsId) {
             return;
         }
 
-        setResult(null);
-        setError(null);
         fetch(`/news/${newsId}/share-preview`, { headers: { Accept: 'application/json' } })
             .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                 }
+
                 return response.json();
             })
-            .then(setResult)
-            .catch((reason: Error) => setError(reason.message));
+            .then((data) => setLoaded({ newsId, data }))
+            .catch((reason: Error) => setLoaded({ newsId, error: reason.message }));
     }, [open, newsId]);
 
     const meta = result?.meta;
-    const domain = meta ? new URL(meta.url).host : '';
     const encodedUrl = meta ? encodeURIComponent(meta.url) : '';
 
     return (
@@ -92,52 +84,7 @@ export function SharePreviewDialog({ newsId, open, onOpenChange }: { newsId: num
                             ))}
                         </div>
 
-                        <div className="grid gap-6 md:grid-cols-2">
-                            <PreviewFrame label="WhatsApp / Telegram">
-                                <div className="rounded-lg bg-[#d9fdd3] p-1.5 text-[#111b21]">
-                                    <div className="overflow-hidden rounded-md bg-[#cfe9c6]">
-                                        <img src={meta.image.url} alt="" className="aspect-[1.91/1] w-full object-cover" />
-                                        <div className="space-y-0.5 p-2">
-                                            <p className="line-clamp-2 text-sm font-semibold">{meta.title}</p>
-                                            <p className="line-clamp-2 text-xs text-[#3b4a54]">{meta.description}</p>
-                                            <p className="text-xs text-[#667781]">{domain}</p>
-                                        </div>
-                                    </div>
-                                    <p className="break-all px-1 pt-1 text-xs text-[#027eb5]">{meta.url}</p>
-                                </div>
-                            </PreviewFrame>
-
-                            <PreviewFrame label="Facebook">
-                                <div className="overflow-hidden border border-[#dadde1] bg-white text-[#050505]">
-                                    <img src={meta.image.url} alt="" className="aspect-[1.91/1] w-full object-cover" />
-                                    <div className="border-t border-[#dadde1] bg-[#f0f2f5] px-3 py-2">
-                                        <p className="text-xs uppercase text-[#65676b]">{domain}</p>
-                                        <p className="line-clamp-2 font-semibold">{meta.title}</p>
-                                        <p className="line-clamp-1 text-sm text-[#65676b]">{meta.description}</p>
-                                    </div>
-                                </div>
-                            </PreviewFrame>
-
-                            <PreviewFrame label="LinkedIn">
-                                <div className="overflow-hidden rounded-md border border-[#e0dfdc] bg-white text-[#191919]">
-                                    <img src={meta.image.url} alt="" className="aspect-[1.91/1] w-full object-cover" />
-                                    <div className="px-3 py-2">
-                                        <p className="line-clamp-2 text-sm font-semibold">{meta.title}</p>
-                                        <p className="text-xs text-[#666666]">{domain}</p>
-                                    </div>
-                                </div>
-                            </PreviewFrame>
-
-                            <PreviewFrame label="X (summary_large_image)">
-                                <div className="text-[#0f1419]">
-                                    <div className="relative overflow-hidden rounded-2xl border border-[#cfd9de]">
-                                        <img src={meta.image.url} alt="" className="aspect-[1.91/1] w-full object-cover" />
-                                        <span className="absolute bottom-2 left-2 rounded bg-black/70 px-1.5 py-0.5 text-xs text-white">{meta.title}</span>
-                                    </div>
-                                    <p className="pt-1 text-xs text-[#536471]">Dari {domain}</p>
-                                </div>
-                            </PreviewFrame>
-                        </div>
+                        <LinkPreviews title={meta.title} description={meta.description} imageUrl={meta.image.url} url={meta.url} />
 
                         <div className="space-y-2 rounded-lg border p-4 text-sm">
                             <div className="flex flex-wrap items-center gap-2">

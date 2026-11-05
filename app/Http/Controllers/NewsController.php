@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class NewsController extends Controller
 {
@@ -33,6 +34,26 @@ class NewsController extends Controller
         return Inertia::render('news/index', [
             'news' => $news,
             'filters' => ['search' => $search],
+        ]);
+    }
+
+    public function create(): Response
+    {
+        return Inertia::render('news/form', [
+            'news' => null,
+            'share' => null,
+            'siteUrl' => rtrim(config('app.url'), '/'),
+        ]);
+    }
+
+    public function edit(News $news, NewsShareMeta $shareMeta): Response
+    {
+        $news->load('author');
+
+        return Inertia::render('news/form', [
+            'news' => $news,
+            'share' => $shareMeta->build($news),
+            'siteUrl' => rtrim(config('app.url'), '/'),
         ]);
     }
 
@@ -63,7 +84,7 @@ class NewsController extends Controller
 
         $news->logActivity('created', 'News', $news->id, "Menambahkan berita baru: {$news->title}");
 
-        return redirect()->back()->with('success', 'Berita berhasil dibuat.');
+        return redirect()->route('news.edit', $news)->with('success', 'Berita berhasil dibuat.');
     }
 
     public function update(Request $request, News $news)

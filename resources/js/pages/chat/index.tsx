@@ -527,7 +527,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
             <Head title="Pesan" />
 
             <div className="flex h-[calc(100svh-5rem)] min-h-[480px] p-1 sm:p-4 pt-0">
-                <div className="flex w-full overflow-hidden rounded-xl border bg-background shadow-xs">
+                <div className="flex w-full overflow-hidden rounded-lg border bg-background">
                     {/* ===== Daftar percakapan ===== */}
                     <aside className={cn('flex w-full flex-col border-r bg-card md:w-80 md:shrink-0 lg:w-96', active && 'hidden md:flex')}>
                         <div className="flex items-center justify-between gap-2 border-b px-4 py-3">
@@ -617,7 +617,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                             </div>
                         ) : (
                             <>
-                                <header className="flex h-14 sm:h-16 shrink-0 items-center gap-2.5 sm:gap-3 border-b bg-card/90 px-3 sm:px-6 py-2.5 backdrop-blur-xs">
+                                <header className="flex h-14 sm:h-16 shrink-0 items-center gap-2.5 sm:gap-3 border-b bg-card px-3 sm:px-6 py-2.5">
                                     <Button
                                         variant="ghost"
                                         size="icon"
@@ -851,7 +851,7 @@ export default function ChatIndex({ conversations: initialConversations, contact
                                 </div>
 
                                 {/* Bagian Input Bawah */}
-                                <footer className="border-t bg-card/90 p-2 sm:p-3 backdrop-blur-xs">
+                                <footer className="border-t bg-card p-2 sm:p-3">
                                     <div className="mx-auto max-w-3xl">
                                         {error && <p className="mb-2 text-xs font-medium text-destructive">{error}</p>}
 

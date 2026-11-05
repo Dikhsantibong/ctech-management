@@ -87,7 +87,7 @@ function StatCard({
             </div>
             <div className="min-w-0">
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
-                <p className="text-xl font-bold leading-tight">{value}</p>
+                <p className="text-xl font-semibold leading-tight">{value}</p>
                 {hint && <p className="truncate text-xs text-muted-foreground">{hint}</p>}
             </div>
         </div>
@@ -216,7 +216,7 @@ export default function ProjectShow({ project }: { project: any }) {
                         </Button>
                         <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                                <h2 className="truncate text-xl font-bold tracking-tight">{project.project_name}</h2>
+                                <h2 className="truncate text-xl font-semibold tracking-tight">{project.project_name}</h2>
                                 <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusStyle.chip}`}>
                                     {statusStyle.label}
                                 </span>

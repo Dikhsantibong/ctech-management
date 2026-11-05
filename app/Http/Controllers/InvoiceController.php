@@ -6,19 +6,26 @@ use App\Models\Client;
 use App\Models\CompanySetting;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Services\Documents\DocumentSigner;
+use App\Services\Documents\KwitansiPdf;
+use App\Support\MenuRegistry;
 use App\Traits\LogsActivity;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class InvoiceController extends Controller
 {
     use LogsActivity;
 
+    public function __construct(private KwitansiPdf $kwitansi, private DocumentSigner $signer) {}
+
     public function index()
     {
-        $invoices = Invoice::with('items')->latest()->get();
+        $invoices = Invoice::with('items')->withExists(['signatures as is_signed' => fn ($query) => $query->whereNull('revoked_at')])->latest()->get();
+
         return Inertia::render('invoices/index', [
             'invoices' => $invoices,
         ]);
@@ -66,8 +73,8 @@ class InvoiceController extends Controller
         $prefix = "CTECH/{$year}/{$month}/";
 
         $latestInvoice = Invoice::where('invoice_number', 'like', "{$prefix}%")
-                                ->orderBy('invoice_number', 'desc')
-                                ->first();
+            ->orderBy('invoice_number', 'desc')
+            ->first();
 
         if ($latestInvoice) {
             $lastSequence = (int) substr($latestInvoice->invoice_number, -3);
@@ -76,7 +83,7 @@ class InvoiceController extends Controller
             $nextId = 1;
         }
 
-        $invoiceNumber = $prefix . str_pad($nextId, 3, '0', STR_PAD_LEFT);
+        $invoiceNumber = $prefix.str_pad($nextId, 3, '0', STR_PAD_LEFT);
 
         $subtotal = 0;
         foreach ($validated['items'] as $item) {
@@ -115,14 +122,20 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $invoice->load('items');
+        $invoice->load('items', 'activeSignature');
+
         return Inertia::render('invoices/show', [
             'invoice' => $invoice,
+            'can_verify' => Auth::user()?->role === MenuRegistry::SUPER_ROLE,
+            'kwitansi_signature' => $invoice->activeSignature?->toPanel(),
+            'has_signature_image' => (bool) CompanySetting::first()?->has_signature_image,
         ]);
     }
 
     public function update(Request $request, Invoice $invoice)
     {
+        $this->ensureKwitansiNotSigned($invoice);
+
         $validated = $request->validate([
             'client_name' => 'required|string|max:255',
             'issue_date' => 'required|date',
@@ -189,6 +202,12 @@ class InvoiceController extends Controller
             'status' => 'required|in:Draft,Sent,Paid,Overdue',
         ]);
 
+        abort_if(
+            $validated['status'] !== 'Paid' && $invoice->isSigned(),
+            423,
+            'Kwitansi invoice ini sudah ditandatangani. Cabut pengesahan kwitansi terlebih dahulu.'
+        );
+
         $invoice->update(['status' => $validated['status']]);
 
         $this->logActivity('updated', 'Invoice', $invoice->id, "Mengupdate status invoice {$invoice->invoice_number} menjadi {$validated['status']}");
@@ -198,8 +217,11 @@ class InvoiceController extends Controller
 
     public function destroy(Invoice $invoice)
     {
+        $this->ensureKwitansiNotSigned($invoice);
+
         $this->logActivity('deleted', 'Invoice', $invoice->id, "Menghapus invoice: {$invoice->invoice_number}");
         $invoice->delete();
+
         return redirect()->back()->with('success', 'Invoice deleted.');
     }
 
@@ -257,30 +279,28 @@ class InvoiceController extends Controller
 
     public function downloadPdf(Invoice $invoice)
     {
-        return $this->buildPdf($invoice)->stream(str_replace('/', '-', $invoice->invoice_number) . '.pdf');
+        return $this->buildPdf($invoice)->stream(str_replace('/', '-', $invoice->invoice_number).'.pdf');
     }
 
-    public function downloadKwitansi(Invoice $invoice)
+    /**
+     * Kwitansi bertanda tangan elektronik dikirim dari PDF beku; selain itu dirender ulang
+     * dengan ruang tanda tangan kosong.
+     */
+    public function downloadKwitansi(Invoice $invoice): HttpResponse
     {
-        $invoice->load('items');
-        $settings = CompanySetting::first();
+        $filename = str_replace('/', '-', $invoice->kwitansiNumber()).'.pdf';
 
-        $logo = null;
-        $logoPath = public_path('letter/main-logo.png');
-        if (is_file($logoPath) && extension_loaded('gd')) {
-            $logo = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
-        }
+        return $this->signer->signedPdfResponse($invoice, $filename)
+            ?? $this->kwitansi->build($invoice)->stream($filename);
+    }
 
-        $kwitansi_number = str_replace('CTECH', 'KWT', $invoice->invoice_number);
-
-        $pdf = Pdf::loadView('pdf.kwitansi', [
-            'invoice' => $invoice,
-            'settings' => $settings,
-            'logo' => $logo,
-            'kwitansi_number' => $kwitansi_number,
-        ])->setPaper('a5', 'landscape');
-
-        return $pdf->stream(str_replace('/', '-', $kwitansi_number) . '.pdf');
+    private function ensureKwitansiNotSigned(Invoice $invoice): void
+    {
+        abort_if(
+            $invoice->isSigned(),
+            423,
+            'Kwitansi invoice ini sudah ditandatangani. Cabut pengesahan kwitansi terlebih dahulu untuk mengubah atau menghapus.'
+        );
     }
 
     private function buildPdf(Invoice $invoice)
@@ -294,7 +314,7 @@ class InvoiceController extends Controller
         $logo = null;
         $logoPath = public_path('letter/main-logo.png');
         if (is_file($logoPath) && extension_loaded('gd')) {
-            $logo = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+            $logo = 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath));
         }
 
         $pdf = Pdf::loadView('pdf.invoice', [

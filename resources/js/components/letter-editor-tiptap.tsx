@@ -60,6 +60,55 @@ const FontSize = Extension.create({
 });
 
 // ──────────────────────────────────────────
+// Paste dari Excel / Word / Google Sheets
+// ──────────────────────────────────────────
+
+/**
+ * Bersihkan HTML clipboard Office sebelum diparse ProseMirror: komentar kondisional,
+ * tag namespace (o:p, w:*), style/meta, serta ukuran sel tetap yang membuat tabel melebar.
+ */
+function cleanOfficeHtml(html: string): string {
+    return html
+        .replace(/<!--\[if[\s\S]*?<!\[endif\]-->/gi, '')
+        .replace(/<!\[if[\s\S]*?<!\[endif\]>/gi, '')
+        .replace(/<!--[\s\S]*?-->/g, '')
+        .replace(/<(style|meta|link|xml|title)[^>]*>[\s\S]*?<\/\1>/gi, '')
+        .replace(/<(meta|link)[^>]*\/?>/gi, '')
+        .replace(/<\/?[a-z]+:[^>]*>/gi, '')
+        .replace(/<(td|th|table|tr|col)\b([^>]*)>/gi, (_match, tag: string, attrs: string) => {
+            const kept = attrs
+                .replace(/\s(width|height|class|style|valign|nowrap|x:[a-z]+)=("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+                .replace(/\s(nowrap)\b/gi, '');
+
+            return `<${tag}${kept}>`;
+        });
+}
+
+function escapeHtml(text: string): string {
+    return text.replace(/[&<>"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[char] as string);
+}
+
+/**
+ * Teks tab-separated (salinan Excel/Sheets tanpa HTML) → tabel HTML.
+ * Mengembalikan null bila teks bukan data tabel.
+ */
+function tsvToTableHtml(text: string): string | null {
+    const rows = text.replace(/\r\n?/g, '\n').replace(/\n+$/, '').split('\n');
+
+    if (rows.length === 0 || !rows.some((row) => row.includes('\t'))) {
+        return null;
+    }
+
+    const cells = rows.map((row) => row.split('\t'));
+    const columns = Math.max(...cells.map((row) => row.length));
+    const body = cells
+        .map((row) => `<tr>${Array.from({ length: columns }, (_, index) => `<td><p>${escapeHtml(row[index] ?? '')}</p></td>`).join('')}</tr>`)
+        .join('');
+
+    return `<table><tbody>${body}</tbody></table><p></p>`;
+}
+
+// ──────────────────────────────────────────
 // Toolbar button component
 // ──────────────────────────────────────────
 function ToolbarBtn({
@@ -288,8 +337,30 @@ export default function LetterEditorTiptap({
             attributes: {
                 class: 'tiptap-editor-content',
             },
+            transformPastedHTML: cleanOfficeHtml,
+            handlePaste: (view, event) => {
+                const clipboard = event.clipboardData;
+
+                if (!clipboard || clipboard.getData('text/html').includes('<table')) {
+                    // HTML tabel dari Excel/Word/Sheets ditangani parser bawaan (setelah dibersihkan).
+                    return false;
+                }
+
+                const tableHtml = tsvToTableHtml(clipboard.getData('text/plain'));
+
+                if (!tableHtml) {
+                    return false;
+                }
+
+                event.preventDefault();
+                // Lewat pipeline paste ProseMirror (event sintetis tanpa clipboard → handler ini tidak berulang).
+                view.pasteHTML(tableHtml);
+
+                return true;
+            },
         },
     });
+
 
     // Sync external value changes
     useEffect(() => {
@@ -482,6 +553,9 @@ export default function LetterEditorTiptap({
                             </DropdownItem>
                             <DropdownItem onClick={() => editor.chain().focus().splitCell().run()}>
                                 Pisah Sel
+                            </DropdownItem>
+                            <DropdownItem onClick={() => editor.chain().focus().toggleHeaderRow().run()}>
+                                Baris Header (on/off)
                             </DropdownItem>
                             <div className="my-1 h-px bg-border" />
                             <DropdownItem onClick={() => editor.chain().focus().deleteTable().run()}>

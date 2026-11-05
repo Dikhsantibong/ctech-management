@@ -695,8 +695,8 @@ export default function ContentPlansIndex({
                 {/* Header */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Content Planning</h2>
-                        <p className="text-sm text-muted-foreground">
+                        <h2 className="text-2xl font-semibold tracking-tight">Content Planning</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">
                             Rencanakan, jadwalkan, dan pantau konten di seluruh platform.
                         </p>
                     </div>
@@ -730,7 +730,7 @@ export default function ContentPlansIndex({
                                 <stat.icon className="h-3.5 w-3.5" />
                                 {stat.label}
                             </p>
-                            <p className={`mt-1 text-2xl font-bold leading-none ${stat.tone}`}>{stat.value}</p>
+                            <p className={`mt-1 text-2xl font-semibold leading-none ${stat.tone}`}>{stat.value}</p>
                         </div>
                     ))}
                 </div>

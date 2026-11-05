@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { statusTone } from '@/components/status-badge';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -235,15 +236,7 @@ export default function IncomingLettersIndex({
         }
     };
 
-    const statusBadgeVariant = (status: string) => {
-        switch (status) {
-            case 'Diterima': return 'outline' as const;
-            case 'Diproses': return 'default' as const;
-            case 'Selesai': return 'secondary' as const;
-            case 'Diarsipkan': return 'outline' as const;
-            default: return 'outline' as const;
-        }
-    };
+    const statusBadgeVariant = (status: string) => statusTone(status);
 
     const statusDotColor = (status: string) => {
         switch (status) {
@@ -262,8 +255,8 @@ export default function IncomingLettersIndex({
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Surat Masuk</h2>
-                        <p className="text-muted-foreground">Kelola dan catat surat masuk perusahaan.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Surat Masuk</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Kelola dan catat surat masuk perusahaan.</p>
                     </div>
                     <Button onClick={openCreateModal}>
                         <Plus className="mr-2 h-4 w-4" /> Catat Surat Masuk
@@ -308,7 +301,7 @@ export default function IncomingLettersIndex({
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b transition-colors hover:bg-muted/50">
+                                    <tr className="border-b transition-colors hover:bg-muted">
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">No. Agenda</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">No. Surat</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Pengirim</th>
@@ -322,7 +315,7 @@ export default function IncomingLettersIndex({
                                 </thead>
                                 <tbody>
                                     {incomingLetters.map((letter) => (
-                                        <tr key={letter.id} className="border-b transition-colors hover:bg-muted/50">
+                                        <tr key={letter.id} className="border-b transition-colors hover:bg-muted">
                                             <td className="p-4 align-middle font-medium">
                                                 <button
                                                     onClick={() => openDetailModal(letter)}

@@ -11,8 +11,8 @@ export default function CrmPenawaranIndex({ quotations, canCreateQuotation }: { 
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Penawaran</h2>
-                        <p className="text-muted-foreground">Penawaran (RAB) yang terhubung dengan proses penjualan CRM.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Penawaran</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Penawaran (RAB) yang terhubung dengan proses penjualan CRM.</p>
                     </div>
                     {canCreateQuotation && (
                         <Button asChild><Link href="/quotations/create"><Plus className="mr-2 h-4 w-4" /> Buat Penawaran</Link></Button>
@@ -34,7 +34,7 @@ export default function CrmPenawaranIndex({ quotations, canCreateQuotation }: { 
                         </thead>
                         <tbody>
                             {quotations.map((q) => (
-                                <tr key={q.id} className="border-b last:border-0 hover:bg-muted/50">
+                                <tr key={q.id} className="border-b last:border-0 hover:bg-muted">
                                     <td className="whitespace-nowrap px-4 py-2.5 font-medium">{q.quotation_number}</td>
                                     <td className="px-4 py-2.5">
                                         {q.prospect ? (

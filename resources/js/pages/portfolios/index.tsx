@@ -100,8 +100,8 @@ export default function PortfoliosIndex({ portfolios }: { portfolios: any[] }) {
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Karya Kami / Portfolio</h2>
-                        <p className="text-muted-foreground">Kelola daftar project terselesaikan untuk ditampilkan di halaman depan.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Karya Kami / Portfolio</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Kelola daftar project terselesaikan untuk ditampilkan di halaman depan.</p>
                     </div>
                     <Button onClick={openCreateModal}>
                         <Plus className="mr-2 h-4 w-4" /> Tambah Portfolio
@@ -113,7 +113,7 @@ export default function PortfoliosIndex({ portfolios }: { portfolios: any[] }) {
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b transition-colors hover:bg-muted/50">
+                                    <tr className="border-b transition-colors hover:bg-muted">
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Preview</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Judul Project</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Kategori</th>
@@ -123,7 +123,7 @@ export default function PortfoliosIndex({ portfolios }: { portfolios: any[] }) {
                                 </thead>
                                 <tbody>
                                     {portfolios.map((item) => (
-                                        <tr key={item.id} className="border-b transition-colors hover:bg-muted/50">
+                                        <tr key={item.id} className="border-b transition-colors hover:bg-muted">
                                             <td className="p-4 align-middle">
                                                 {item.image ? (
                                                     <img src={`/storage/${item.image}`} alt={item.title} className="h-12 w-20 object-cover rounded border" />

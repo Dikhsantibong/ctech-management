@@ -64,8 +64,8 @@ export default function ProspectsIndex({ prospects, filters, options }: { prospe
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Prospek</h2>
-                        <p className="text-muted-foreground">Database calon customer dan pipeline penjualan.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Prospek</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Database calon customer dan pipeline penjualan.</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                         <Button variant="outline" asChild>
@@ -125,7 +125,7 @@ export default function ProspectsIndex({ prospects, filters, options }: { prospe
                             </thead>
                             <tbody>
                                 {rows.map((p) => (
-                                    <tr key={p.id} className="border-b last:border-0 hover:bg-muted/50">
+                                    <tr key={p.id} className="border-b last:border-0 hover:bg-muted">
                                         <td className="whitespace-nowrap px-4 py-2.5">
                                             <Link href={`/crm/prospek/${p.id}`} className="font-medium hover:underline">{p.company_name}</Link>
                                             {p.brand_name && <div className="text-xs text-muted-foreground">{p.brand_name}</div>}

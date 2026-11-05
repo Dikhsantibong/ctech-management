@@ -340,8 +340,8 @@ export default function AppSubscriptionsIndex({
             <div className="flex flex-1 flex-col gap-4 p-6">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Langganan Aplikasi</h2>
-                        <p className="text-sm text-muted-foreground">
+                        <h2 className="text-2xl font-semibold tracking-tight">Langganan Aplikasi</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">
                             Kelola langganan POS App dan Photobooth App: lama berlangganan, pembayaran yang masuk, dan tunggakan.
                         </p>
                     </div>
@@ -350,12 +350,12 @@ export default function AppSubscriptionsIndex({
                 {/* Ringkasan */}
                 <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                     {stats.map((s) => (
-                        <div key={s.label} className="rounded-xl border bg-card p-3.5 shadow-sm">
+                        <div key={s.label} className="rounded-lg border bg-card p-3.5">
                             <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                 <s.icon className="h-3.5 w-3.5" />
                                 {s.label}
                             </p>
-                            <p className={`mt-1.5 text-xl font-bold leading-none ${s.tone}`}>{s.value}</p>
+                            <p className={`mt-1.5 text-xl font-semibold leading-none ${s.tone}`}>{s.value}</p>
                             <p className="mt-1.5 text-xs text-muted-foreground">{s.hint}</p>
                         </div>
                     ))}
@@ -379,7 +379,7 @@ export default function AppSubscriptionsIndex({
 
                     {/* ==================== TAB LANGGANAN ==================== */}
                     <TabsContent value="langganan" className="space-y-4">
-                        <div className="flex flex-col gap-2 rounded-xl border bg-card p-3 shadow-sm lg:flex-row lg:items-center">
+                        <div className="flex flex-col gap-2 rounded-lg border bg-card p-3 lg:flex-row lg:items-center">
                             <div className="relative flex-1">
                                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
@@ -421,7 +421,7 @@ export default function AppSubscriptionsIndex({
                             </Button>
                         </div>
 
-                        <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+                        <div className="overflow-hidden rounded-lg border bg-card">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
                                     <thead className="border-b bg-muted/30">
@@ -553,7 +553,7 @@ export default function AppSubscriptionsIndex({
 
                     {/* ==================== TAB KATEGORI ==================== */}
                     <TabsContent value="kategori" className="space-y-4">
-                        <div className="flex items-center justify-between rounded-xl border bg-card p-3 shadow-sm">
+                        <div className="flex items-center justify-between rounded-lg border bg-card p-3">
                             <p className="text-sm text-muted-foreground">
                                 Kategori menentukan jenis aplikasi yang dilanggan dan harga bawaannya.
                             </p>
@@ -564,7 +564,7 @@ export default function AppSubscriptionsIndex({
 
                         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                             {categories.map((cat) => (
-                                <div key={cat.id} className="flex flex-col rounded-xl border bg-card shadow-sm">
+                                <div key={cat.id} className="flex flex-col rounded-lg border bg-card">
                                     <div className="flex items-start justify-between gap-3 border-b p-4">
                                         <div className="min-w-0">
                                             <h3 className="font-semibold">{cat.name}</h3>
@@ -612,7 +612,7 @@ export default function AppSubscriptionsIndex({
                             ))}
 
                             {categories.length === 0 && (
-                                <div className="col-span-full rounded-xl border border-dashed py-12 text-center text-muted-foreground">
+                                <div className="col-span-full rounded-lg border border-dashed py-12 text-center text-muted-foreground">
                                     Belum ada kategori aplikasi.
                                 </div>
                             )}

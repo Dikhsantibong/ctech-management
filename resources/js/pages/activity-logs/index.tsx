@@ -19,8 +19,8 @@ export default function ActivityLogsIndex({ logs }: { logs: any }) {
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Activity Logs</h2>
-                        <p className="text-muted-foreground">Track all system activities and changes.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Activity Logs</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Track all system activities and changes.</p>
                     </div>
                 </div>
 
@@ -29,7 +29,7 @@ export default function ActivityLogsIndex({ logs }: { logs: any }) {
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <tr className="border-b transition-colors hover:bg-muted data-[state=selected]:bg-muted">
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">User</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Action</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Module</th>
@@ -39,7 +39,7 @@ export default function ActivityLogsIndex({ logs }: { logs: any }) {
                                 </thead>
                                 <tbody>
                                     {logs.data.map((log: any) => (
-                                        <tr key={log.id} className="border-b transition-colors hover:bg-muted/50">
+                                        <tr key={log.id} className="border-b transition-colors hover:bg-muted">
                                             <td className="p-4 align-middle font-medium">
                                                 {log.user?.name || 'System'}
                                             </td>

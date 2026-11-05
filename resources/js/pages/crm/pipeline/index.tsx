@@ -23,8 +23,8 @@ export default function PipelineIndex({ columns }: { columns: Column[]; stages: 
             <Head title="Pipeline" />
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Pipeline</h2>
-                    <p className="text-muted-foreground">Geser kartu antar tahap untuk memperbarui posisi opportunity.</p>
+                    <h2 className="text-2xl font-semibold tracking-tight">Pipeline</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">Geser kartu antar tahap untuk memperbarui posisi opportunity.</p>
                 </div>
 
                 <div className="overflow-x-auto pb-4">

@@ -146,8 +146,8 @@ export default function QuotationForm({ quotation, clients, settings, prospectId
                             <Link href="/quotations"><ArrowLeft className="h-5 w-5" /></Link>
                         </Button>
                         <div>
-                            <h2 className="text-2xl font-bold tracking-tight">{isEdit ? 'Edit Penawaran' : 'Buat Penawaran'}</h2>
-                            <p className="text-muted-foreground">{isEdit ? quotation.quotation_number : 'Susun dokumen penawaran lengkap dengan RAB.'}</p>
+                            <h2 className="text-2xl font-semibold tracking-tight">{isEdit ? 'Edit Penawaran' : 'Buat Penawaran'}</h2>
+                            <p className="mt-1 text-sm text-muted-foreground">{isEdit ? quotation.quotation_number : 'Susun dokumen penawaran lengkap dengan RAB.'}</p>
                         </div>
                     </div>
                     <div className="flex shrink-0 items-center rounded-lg border bg-muted/40 p-0.5">
@@ -264,7 +264,7 @@ export default function QuotationForm({ quotation, clients, settings, prospectId
                                             <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span className="font-medium">{formatCurrency(subtotal)}</span></div>
                                             {discount > 0 && <div className="flex justify-between text-sm"><span className="text-muted-foreground">Diskon</span><span className="font-medium">- {formatCurrency(discount)}</span></div>}
                                             {data.use_tax && <div className="flex justify-between text-sm"><span className="text-muted-foreground">PPN ({data.tax_rate || 0}%)</span><span className="font-medium">{formatCurrency(tax)}</span></div>}
-                                            <div className="flex justify-between border-t pt-2 text-base"><span className="font-bold">Grand Total</span><span className="font-bold text-primary">{formatCurrency(total)}</span></div>
+                                            <div className="flex justify-between border-t pt-2 text-base"><span className="font-semibold">Grand Total</span><span className="font-semibold text-primary">{formatCurrency(total)}</span></div>
                                         </div>
                                     </CardContent>
                                 </Card>

@@ -131,8 +131,8 @@ export default function LetterForm({ letter, settings }: { letter: any | null; s
                         </Link>
                     </Button>
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">{isEdit ? "Edit Letter" : "Create Official Letter"}</h2>
-                        <p className="text-muted-foreground">
+                        <h2 className="text-2xl font-semibold tracking-tight">{isEdit ? "Edit Letter" : "Create Official Letter"}</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">
                             {isEdit ? "Update document details and content." : "Draft a new official document for the company."}
                         </p>
                     </div>

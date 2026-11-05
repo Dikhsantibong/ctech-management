@@ -294,8 +294,8 @@ export default function CalendarIndex({ events: initialEvents }: { events: Calen
                 {/* Header */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Kalender</h2>
-                        <p className="text-sm text-muted-foreground">
+                        <h2 className="text-2xl font-semibold tracking-tight">Kalender</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">
                             Semua tenggat project, task, meeting, jadwal konten, dan jatuh tempo invoice dalam satu tampilan.
                         </p>
                     </div>
@@ -319,7 +319,7 @@ export default function CalendarIndex({ events: initialEvents }: { events: Calen
                                 <stat.icon className="h-3.5 w-3.5" />
                                 {stat.label}
                             </p>
-                            <p className={`mt-1 text-2xl font-bold leading-none ${stat.tone}`}>{stat.value}</p>
+                            <p className={`mt-1 text-2xl font-semibold leading-none ${stat.tone}`}>{stat.value}</p>
                         </div>
                     ))}
                 </div>
@@ -483,7 +483,7 @@ export default function CalendarIndex({ events: initialEvents }: { events: Calen
                                             >
                                                 <div className="mb-2 flex items-center gap-1.5">
                                                     <span
-                                                        className={`flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold ${
+                                                        className={`flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold ${
                                                             isToday ? 'bg-primary text-primary-foreground' : 'text-foreground'
                                                         }`}
                                                     >
@@ -614,7 +614,7 @@ function AgendaView({
                                     {parsed.toLocaleDateString('id-ID', { weekday: 'short' })}
                                 </p>
                                 <p
-                                    className={`mx-auto mt-0.5 flex h-9 w-9 items-center justify-center rounded-full text-lg font-bold ${
+                                    className={`mx-auto mt-0.5 flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold ${
                                         isToday ? 'bg-primary text-primary-foreground' : ''
                                     }`}
                                 >

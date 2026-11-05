@@ -193,7 +193,7 @@ export default function LetterDocumentPreview({
                     {data.content ? (
                         contentHasHtml ? (
                             <div
-                                className="letter-preview-content text-justify [&_li]:mb-1 [&_ol]:mb-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:mb-2 [&_table]:border-collapse [&_td]:border [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:px-2 [&_th]:py-1 [&_ul]:mb-2 [&_ul]:list-disc [&_ul]:pl-6"
+                                className="letter-preview-content text-justify [&_li]:mb-1 [&_ol]:mb-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:mb-2 [&_table]:my-2 [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-black [&_td]:px-2 [&_td]:py-1 [&_td]:align-top [&_td_p]:mb-0 [&_th]:border [&_th]:border-black [&_th]:bg-[#f2f4f7] [&_th]:px-2 [&_th]:py-1 [&_th]:text-left [&_th_p]:mb-0 [&_ul]:mb-2 [&_ul]:list-disc [&_ul]:pl-6"
                                 dangerouslySetInnerHTML={{ __html: data.content }}
                             />
                         ) : (

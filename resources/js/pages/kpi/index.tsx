@@ -73,10 +73,10 @@ export default function KpiIndex({
                 {/* Header */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-                            <Gauge className="h-6 w-6 text-muted-foreground" /> Monitoring KPI
+                        <h2 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+                            <Gauge className="h-5 w-5 text-muted-foreground" /> Monitoring KPI
                         </h2>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="mt-1 text-sm text-muted-foreground">
                             Capaian tiap role dihitung otomatis dari data operasional. Klik ikon pensil untuk menyesuaikan target.
                         </p>
                     </div>
@@ -100,7 +100,7 @@ export default function KpiIndex({
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                     <div className="rounded-lg border bg-muted/10 p-4">
                         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Skor Perusahaan</p>
-                        <p className={`mt-1 text-3xl font-bold leading-none ${companyTone.text}`}>{companyScore}%</p>
+                        <p className={`mt-1 text-2xl font-semibold leading-none tabular-nums ${companyTone.text}`}>{companyScore}%</p>
                         <p className="mt-1 text-xs text-muted-foreground">Rata-rata {scored.length} role</p>
                     </div>
 
@@ -113,7 +113,7 @@ export default function KpiIndex({
                                 <p className="truncate text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                     {role.role_label}
                                 </p>
-                                <p className={`mt-1 text-3xl font-bold leading-none ${tone.text}`}>{role.score}%</p>
+                                <p className={`mt-1 text-2xl font-semibold leading-none tabular-nums ${tone.text}`}>{role.score}%</p>
                                 <p className="mt-1 text-xs text-muted-foreground">
                                     {behind > 0 ? `${behind} indikator perlu perhatian` : 'Semua indikator aman'}
                                 </p>

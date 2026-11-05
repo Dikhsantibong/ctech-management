@@ -456,7 +456,7 @@ export default function ProjectMilestones({ project }: { project: any }) {
                                                         )}
                                                         {milestone.pic && (
                                                             <span className="flex items-center gap-1">
-                                                                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold text-primary">
+                                                                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
                                                                     {milestone.pic.name.charAt(0).toUpperCase()}
                                                                 </span>
                                                                 {milestone.pic.name}

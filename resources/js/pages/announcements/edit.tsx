@@ -63,8 +63,8 @@ export default function AnnouncementEdit({ announcement }: Props) {
             <Head title="Edit Pengumuman" />
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Edit Pengumuman</h2>
-                    <p className="text-muted-foreground">Edit pengumuman untuk tim Anda.</p>
+                    <h2 className="text-2xl font-semibold tracking-tight">Edit Pengumuman</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">Edit pengumuman untuk tim Anda.</p>
                 </div>
 
                 <div className="rounded-lg border bg-card text-card-foreground p-6">

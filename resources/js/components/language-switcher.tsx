@@ -36,10 +36,10 @@ export function LanguageSwitcher() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleLanguageChange('id')} className={lang === 'id' ? 'font-bold bg-muted' : ''}>
+                <DropdownMenuItem onClick={() => handleLanguageChange('id')} className={lang === 'id' ? 'font-semibold bg-muted' : ''}>
                     Indonesia (ID)
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleLanguageChange('en')} className={lang === 'en' ? 'font-bold bg-muted' : ''}>
+                <DropdownMenuItem onClick={() => handleLanguageChange('en')} className={lang === 'en' ? 'font-semibold bg-muted' : ''}>
                     English (EN)
                 </DropdownMenuItem>
             </DropdownMenuContent>

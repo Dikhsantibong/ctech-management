@@ -4,22 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\CompanySetting;
 use App\Models\Letter;
+use App\Services\Documents\DocumentSigner;
+use App\Services\Documents\LetterPdf;
 use App\Support\MenuRegistry;
 use App\Traits\LogsActivity;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class LetterController extends Controller
 {
     use LogsActivity;
 
+    public function __construct(private LetterPdf $pdf, private DocumentSigner $signer) {}
+
     public function index(Request $request)
     {
         $search = $request->query('search', '');
-        $query = Letter::with('creator');
+        $query = Letter::with('creator')->withExists(['signatures as is_signed' => fn ($query) => $query->whereNull('revoked_at')]);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -141,53 +145,17 @@ class LetterController extends Controller
 
     public function show(Letter $letter)
     {
-        $letter->load('creator', 'verifier');
+        $letter->load('creator', 'verifier', 'activeSignature');
+        $signature = $letter->activeSignature;
 
         return Inertia::render('letters/show', [
             'letter' => $letter,
-            'verification_code' => $letter->content ? $this->verificationCode($letter) : null,
+            'verification_code' => $letter->content ? $this->pdf->verificationCode($letter) : null,
             'settings' => CompanySetting::first(),
             'can_verify' => Auth::user()?->role === MenuRegistry::SUPER_ROLE,
+            'signature' => $signature?->toPanel(),
+            'has_signature_image' => (bool) CompanySetting::first()?->has_signature_image,
         ]);
-    }
-
-    /**
-     * Verifikasi/pengesahan dokumen — hanya Direktur Utama.
-     * Menandai surat sah (Final) beserta jejak siapa & kapan memverifikasi.
-     */
-    public function verifyDocument(Letter $letter)
-    {
-        $this->authorizeVerifier();
-
-        abort_if(empty($letter->content), 422, 'Surat tanpa isi tidak dapat diverifikasi.');
-
-        $letter->update([
-            'status' => 'Final',
-            'verified_at' => now(),
-            'verified_by' => Auth::id(),
-        ]);
-
-        $this->logActivity('verified', 'Letter', $letter->id, "Memverifikasi surat: {$letter->reference_number}");
-
-        return redirect()->back()->with('success', 'Surat berhasil diverifikasi.');
-    }
-
-    /**
-     * Batalkan verifikasi — hanya Direktur Utama. Surat kembali menjadi Draft.
-     */
-    public function unverifyDocument(Letter $letter)
-    {
-        $this->authorizeVerifier();
-
-        $letter->update([
-            'status' => 'Draft',
-            'verified_at' => null,
-            'verified_by' => null,
-        ]);
-
-        $this->logActivity('unverified', 'Letter', $letter->id, "Membatalkan verifikasi surat: {$letter->reference_number}");
-
-        return redirect()->back()->with('success', 'Verifikasi surat dibatalkan.');
     }
 
     public function create()
@@ -214,6 +182,8 @@ class LetterController extends Controller
             'line_spacing' => 'nullable|in:1,1.15,1.5,2',
         ]);
 
+        $this->ensureNotSigned($letter);
+
         // Status/pengesahan tidak diubah di sini — hanya lewat verifikasi Direktur Utama
         $letter->update($validated);
 
@@ -224,6 +194,8 @@ class LetterController extends Controller
 
     public function edit(Letter $letter)
     {
+        $this->ensureNotSigned($letter);
+
         $letter->load('creator');
 
         return Inertia::render('letters/form', [
@@ -234,24 +206,39 @@ class LetterController extends Controller
 
     public function destroy(Letter $letter)
     {
+        $this->ensureNotSigned($letter);
+
         $this->logActivity('deleted', 'Letter', $letter->id, "Menghapus surat: {$letter->reference_number}");
         $letter->delete();
 
         return redirect()->back()->with('success', 'Letter deleted.');
     }
 
-    public function downloadPdf(Letter $letter)
+    public function downloadPdf(Letter $letter): HttpResponse
     {
-        $pdf = $this->buildPdf($letter);
-
-        return $pdf->download(str_replace('/', '-', $letter->reference_number).'.pdf');
+        return $this->pdfResponse($letter, 'attachment');
     }
 
-    public function previewPdf(Letter $letter)
+    public function previewPdf(Letter $letter): HttpResponse
     {
-        $pdf = $this->buildPdf($letter);
+        return $this->pdfResponse($letter, 'inline');
+    }
 
-        return $pdf->stream(str_replace('/', '-', $letter->reference_number).'.pdf');
+    /**
+     * Surat yang sudah ditandatangani selalu dikirim dari file PDF beku (byte identik,
+     * sehingga sidik digitalnya cocok); surat lain dirender ulang.
+     */
+    private function pdfResponse(Letter $letter, string $disposition): HttpResponse
+    {
+        $filename = str_replace('/', '-', $letter->reference_number).'.pdf';
+
+        if ($signed = $this->signer->signedPdfResponse($letter, $filename, $disposition)) {
+            return $signed;
+        }
+
+        $pdf = $this->pdf->build($letter);
+
+        return $disposition === 'attachment' ? $pdf->download($filename) : $pdf->stream($filename);
     }
 
     /**
@@ -291,13 +278,9 @@ class LetterController extends Controller
             'line_spacing' => $validated['line_spacing'] ?? null,
         ]);
         $letter->reference_number = $validated['reference_number'] ?? 'XXX/DRAFT/CTECH';
+
         // Pratinjau selalu Draft agar tidak menghasilkan dokumen yang tampak resmi
-        $letter->status = 'Draft';
-        $letter->setRelation('creator', Auth::user());
-
-        $pdf = $this->buildPdf($letter, isPreview: true);
-
-        return $pdf->stream('pratinjau-surat.pdf');
+        return $this->pdf->buildDraft($letter)->stream('pratinjau-surat.pdf');
     }
 
     /**
@@ -314,7 +297,7 @@ class LetterController extends Controller
 
         if ($normalized !== '') {
             $match = Letter::with('creator')->get()->first(
-                fn (Letter $letter) => str_replace('-', '', $this->verificationCode($letter)) === $normalized
+                fn (Letter $letter) => str_replace('-', '', $this->pdf->verificationCode($letter)) === $normalized
             );
 
             if ($match) {
@@ -328,7 +311,7 @@ class LetterController extends Controller
                     'status' => $match->status,
                     'issuer' => CompanySetting::first()?->company_name,
                     'creator' => $match->creator?->name,
-                    'code' => $this->verificationCode($match),
+                    'code' => $this->pdf->verificationCode($match),
                 ];
             } else {
                 $result = ['found' => false];
@@ -341,75 +324,15 @@ class LetterController extends Controller
         ]);
     }
 
-    private function buildPdf(Letter $letter, bool $isPreview = false)
-    {
-        abort_if(empty($letter->content), 404, 'Surat ini hanya reservasi nomor, tidak memiliki isi untuk dicetak.');
-
-        // Model transien (pratinjau) belum punya relasi tersimpan; hanya load bila sudah ada di DB
-        if ($letter->exists && ! $letter->relationLoaded('creator')) {
-            $letter->load('creator', 'verifier');
-        }
-
-        $settings = CompanySetting::first();
-
-        // Konten hasil paste dari Word/PDF sering penuh non-breaking space sehingga
-        // dompdf tidak bisa memotong baris dan teks keluar dari halaman
-        $letter->content = preg_replace('/(&nbsp;|\x{00A0})/u', ' ', $letter->content);
-
-        // Dompdf butuh ekstensi GD untuk merender PNG; tanpa guard ini server tanpa GD akan 500
-        $logo = null;
-        $logoPath = public_path('letter/main-logo.png');
-        if (is_file($logoPath) && extension_loaded('gd')) {
-            $logo = 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath));
-        }
-
-        $pdf = Pdf::loadView('pdf.letter', [
-            'letter' => $letter,
-            'settings' => $settings,
-            'logo' => $logo,
-            'verificationCode' => $this->verificationCode($letter),
-            'printedAt' => now()->locale('id')->translatedFormat('d M Y H:i'),
-            'isPreview' => $isPreview,
-            'isVerified' => ! $isPreview && ! empty($letter->verified_at),
-            'verifierName' => $letter->verifier?->name,
-            'verifiedAt' => $letter->verified_at ? $letter->verified_at->locale('id')->translatedFormat('d F Y') : null,
-        ]);
-        $pdf->setPaper('a4', 'portrait');
-        // Panel verifikasi memakai glyph centang dari DejaVu Sans; subsetting menjaga
-        // ukuran PDF tetap kecil (hanya glyph terpakai yang di-embed, bukan seluruh font)
-        $pdf->setOption('isFontSubsettingEnabled', true);
-
-        return $pdf;
-    }
-
     /**
-     * Kode dokumen deterministik untuk kebutuhan penomoran arsip internal.
-     * Bukan tanda tangan/verifikasi elektronik tersertifikasi (TTE) — hanya
-     * referensi pengecekan keaslian arsip di sistem perusahaan.
-     * Format: XXXX-XXXX-XXXX (12 karakter heksadesimal huruf besar).
+     * Surat yang sudah ditandatangani tidak boleh diubah/dihapus sebelum tanda tangannya dicabut.
      */
-    private function verificationCode(Letter $letter): string
+    private function ensureNotSigned(Letter $letter): void
     {
-        $seed = implode('|', [
-            $letter->reference_number ?? '',
-            $letter->id ?? 'preview',
-            optional($letter->letter_date)->format('Y-m-d') ?? '',
-        ]);
-
-        $hash = strtoupper(substr(hash('sha256', $seed), 0, 12));
-
-        return implode('-', str_split($hash, 4));
-    }
-
-    /**
-     * Pastikan hanya Direktur Utama yang dapat memverifikasi/membatalkan verifikasi.
-     */
-    private function authorizeVerifier(): void
-    {
-        abort_unless(
-            Auth::user()?->role === MenuRegistry::SUPER_ROLE,
-            403,
-            'Hanya Direktur Utama yang dapat memverifikasi dokumen.'
+        abort_if(
+            $letter->isSigned(),
+            423,
+            'Surat sudah ditandatangani. Cabut pengesahan terlebih dahulu untuk mengubah atau menghapus.'
         );
     }
 }

@@ -62,7 +62,7 @@ export default function ProspectShow({ prospect, options, activityTypes, needFie
                         <Link href="/crm/prospek" className="mt-1 text-muted-foreground hover:text-foreground"><ArrowLeft className="h-5 w-5" /></Link>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h2 className="text-2xl font-bold tracking-tight">{prospect.company_name}</h2>
+                                <h2 className="text-2xl font-semibold tracking-tight">{prospect.company_name}</h2>
                                 {prospect.brand_name && <span className="text-muted-foreground">({prospect.brand_name})</span>}
                             </div>
                             <div className="mt-2 flex flex-wrap items-center gap-2">

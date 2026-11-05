@@ -43,16 +43,17 @@ interface ActivityLog {
     };
 }
 
-/** Professional, theme-aware chart palette. */
-const CHART_COLORS = ['#155EEF', '#12B76A', '#F79009', '#F04438', '#7A5AF8', '#06AED4', '#EE46BC', '#667085'];
+/** Skala biru + neutral (design.md §05 Chart). */
+const CHART_COLORS = ['#155EEF', '#528BFF', '#84ADFF', '#B2CCFF', '#0B3B8F', '#667085', '#98A2B3', '#D0D5DD'];
 
+/** Icon stat: neutral, semantic hanya bila bermakna status (design.md §24). */
 const ACCENTS: Record<string, string> = {
-    blue: 'text-blue-600 bg-blue-500/10 dark:text-blue-400',
-    emerald: 'text-emerald-600 bg-emerald-500/10 dark:text-emerald-400',
-    amber: 'text-amber-600 bg-amber-500/10 dark:text-amber-400',
-    red: 'text-red-600 bg-red-500/10 dark:text-red-400',
-    violet: 'text-violet-600 bg-violet-500/10 dark:text-violet-400',
-    slate: 'text-slate-600 bg-slate-500/10 dark:text-slate-300',
+    blue: 'text-muted-foreground bg-neutral-soft',
+    emerald: 'text-success-soft-foreground bg-success-soft',
+    amber: 'text-warning-soft-foreground bg-warning-soft',
+    red: 'text-danger-soft-foreground bg-danger-soft',
+    violet: 'text-muted-foreground bg-neutral-soft',
+    slate: 'text-muted-foreground bg-neutral-soft',
 };
 
 const rp = (n: number | string | undefined) => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
@@ -263,7 +264,7 @@ export default function Dashboard({
                 <div className="flex flex-wrap items-end justify-between gap-3">
                     <div>
                         <h2 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h2>
-                        <p className="text-muted-foreground mt-1 text-sm">Ringkasan operasional yang disesuaikan dengan peran Anda.</p>
+                        <p className="mt-1 text-sm text-muted-foreground">Ringkasan operasional yang disesuaikan dengan peran Anda.</p>
                     </div>
                     {user_role && (
                         <Badge variant="secondary" className="capitalize">{String(user_role).replace(/_/g, ' ')}</Badge>
@@ -276,7 +277,7 @@ export default function Dashboard({
                         {announcements.map((announcement: Announcement) => {
                             const { Icon, cls } = announcementIcon(announcement.type);
                             return (
-                                <div key={announcement.id} className="flex gap-3 rounded-xl border bg-card p-3.5 shadow-none">
+                                <div key={announcement.id} className="flex gap-3 rounded-lg border bg-card p-3.5">
                                     <Icon className={`h-4 w-4 shrink-0 mt-0.5 ${cls}`} />
                                     <div className="min-w-0">
                                         <h3 className="font-semibold text-sm line-clamp-1">{announcement.title}</h3>
@@ -488,7 +489,7 @@ export default function Dashboard({
                             <div className="space-y-6">
                                 <div className="grid gap-4 md:grid-cols-3">
                                     <StatCard title="My Assigned Projects" value={stats?.project_assigned || 0} icon={Briefcase} accent="blue" />
-                                    <StatCard title="Pending Tasks" value={stats?.pending_tasks || 0} icon={ListTodo} accent="amber" valueClass="text-amber-600 dark:text-amber-400" />
+                                    <StatCard title="Pending Tasks" value={stats?.pending_tasks || 0} icon={ListTodo} accent="amber" valueClass="text-warning-soft-foreground" />
                                     <StatCard title="Tasks Due Today" value={stats?.today_tasks || 0} icon={AlertTriangle} accent="red" valueClass="text-destructive" />
                                 </div>
 
@@ -573,7 +574,7 @@ export default function Dashboard({
                                     <StatCard title="Total Clients" value={stats?.total_clients || 0} icon={Building2} accent="blue" />
                                     <StatCard title="Active Portfolios" value={stats?.active_portfolios || 0} icon={FolderOpen} accent="violet" />
                                     <StatCard title="Published News" value={stats?.published_news || 0} icon={Newspaper} accent="slate" />
-                                    <StatCard title="Scheduled Content" value={stats?.content_plans || 0} icon={Megaphone} accent="emerald" valueClass="text-emerald-600 dark:text-emerald-400" />
+                                    <StatCard title="Scheduled Content" value={stats?.content_plans || 0} icon={Megaphone} accent="slate" />
                                 </div>
 
                                 <div className="grid gap-6 lg:grid-cols-3">

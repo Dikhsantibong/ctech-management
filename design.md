@@ -1,8 +1,24 @@
-# CTECH ERP — Visual Design System
+# CTECH Management System — Visual Design System
+
+## 00. Tujuan Aplikasi
+
+**CTECH Management System** adalah aplikasi internal PT Kreatif Teknologi Maju Bersama untuk mengelola operasional perusahaan sehari-hari dalam satu tempat:
+
+- **Operasional** — Projects (milestone, rapat, dokumen, revisi, feedback klien, canvas), Tasks, Work, Daily Reports, Calendar, Clients.
+- **Komunikasi** — Pengumuman dan Pesan (chat) antar tim.
+- **CRM** — Dashboard CRM, Prospek, Pipeline, Aktivitas sales, Penawaran.
+- **Finance** — Penawaran / RAB, Invoice & Kwitansi, Langganan Aplikasi.
+- **Marketing** — Berita, Portfolio, Content Planning, Akun Media Sosial.
+- **Administration** — Surat Keluar, Surat Masuk, Documents, Files.
+- **System** — Monitoring KPI, Activity Logs, Team, Hak Akses Menu, Pengaturan Perusahaan.
+
+Pengguna: Direktur Utama, Project Manager, tim produksi (designer & developer), Sales/Marketing, serta Finance/Admin. Setiap peran melihat dashboard dan menu sesuai hak akses yang diatur dari server.
+
+Dokumen ini berlaku untuk seluruh panel internal. Website publik CTECH (`pages/public/**`) memakai tema terpisah dan tidak diatur di sini.
 
 ## 01. Design Direction
 
-CTECH ERP menggunakan pendekatan **Corporate Editorial UI** yang memadukan karakter perusahaan creative agency dengan tampilan enterprise software yang profesional.
+CTECH Management System menggunakan pendekatan **Corporate Editorial UI** yang memadukan karakter perusahaan creative agency dengan tampilan enterprise software yang profesional.
 
 Tujuan visual:
 
@@ -140,6 +156,45 @@ Digunakan secara terbatas untuk emphasis.
 #E4E7EC
 ```
 
+## Input Border
+
+```text
+#D0D5DD
+```
+
+## Sidebar (Identitas CTECH)
+
+Sidebar menggunakan navy gelap dan menjadi satu-satunya area gelap pada light mode.
+
+```text
+Background         #101828
+Text               #CECFD2
+Group label        #667085
+Hover / Active     #1D2939
+Active text        #FFFFFF
+Active indicator   #155EEF (garis 2px di kiri)
+Border             #1D2939
+```
+
+## Dark Mode
+
+Dark mode menggunakan palet yang sama dengan nilai gelap:
+
+```text
+Background         #0C111D
+Surface            #161B26
+Muted surface      #1F242F
+Border             #2A303C
+Input border       #333741
+Main text          #F5F5F6
+Secondary text     #CECFD2
+Muted text         #94969C
+Primary            #528BFF
+Sidebar            #0C111D
+```
+
+Semua warna di halaman harus berasal dari token sehingga otomatis mengikuti light dan dark mode.
+
 ---
 
 # 05. Semantic Colors
@@ -173,6 +228,24 @@ Gunakan warna status secara konsisten.
 Semantic color hanya digunakan ketika memiliki makna.
 
 Jangan menggunakan warna tersebut sebagai dekorasi.
+
+### Status Modul CTECH
+
+| Warna | Status |
+| --- | --- |
+| Success | Published, Completed, Selesai, Paid, Lunas, Approved, Won, Active |
+| Info | In Progress, Proses, Sent, Review, Scheduled, Negotiation, Follow Up |
+| Warning | Pending, Menunggu, Partial, Revisi, On Hold, Proposal, Medium |
+| Danger | Overdue, Terlambat, Cancelled, Rejected, Lost, Failed, High |
+| Neutral | Draft, New, Baru, Archived, Inactive, Low |
+
+### Chart
+
+Chart menggunakan skala biru dan neutral. Semantic color hanya bila data memiliki makna status (lunas, terlambat).
+
+```text
+#155EEF  #528BFF  #84ADFF  #B2CCFF  #667085
+```
 
 ---
 
@@ -495,7 +568,7 @@ Decorative illustration
 
 # 17. Tables
 
-Table harus menjadi salah satu elemen visual paling kuat dalam ERP.
+Table harus menjadi salah satu elemen visual paling kuat dalam aplikasi.
 
 Style:
 
@@ -756,6 +829,12 @@ Navigation harus:
 Active state menggunakan:
 
 ```text
+Sidebar (navy):
+Background: #1D2939
+Text: #FFFFFF
+Indicator: 2px #155EEF di kiri
+
+Navigasi di area konten (tab, sub-menu):
 Background: #EFF4FF
 Text: #155EEF
 ```
@@ -965,7 +1044,7 @@ Hindari:
 - Floating animation
 - Excessive transition
 
-ERP harus terasa cepat.
+Aplikasi harus terasa cepat.
 
 ---
 
@@ -1043,7 +1122,7 @@ Jangan membuat mobile layout dengan terlalu banyak perubahan visual.
 
 # 38. Density
 
-CTECH ERP menggunakan:
+CTECH Management System menggunakan:
 
 > **Medium Information Density**
 
@@ -1221,6 +1300,19 @@ Gunakan token berikut sebagai baseline:
   --color-danger: #F04438;
   --color-info: #2E90FA;
 
+  --color-input-border: #D0D5DD;
+  --color-placeholder: #98A2B3;
+
+  --color-success-soft: #ECFDF3;  --color-success-text: #027A48;
+  --color-warning-soft: #FFFAEB;  --color-warning-text: #B54708;
+  --color-danger-soft: #FEF3F2;   --color-danger-text: #B42318;
+  --color-info-soft: #EFF8FF;     --color-info-text: #175CD3;
+  --color-neutral-soft: #F2F4F7;  --color-neutral-text: #344054;
+
+  --color-sidebar: #101828;
+  --color-sidebar-text: #CECFD2;
+  --color-sidebar-active: #1D2939;
+
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 10px;
@@ -1236,7 +1328,22 @@ Gunakan token berikut sebagai baseline:
   --spacing-12: 48px;
   --spacing-16: 64px;
 }
+
+.dark {
+  --color-primary: #528BFF;
+  --color-bg: #0C111D;
+  --color-surface: #161B26;
+  --color-border: #2A303C;
+  --color-input-border: #333741;
+  --color-text: #F5F5F6;
+  --color-text-secondary: #CECFD2;
+  --color-text-muted: #94969C;
+  --color-sidebar: #0C111D;
+  --color-sidebar-active: #1F242F;
+}
 ```
+
+Implementasi token berada di `resources/css/app.css` (nama variabel mengikuti konvensi shadcn: `--primary`, `--background`, `--card`, `--border`, `--input`, `--muted-foreground`, `--sidebar`, dll.).
 
 ---
 
@@ -1267,7 +1374,7 @@ Sebelum sebuah komponen dianggap selesai, pastikan:
 
 # 46. Final Design Principle
 
-CTECH ERP harus terlihat:
+CTECH Management System harus terlihat:
 
 **Corporate enough for management.**
 

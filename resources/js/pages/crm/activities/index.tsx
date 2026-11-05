@@ -24,7 +24,7 @@ function ActivityTable({ items, emptyLabel }: { items: any[]; emptyLabel: string
                 </thead>
                 <tbody>
                     {items.map((a) => (
-                        <tr key={a.id} className="border-b last:border-0 hover:bg-muted/50">
+                        <tr key={a.id} className="border-b last:border-0 hover:bg-muted">
                             <td className="px-4 py-2.5">
                                 <span className="font-medium">{a.type}</span>
                                 <div className="text-xs text-muted-foreground">{a.subject}</div>
@@ -60,8 +60,8 @@ export default function ActivitiesIndex({ today, upcoming, overdue }: { today: a
             <Head title="Aktivitas" />
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Aktivitas</h2>
-                    <p className="text-muted-foreground">Pusat pekerjaan sales: komunikasi, follow-up, dan tugas.</p>
+                    <h2 className="text-2xl font-semibold tracking-tight">Aktivitas</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">Pusat pekerjaan sales: komunikasi, follow-up, dan tugas.</p>
                 </div>
 
                 <Tabs defaultValue="today">

@@ -215,7 +215,7 @@ export default function ProjectRevisions({ project }: { project: any }) {
                                             </span>
                                         )}
                                     </div>
-                                    <h4 className="text-base font-bold">{rev.title}</h4>
+                                    <h4 className="text-base font-semibold">{rev.title}</h4>
                                     {rev.description && (
                                         <p className="whitespace-pre-wrap text-sm text-muted-foreground">{rev.description}</p>
                                     )}

@@ -95,8 +95,8 @@ export default function DocumentsIndex({ documents, filters }: { documents: any,
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Documents</h2>
-                        <p className="text-muted-foreground">Internal company wiki and documentation.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Documents</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Internal company wiki and documentation.</p>
                     </div>
                     <div className="flex items-center gap-4">
                         <Input 

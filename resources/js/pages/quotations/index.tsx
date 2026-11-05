@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Plus, MoreVertical, FileSpreadsheet, Trash2, Eye, Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { statusTone } from '@/components/status-badge';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -37,14 +38,7 @@ export default function QuotationsIndex({ quotations }: { quotations: any[] }) {
         destroy(`/quotations/${selected?.id}`, { onSuccess: () => setDeleteOpen(false) });
     };
 
-    const statusBadge = (status: string) => {
-        switch (status) {
-            case 'Diterima': return 'default';
-            case 'Terkirim': return 'secondary';
-            case 'Ditolak': return 'destructive';
-            default: return 'outline';
-        }
-    };
+    const statusBadge = (status: string) => statusTone(status);
 
     return (
         <>
@@ -52,8 +46,8 @@ export default function QuotationsIndex({ quotations }: { quotations: any[] }) {
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Penawaran / RAB</h2>
-                        <p className="text-muted-foreground">Buat dokumen penawaran lengkap dengan Rencana Anggaran Biaya.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Penawaran / RAB</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Buat dokumen penawaran lengkap dengan Rencana Anggaran Biaya.</p>
                     </div>
                     <Button asChild>
                         <Link href="/quotations/create">
@@ -78,7 +72,7 @@ export default function QuotationsIndex({ quotations }: { quotations: any[] }) {
                             </thead>
                             <tbody>
                                 {quotations.map((q) => (
-                                    <tr key={q.id} className="border-b transition-colors hover:bg-muted/50">
+                                    <tr key={q.id} className="border-b transition-colors hover:bg-muted">
                                         <td className="p-4 align-middle font-medium">
                                             <Link href={`/quotations/${q.id}`} className="flex items-center gap-2 hover:underline">
                                                 <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
@@ -99,13 +93,17 @@ export default function QuotationsIndex({ quotations }: { quotations: any[] }) {
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/quotations/${q.id}`}><Eye className="mr-2 h-4 w-4" /> Lihat Detail</Link>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem asChild>
-                                                        <Link href={`/quotations/${q.id}/edit`}><Edit2 className="mr-2 h-4 w-4" /> Edit</Link>
-                                                    </DropdownMenuItem>
+                                                    {!q.is_signed && (
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/quotations/${q.id}/edit`}><Edit2 className="mr-2 h-4 w-4" /> Edit</Link>
+                                                        </DropdownMenuItem>
+                                                    )}
                                                     <DropdownMenuItem asChild>
                                                         <a href={`/quotations/${q.id}/preview`} target="_blank" rel="noopener noreferrer"><Eye className="mr-2 h-4 w-4" /> Preview PDF</a>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => openDelete(q)} className="text-destructive"><Trash2 className="mr-2 h-4 w-4" /> Hapus</DropdownMenuItem>
+                                                    {!q.is_signed && (
+                                                        <DropdownMenuItem onClick={() => openDelete(q)} className="text-destructive"><Trash2 className="mr-2 h-4 w-4" /> Hapus</DropdownMenuItem>
+                                                    )}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </td>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CompanySettingController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use Illuminate\Auth\Middleware\RequirePassword;
@@ -7,8 +8,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
     Route::middleware('role:direktur_utama')->group(function () {
-        Route::get('settings', [\App\Http\Controllers\CompanySettingController::class, 'edit'])->name('settings.index');
-        Route::post('settings', [\App\Http\Controllers\CompanySettingController::class, 'update'])->name('settings.update');
+        Route::get('settings', [CompanySettingController::class, 'edit'])->name('settings.index');
+        Route::post('settings', [CompanySettingController::class, 'update'])->name('settings.update');
+        Route::post('settings/signature-assets', [CompanySettingController::class, 'storeSignatureAsset'])->name('settings.signature-assets.store');
+        Route::get('settings/signature-assets/{asset}', [CompanySettingController::class, 'showSignatureAsset'])->whereIn('asset', ['signature', 'stamp'])->name('settings.signature-assets.show');
+        Route::delete('settings/signature-assets/{asset}', [CompanySettingController::class, 'destroySignatureAsset'])->whereIn('asset', ['signature', 'stamp'])->name('settings.signature-assets.destroy');
     });
 
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');

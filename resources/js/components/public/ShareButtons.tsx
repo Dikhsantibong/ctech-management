@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { Check, Download, Facebook, Link as LinkIcon, Linkedin, MessageCircle, Send, Share2 } from 'lucide-react';
+import { useState } from 'react';
 
 interface ShareButtonsProps {
     url: string;
@@ -40,6 +40,7 @@ export function ShareButtons({ url, title, storyImageUrl }: ShareButtonsProps) {
         } catch {
             window.prompt('Salin link artikel:', url);
         }
+
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
@@ -55,12 +56,14 @@ export function ShareButtons({ url, title, storyImageUrl }: ShareButtonsProps) {
     /** Bagikan story image sebagai file (fitur Story di HP); fallback unduh. */
     const shareStory = async () => {
         setPreparingStory(true);
+
         try {
             const blob = await fetch(storyImageUrl).then((response) => response.blob());
             const file = new File([blob], 'ctech-story.jpg', { type: blob.type || 'image/jpeg' });
 
             if (navigator.canShare?.({ files: [file] })) {
                 await navigator.share({ files: [file], title, text: url });
+
                 return;
             }
 

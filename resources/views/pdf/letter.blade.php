@@ -136,6 +136,22 @@
             word-wrap: break-word; /* jangan biarkan teks panjang keluar dari halaman */
         }
         .content img { max-width: 100%; }
+        /* Tabel dari editor (termasuk hasil paste Excel/Word): garis hitam tipis di semua sel */
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 6px 0 10px 0;
+            page-break-inside: auto;
+        }
+        .content tr { page-break-inside: avoid; }
+        .content th, .content td {
+            border: 0.75pt solid #000000;
+            padding: 3px 6px;
+            vertical-align: top;
+            text-align: left;
+        }
+        .content th { background-color: #f2f4f7; font-weight: bold; }
+        .content td p, .content th p { margin: 0; }
         .content p { margin: 0 0 8px 0; }
         .content ol, .content ul {
             margin: 0 0 8px 0;
@@ -287,11 +303,18 @@
         </div>
     @else
         <div class="doc-footer">
+            @if(!empty($signature))
+                Ditandatangani secara elektronik oleh <strong>{{ $signature['name'] }}</strong> ({{ $signature['title'] }}) pada {{ $signature['signed_at'] }}.
+                Verifikasi keaslian: {{ $signature['url'] }}
+            @elseif(!empty($forWetSignature))
+                Dokumen resmi {{ $settings->company_name ?? 'CTECH' }}. Sah setelah ditandatangani pejabat berwenang dan dibubuhi cap resmi perusahaan.
+            @else
             @if(!empty($verifierName))
                 Diverifikasi &amp; disahkan oleh <strong>{{ $verifierName }}</strong> (Direktur Utama){{ !empty($verifiedAt) ? ' pada '.$verifiedAt : '' }}.
                 <br>
             @endif
             Dokumen ini dihasilkan oleh sistem informasi {{ $settings->company_name ?? 'CTECH' }}. Keabsahan dokumen mensyaratkan tanda tangan pejabat berwenang dan cap resmi perusahaan.
+            @endif
             <br>
             Kode Dokumen: <span class="verif-code">{{ $verificationCode ?? '-' }}</span> &nbsp;&bull;&nbsp; untuk pengecekan keaslian arsip @if(!empty($printedAt)) &nbsp;&bull;&nbsp; Dicetak: {{ $printedAt }} @endif
         </div>
@@ -376,12 +399,14 @@
     {{-- ===== Tanda tangan (satu-satunya blok tanda tangan; jangan tulis ulang di isi surat) ===== --}}
     <table class="signature-table">
         <tr>
-            <td style="width: 55%; vertical-align: bottom;"></td>
+            <td style="width: 55%; vertical-align: bottom;">
+                @include('pdf.partials.signature-qr', ['signature' => $signature ?? null])
+            </td>
             <td class="signature-cell">
                 <p style="margin: 0 0 2px 0;">Hormat kami,</p>
                 <p style="margin: 0;"><strong>{{ $settings->company_name ?? '' }}</strong></p>
-                <div class="signature-space"></div>
-                <p class="signature-name">{{ $settings->leader_name ?? ($letter->creator->name ?? '') }}</p>
+                @include('pdf.partials.signature-mark', ['signature' => $signature ?? null, 'height' => 80])
+                <p class="signature-name">{{ $signature['name'] ?? ($settings->leader_name ?? ($letter->creator->name ?? '')) }}</p>
                 <p class="signature-role">Direktur Utama</p>
             </td>
         </tr>

@@ -1,32 +1,31 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Download, FileText, CheckCircle, Eye, ShieldCheck, ShieldX, Clock } from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
+import { ArrowLeft, Download, FileText, CheckCircle, Eye, ShieldCheck, Clock } from 'lucide-react';
+import { DocumentSignaturePanel, type DocumentSignatureInfo } from '@/components/document-signature-panel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import LetterDocumentPreview, { type CompanySettings } from '@/components/letter-document-preview';
+import { statusTone } from '@/components/status-badge';
 
 export default function LetterShow({
     letter,
     settings,
     verification_code,
     can_verify,
+    signature,
+    has_signature_image,
 }: {
     letter: any;
     settings?: CompanySettings | null;
     verification_code?: string | null;
     can_verify?: boolean;
+    signature: DocumentSignatureInfo | null;
+    has_signature_image: boolean;
 }) {
     const isVerified = !!letter.verified_at;
 
-    const statusBadgeColor = (status: string) => {
-        switch (status) {
-            case 'Final': return 'default';
-            default: return 'outline';
-        }
-    };
+    const statusBadgeColor = (status: string) => statusTone(status);
 
-    const verify = () => router.put(`/letters/${letter.id}/verify`, {}, { preserveScroll: true });
-    const unverify = () => router.put(`/letters/${letter.id}/unverify`, {}, { preserveScroll: true });
 
     return (
         <>
@@ -53,24 +52,10 @@ export default function LetterShow({
                     </div>
                     
                     <div className="flex flex-wrap items-center gap-3">
-                        {letter.content && (
-                            isVerified ? (
-                                can_verify && (
-                                    <Button variant="outline" onClick={unverify} className="text-amber-600">
-                                        <ShieldX className="mr-2 h-4 w-4" /> Batalkan Verifikasi
-                                    </Button>
-                                )
-                            ) : (
-                                can_verify ? (
-                                    <Button onClick={verify} className="bg-green-600 hover:bg-green-700">
-                                        <ShieldCheck className="mr-2 h-4 w-4" /> Verifikasi Dokumen
-                                    </Button>
-                                ) : (
-                                    <span className="flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-700 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300">
-                                        <Clock className="h-4 w-4" /> Menunggu verifikasi Direktur Utama
-                                    </span>
-                                )
-                            )
+                        {letter.content && !isVerified && !can_verify && (
+                            <span className="flex items-center gap-1.5 rounded-md bg-warning-soft px-3 py-1.5 text-sm font-medium text-warning-soft-foreground">
+                                <Clock className="h-4 w-4" /> Menunggu pengesahan Direktur Utama
+                            </span>
                         )}
                         {letter.content && (
                             <>
@@ -124,6 +109,16 @@ export default function LetterShow({
                     </div>
 
                     <div className="space-y-6">
+                        {letter.content && (
+                            <DocumentSignaturePanel
+                                documentType="letter"
+                                documentId={letter.id}
+                                documentLabel="surat"
+                                signature={signature}
+                                canSign={!!can_verify}
+                                hasSignatureImage={has_signature_image}
+                            />
+                        )}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Document Details</CardTitle>

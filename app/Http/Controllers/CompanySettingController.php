@@ -4,12 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\CompanySetting;
 use App\Traits\LogsActivity;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CompanySettingController extends Controller
 {
     use LogsActivity;
+
+    /** @var array<string, string> Jenis aset → kolom company_settings */
+    private const SIGNATURE_ASSETS = [
+        'signature' => 'signature_image',
+        'stamp' => 'stamp_image',
+    ];
 
     public function edit()
     {
@@ -62,5 +71,58 @@ class CompanySettingController extends Controller
         $this->logActivity('updated', 'CompanySetting', $settings->id, 'Mengupdate pengaturan perusahaan');
 
         return redirect()->back()->with('success', 'Company settings updated successfully.');
+    }
+
+    /**
+     * Unggah gambar tanda tangan Direktur Utama atau cap perusahaan untuk tanda tangan elektronik.
+     * Disimpan di disk privat; PDF yang sudah ditandatangani tidak ikut berubah.
+     */
+    public function storeSignatureAsset(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'asset' => ['required', 'in:signature,stamp'],
+            'file' => ['required', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],
+        ]);
+
+        $column = self::SIGNATURE_ASSETS[$validated['asset']];
+        $settings = CompanySetting::firstOrCreate([]);
+
+        if ($settings->{$column}) {
+            Storage::disk('local')->delete($settings->{$column});
+        }
+
+        $settings->forceFill([$column => $request->file('file')->store('signature-assets', 'local')])->save();
+
+        $this->logActivity('updated', 'CompanySetting', $settings->id, $validated['asset'] === 'signature'
+            ? 'Mengganti gambar tanda tangan Direktur Utama'
+            : 'Mengganti gambar cap perusahaan');
+
+        return redirect()->back()->with('success', $validated['asset'] === 'signature' ? 'Tanda tangan disimpan.' : 'Cap perusahaan disimpan.');
+    }
+
+    public function showSignatureAsset(string $asset): StreamedResponse
+    {
+        $path = CompanySetting::first()?->{self::SIGNATURE_ASSETS[$asset]};
+
+        abort_unless($path && Storage::disk('local')->exists($path), 404);
+
+        return Storage::disk('local')->response($path, null, ['Cache-Control' => 'private, no-store']);
+    }
+
+    public function destroySignatureAsset(string $asset): RedirectResponse
+    {
+        $settings = CompanySetting::first();
+        $column = self::SIGNATURE_ASSETS[$asset];
+
+        if ($settings?->{$column}) {
+            Storage::disk('local')->delete($settings->{$column});
+            $settings->forceFill([$column => null])->save();
+
+            $this->logActivity('updated', 'CompanySetting', $settings->id, $asset === 'signature'
+                ? 'Menghapus gambar tanda tangan Direktur Utama'
+                : 'Menghapus gambar cap perusahaan');
+        }
+
+        return redirect()->back()->with('success', 'Gambar dihapus.');
     }
 }

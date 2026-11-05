@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Plus, MoreVertical, FileText, Trash2, Eye, Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { statusTone } from '@/components/status-badge';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -37,14 +38,7 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
         destroy(`/invoices/${selected?.id}`, { onSuccess: () => setDeleteOpen(false) });
     };
 
-    const statusBadgeColor = (status: string) => {
-        switch (status) {
-            case 'Paid': return 'default';
-            case 'Sent': return 'secondary';
-            case 'Overdue': return 'destructive';
-            default: return 'outline';
-        }
-    };
+    const statusBadgeColor = (status: string) => statusTone(status);
 
     return (
         <>
@@ -52,8 +46,8 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Invoices</h2>
-                        <p className="text-muted-foreground">Kelola tagihan dan buat invoice PDF otomatis.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Invoices</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Kelola tagihan dan buat invoice PDF otomatis.</p>
                     </div>
                     <Button asChild>
                         <Link href="/invoices/create">
@@ -78,7 +72,7 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
                             </thead>
                             <tbody>
                                 {invoices.map((inv) => (
-                                    <tr key={inv.id} className="border-b transition-colors hover:bg-muted/50">
+                                    <tr key={inv.id} className="border-b transition-colors hover:bg-muted">
                                         <td className="p-4 align-middle font-medium">
                                             <Link href={`/invoices/${inv.id}`} className="flex items-center gap-2 hover:underline">
                                                 <FileText className="h-4 w-4 text-muted-foreground" />
@@ -99,16 +93,20 @@ export default function InvoicesIndex({ invoices }: { invoices: any[] }) {
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/invoices/${inv.id}`}><Eye className="mr-2 h-4 w-4" /> Lihat Detail</Link>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem asChild>
-                                                        <Link href={`/invoices/${inv.id}/edit`}><Edit2 className="mr-2 h-4 w-4" /> Edit</Link>
-                                                    </DropdownMenuItem>
+                                                    {!inv.is_signed && (
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/invoices/${inv.id}/edit`}><Edit2 className="mr-2 h-4 w-4" /> Edit</Link>
+                                                        </DropdownMenuItem>
+                                                    )}
                                                     <DropdownMenuItem asChild>
                                                         <a href={`/invoices/${inv.id}/pdf`} target="_blank" rel="noopener noreferrer"><Eye className="mr-2 h-4 w-4" /> Preview PDF</a>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
                                                         <a href={`/invoices/${inv.id}/kwitansi`} target="_blank" rel="noopener noreferrer"><FileText className="mr-2 h-4 w-4" /> Cetak Kwitansi</a>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => openDelete(inv)} className="text-destructive"><Trash2 className="mr-2 h-4 w-4" /> Hapus</DropdownMenuItem>
+                                                    {!inv.is_signed && (
+                                                        <DropdownMenuItem onClick={() => openDelete(inv)} className="text-destructive"><Trash2 className="mr-2 h-4 w-4" /> Hapus</DropdownMenuItem>
+                                                    )}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </td>

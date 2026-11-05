@@ -140,7 +140,7 @@ export default function FilesIndex({ files, clients }: { files: any[]; clients: 
                             </Button>
                         )}
                         <div>
-                            <h2 className="text-2xl font-bold tracking-tight">
+                            <h2 className="text-2xl font-semibold tracking-tight">
                                 {activeFolder === null ? 'Files & Assets' : `Folder: ${activeFolderName}`}
                             </h2>
                             <p className="text-muted-foreground flex items-center gap-1.5">

@@ -104,8 +104,8 @@ export default function UsersIndex({ users }: { users: any[] }) {
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Team Members</h2>
-                        <p className="text-muted-foreground">Manage your startup team and their roles.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Team Members</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Manage your startup team and their roles.</p>
                     </div>
                     <Button onClick={openCreateModal}>
                         <Plus className="mr-2 h-4 w-4" /> Add Member
@@ -117,7 +117,7 @@ export default function UsersIndex({ users }: { users: any[] }) {
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <tr className="border-b transition-colors hover:bg-muted data-[state=selected]:bg-muted">
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Name</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Email</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Role</th>
@@ -127,7 +127,7 @@ export default function UsersIndex({ users }: { users: any[] }) {
                                 </thead>
                                 <tbody>
                                     {users.map((user) => (
-                                        <tr key={user.id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                        <tr key={user.id} className="border-b transition-colors hover:bg-muted data-[state=selected]:bg-muted">
                                             <td className="p-4 align-middle">
                                                 <div className="flex items-center gap-3">
                                                     <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">

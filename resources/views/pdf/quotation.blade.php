@@ -162,11 +162,18 @@
         </div>
     @else
         <div class="doc-footer">
+            @if(!empty($signature))
+                Ditandatangani secara elektronik oleh <strong>{{ $signature['name'] }}</strong> ({{ $signature['title'] }}) pada {{ $signature['signed_at'] }}.
+                Verifikasi keaslian: {{ $signature['url'] }}
+            @elseif(!empty($forWetSignature))
+                Dokumen resmi {{ $settings->company_name ?? 'CTECH' }}. Sah setelah ditandatangani pejabat berwenang dan dibubuhi cap resmi perusahaan.
+            @else
             @if(!empty($verifierName))
                 Diverifikasi &amp; disahkan oleh <strong>{{ $verifierName }}</strong> (Direktur Utama){{ !empty($verifiedAt) ? ' pada '.$verifiedAt : '' }}.
                 <br>
             @endif
             Dokumen ini dihasilkan oleh sistem informasi {{ $settings->company_name ?? 'CTECH' }}. Keabsahan mensyaratkan tanda tangan pejabat berwenang dan cap resmi perusahaan.
+            @endif
             <br>
             Kode Dokumen: <span class="code">{{ $documentCode ?? '-' }}</span> &nbsp;&bull;&nbsp; untuk pengecekan keaslian arsip @if(!empty($printedAt)) &nbsp;&bull;&nbsp; Dicetak: {{ $printedAt }} @endif
         </div>
@@ -330,12 +337,14 @@
     {{-- ===== Tanda tangan ===== --}}
     <table class="signature-table">
         <tr>
-            <td style="width: 55%;"></td>
+            <td style="width: 55%; vertical-align: bottom;">
+                @include('pdf.partials.signature-qr', ['signature' => $signature ?? null])
+            </td>
             <td class="signature-cell">
                 <p style="margin: 0 0 2px 0;">Hormat kami,</p>
                 <p style="margin: 0;"><strong>{{ $settings->company_name ?? '' }}</strong></p>
-                <div class="signature-space"></div>
-                <p class="signature-name">{{ $settings->leader_name ?? ($quotation->creator->name ?? '') }}</p>
+                @include('pdf.partials.signature-mark', ['signature' => $signature ?? null, 'height' => 70])
+                <p class="signature-name">{{ $signature['name'] ?? ($settings->leader_name ?? ($quotation->creator->name ?? '')) }}</p>
                 <p style="margin: 2px 0 0 0;">Direktur Utama</p>
             </td>
         </tr>

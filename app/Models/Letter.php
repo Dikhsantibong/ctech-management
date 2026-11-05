@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Services\Documents\SignableDocument;
+use App\Traits\HasDocumentSignatures;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Letter extends Model
+class Letter extends Model implements SignableDocument
 {
+    use HasDocumentSignatures;
+
     protected $fillable = [
         'reference_number',
         'type',
@@ -39,5 +43,46 @@ class Letter extends Model
     public function verifier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function signatureDocumentType(): string
+    {
+        return 'letter';
+    }
+
+    public function signatureDocumentLabel(): string
+    {
+        return 'Surat Keluar';
+    }
+
+    public function signatureDocumentNumber(): string
+    {
+        return (string) $this->reference_number;
+    }
+
+    public function signatureSummary(): array
+    {
+        return [
+            'subject' => $this->subject,
+            'counterpart_label' => 'Kepada',
+            'counterpart' => $this->recipient,
+            'date' => optional($this->letter_date)->toDateString(),
+            'amount' => null,
+        ];
+    }
+
+    public function signatureBlocker(): ?string
+    {
+        return empty($this->content) ? 'Surat tanpa isi (reservasi nomor) tidak dapat ditandatangani.' : null;
+    }
+
+    public function markSigned(User $signer): void
+    {
+        $this->forceFill(['status' => 'Final', 'verified_at' => now(), 'verified_by' => $signer->id])->save();
+    }
+
+    public function markUnsigned(): void
+    {
+        $this->forceFill(['status' => 'Draft', 'verified_at' => null, 'verified_by' => null])->save();
     }
 }

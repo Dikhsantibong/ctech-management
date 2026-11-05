@@ -150,6 +150,33 @@ class NewsSocialSharingTest extends TestCase
             ->assertJsonFragment(['key' => 'featured_image', 'status' => 'warn']);
     }
 
+    public function test_create_and_edit_are_standalone_pages(): void
+    {
+        $news = $this->article();
+        $user = $this->actor();
+
+        $this->actingAs($user)->get('/news/create')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->component('news/form')->where('news', null));
+
+        $this->actingAs($user)->get("/news/{$news->id}/edit")
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->component('news/form')
+                ->where('news.id', $news->id)
+                ->where('share.url', "https://ctechcreative.com/berita/{$news->slug}"));
+    }
+
+    public function test_store_redirects_to_edit_page(): void
+    {
+        $response = $this->actingAs($this->actor())->post('/news', [
+            'title' => 'Berita Halaman Baru',
+            'content' => '<p>Isi</p>',
+            'status' => 'Draft',
+        ]);
+
+        $response->assertRedirect(route('news.edit', News::where('title', 'Berita Halaman Baru')->firstOrFail()));
+    }
+
     public function test_share_preview_requires_authentication(): void
     {
         $news = $this->article();

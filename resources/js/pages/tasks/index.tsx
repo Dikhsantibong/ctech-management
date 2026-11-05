@@ -591,8 +591,8 @@ export default function TasksIndex({
                 {/* Header */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Task</h2>
-                        <p className="text-sm text-muted-foreground">
+                        <h2 className="text-2xl font-semibold tracking-tight">Task</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">
                             {visibleTasks.length} task ditampilkan
                             {hasActiveFilter ? ` dari ${tasks.length} total` : ''}
                             {overdueCount > 0 && (

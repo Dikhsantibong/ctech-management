@@ -9,6 +9,8 @@ class CompanySetting extends Model
     protected $fillable = [
         'company_name',
         'leader_name',
+        'signature_image',
+        'stamp_image',
         'bank_name',
         'bank_account_number',
         'bank_account_name',
@@ -22,6 +24,27 @@ class CompanySetting extends Model
     protected $casts = [
         'bank_accounts' => 'array',
     ];
+
+    /** Path file privat tidak dikirim ke frontend; status tersedia lewat has_signature_image / has_stamp_image. */
+    protected $hidden = [
+        'signature_image',
+        'stamp_image',
+    ];
+
+    protected $appends = [
+        'has_signature_image',
+        'has_stamp_image',
+    ];
+
+    public function getHasSignatureImageAttribute(): bool
+    {
+        return filled($this->signature_image);
+    }
+
+    public function getHasStampImageAttribute(): bool
+    {
+        return filled($this->stamp_image);
+    }
 
     /**
      * Rekening yang sedang dipilih sebagai rekening utama.

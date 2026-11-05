@@ -6,3 +6,4 @@ Before planning or editing, find the row whose globs match the file's path and r
 | --- | --- |
 | app/Http/Controllers/ProjectCanvasController.php | .ai/rules/controllers.md |
 | app/Http/Controllers/Crm/** | .ai/rules/crm.md |
+| app/Services/Documents/** | .ai/rules/documents.md |

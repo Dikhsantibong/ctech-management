@@ -3,23 +3,14 @@ import { Building2, Mail, Phone, User, ArrowLeft, FileText, LayoutTemplate } fro
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { statusTone } from '@/components/status-badge';
 
 export default function ClientsShow({ client }: { client: any }) {
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
     };
 
-    const statusBadgeColor = (status: string) => {
-        switch (status) {
-            case 'Completed': return 'default';
-            case 'Paid': return 'default';
-            case 'Progress': return 'secondary';
-            case 'Sent': return 'secondary';
-            case 'Review': return 'outline';
-            case 'Overdue': return 'destructive';
-            default: return 'outline';
-        }
-    };
+    const statusBadgeColor = (status: string) => statusTone(status);
 
     return (
         <>
@@ -33,11 +24,11 @@ export default function ClientsShow({ client }: { client: any }) {
                             </Button>
                         </Link>
                         <div>
-                            <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-                                <Building2 className="h-6 w-6" />
+                            <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
+                                <Building2 className="h-5 w-5" />
                                 {client.name}
                             </h2>
-                            <p className="text-muted-foreground">Client details and history</p>
+                            <p className="mt-1 text-sm text-muted-foreground">Client details and history</p>
                         </div>
                     </div>
                 </div>

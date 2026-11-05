@@ -61,7 +61,7 @@ export default function AnnouncementShow({ announcement, canManage }: Props) {
                         <Link href="/announcements" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4">
                             <ArrowLeft className="mr-2 h-4 w-4" /> Kembali ke Pengumuman
                         </Link>
-                        <h2 className="text-2xl font-bold tracking-tight">{announcement.title}</h2>
+                        <h2 className="text-2xl font-semibold tracking-tight">{announcement.title}</h2>
                     </div>
                     {canManage && (
                         <div className="flex gap-2">

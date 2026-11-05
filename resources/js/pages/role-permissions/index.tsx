@@ -92,10 +92,10 @@ export default function RolePermissionsIndex({
             <Head title="Hak Akses Menu" />
             <div className="flex flex-1 flex-col gap-5 p-6">
                 <div>
-                    <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-                        <ShieldCheck className="h-6 w-6 text-muted-foreground" /> Hak Akses Menu
+                    <h2 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+                        <ShieldCheck className="h-5 w-5 text-muted-foreground" /> Hak Akses Menu
                     </h2>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="mt-1 text-sm text-muted-foreground">
                         Tentukan menu apa saja yang bisa dibuka tiap role. Pengaturan ini juga mengunci alamat URL-nya, bukan sekadar
                         menyembunyikan menu dari sidebar.
                     </p>

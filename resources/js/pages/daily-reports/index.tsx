@@ -10,6 +10,7 @@ import { Plus, Trash, FileText, CheckCircle, AlertCircle, Calendar } from 'lucid
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { apiFetch } from '@/lib/fetch';
+import { StatusBadge } from '@/components/status-badge';
 
 export default function DailyReportsIndex({ users, projects }: { users: any[], projects: any[] }) {
     const { auth } = usePage().props as any;
@@ -98,20 +99,14 @@ export default function DailyReportsIndex({ users, projects }: { users: any[], p
         }
     };
 
-    const StatusBadge = ({ status }: { status: string }) => {
-        if (status === 'Completed') return <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center w-max"><CheckCircle className="w-3 h-3 mr-1" /> Completed</span>;
-        if (status === 'In Progress') return <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center w-max"><Calendar className="w-3 h-3 mr-1" /> In Progress</span>;
-        return <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full flex items-center w-max"><AlertCircle className="w-3 h-3 mr-1" /> Blocked</span>;
-    };
-
     return (
         <>
             <Head title="Daily Reports" />
             
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Daily Reports</h2>
-                    <p className="text-muted-foreground">Manage and view daily work reports.</p>
+                    <h2 className="text-2xl font-semibold tracking-tight">Daily Reports</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">Manage and view daily work reports.</p>
                 </div>
                 <div className="space-y-6">
                     

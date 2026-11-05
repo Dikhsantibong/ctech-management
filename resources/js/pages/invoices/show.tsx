@@ -4,20 +4,27 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { statusTone } from '@/components/status-badge';
+import { DocumentSignaturePanel, type DocumentSignatureInfo } from '@/components/document-signature-panel';
 
-export default function InvoiceShow({ invoice }: { invoice: any }) {
+export default function InvoiceShow({
+    invoice,
+    can_verify,
+    kwitansi_signature,
+    has_signature_image,
+}: {
+    invoice: any;
+    can_verify?: boolean;
+    kwitansi_signature: DocumentSignatureInfo | null;
+    has_signature_image: boolean;
+}) {
+    const isKwitansiSigned = !!kwitansi_signature;
+
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
     };
 
-    const statusBadgeColor = (status: string) => {
-        switch (status) {
-            case 'Paid': return 'default';
-            case 'Sent': return 'secondary';
-            case 'Overdue': return 'destructive';
-            default: return 'outline';
-        }
-    };
+    const statusBadgeColor = (status: string) => statusTone(status);
 
     const updateStatus = (newStatus: string) => {
         router.put(`/invoices/${invoice.id}/status`, { status: newStatus }, { preserveScroll: true });
@@ -61,11 +68,13 @@ export default function InvoiceShow({ invoice }: { invoice: any }) {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <Button variant="outline" asChild>
-                            <Link href={`/invoices/${invoice.id}/edit`}>
-                                <Edit2 className="mr-2 h-4 w-4" /> Edit
-                            </Link>
-                        </Button>
+                        {!isKwitansiSigned && (
+                            <Button variant="outline" asChild>
+                                <Link href={`/invoices/${invoice.id}/edit`}>
+                                    <Edit2 className="mr-2 h-4 w-4" /> Edit
+                                </Link>
+                            </Button>
+                        )}
                         <Button asChild>
                             <a href={`/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer">
                                 <Eye className="mr-2 h-4 w-4" /> Preview PDF
@@ -164,6 +173,16 @@ export default function InvoiceShow({ invoice }: { invoice: any }) {
                                 )}
                             </CardContent>
                         </Card>
+
+                        <DocumentSignaturePanel
+                            documentType="kwitansi"
+                            documentId={invoice.id}
+                            documentLabel="kwitansi"
+                            signature={kwitansi_signature}
+                            canSign={!!can_verify}
+                            hasSignatureImage={has_signature_image}
+                            signBlocker={invoice.status === 'Paid' ? null : 'Kwitansi hanya dapat ditandatangani setelah invoice berstatus Paid.'}
+                        />
                     </div>
                 </div>
             </div>

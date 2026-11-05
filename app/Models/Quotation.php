@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use App\Services\Documents\SignableDocument;
+use App\Traits\HasDocumentSignatures;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Quotation extends Model
+class Quotation extends Model implements SignableDocument
 {
+    use HasDocumentSignatures;
+
     protected $fillable = [
         'quotation_number',
         'client_name',
@@ -57,6 +61,47 @@ class Quotation extends Model
     public function verifier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function signatureDocumentType(): string
+    {
+        return 'quotation';
+    }
+
+    public function signatureDocumentLabel(): string
+    {
+        return 'Penawaran / RAB';
+    }
+
+    public function signatureDocumentNumber(): string
+    {
+        return (string) $this->quotation_number;
+    }
+
+    public function signatureSummary(): array
+    {
+        return [
+            'subject' => $this->subject,
+            'counterpart_label' => 'Klien',
+            'counterpart' => $this->client_name,
+            'date' => optional($this->quotation_date)->toDateString(),
+            'amount' => (float) $this->total,
+        ];
+    }
+
+    public function signatureBlocker(): ?string
+    {
+        return $this->items()->exists() ? null : 'Penawaran tanpa item tidak dapat ditandatangani.';
+    }
+
+    public function markSigned(User $signer): void
+    {
+        $this->forceFill(['verified_at' => now(), 'verified_by' => $signer->id])->save();
+    }
+
+    public function markUnsigned(): void
+    {
+        $this->forceFill(['verified_at' => null, 'verified_by' => null])->save();
     }
 
     public function prospect(): BelongsTo

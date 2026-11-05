@@ -7,21 +7,25 @@ use App\Models\CompanySetting;
 use App\Models\Prospect;
 use App\Models\Quotation;
 use App\Models\QuotationItem;
+use App\Services\Documents\DocumentSigner;
+use App\Services\Documents\QuotationPdf;
 use App\Support\MenuRegistry;
 use App\Traits\LogsActivity;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class QuotationController extends Controller
 {
     use LogsActivity;
 
+    public function __construct(private QuotationPdf $pdf, private DocumentSigner $signer) {}
+
     public function index()
     {
-        $quotations = Quotation::with('creator')->latest()->get();
+        $quotations = Quotation::with('creator')->withExists(['signatures as is_signed' => fn ($query) => $query->whereNull('revoked_at')])->latest()->get();
 
         return Inertia::render('quotations/index', [
             'quotations' => $quotations,
@@ -87,6 +91,8 @@ class QuotationController extends Controller
 
     public function edit(Quotation $quotation)
     {
+        $this->ensureNotSigned($quotation);
+
         $quotation->load('items', 'creator');
 
         return Inertia::render('quotations/form', [
@@ -98,51 +104,22 @@ class QuotationController extends Controller
 
     public function show(Quotation $quotation)
     {
-        $quotation->load('items', 'creator', 'verifier');
+        $quotation->load('items', 'creator', 'verifier', 'activeSignature');
+        $settings = CompanySetting::first();
 
         return Inertia::render('quotations/show', [
             'quotation' => $quotation,
-            'settings' => CompanySetting::first(),
+            'settings' => $settings,
             'can_verify' => Auth::user()?->role === MenuRegistry::SUPER_ROLE,
+            'signature' => $quotation->activeSignature?->toPanel(),
+            'has_signature_image' => (bool) $settings?->has_signature_image,
         ]);
-    }
-
-    /**
-     * Verifikasi/pengesahan penawaran (RAB) — hanya Direktur Utama.
-     */
-    public function verifyDocument(Quotation $quotation)
-    {
-        $this->authorizeVerifier();
-
-        $quotation->update([
-            'verified_at' => now(),
-            'verified_by' => Auth::id(),
-        ]);
-
-        $this->logActivity('verified', 'Quotation', $quotation->id, "Memverifikasi penawaran: {$quotation->quotation_number}");
-
-        return redirect()->back()->with('success', 'Penawaran berhasil diverifikasi.');
-    }
-
-    /**
-     * Batalkan verifikasi penawaran — hanya Direktur Utama.
-     */
-    public function unverifyDocument(Quotation $quotation)
-    {
-        $this->authorizeVerifier();
-
-        $quotation->update([
-            'verified_at' => null,
-            'verified_by' => null,
-        ]);
-
-        $this->logActivity('unverified', 'Quotation', $quotation->id, "Membatalkan verifikasi penawaran: {$quotation->quotation_number}");
-
-        return redirect()->back()->with('success', 'Verifikasi penawaran dibatalkan.');
     }
 
     public function update(Request $request, Quotation $quotation)
     {
+        $this->ensureNotSigned($quotation);
+
         $validated = $this->validateData($request, true);
 
         $totals = $this->calculateTotals($validated);
@@ -187,20 +164,28 @@ class QuotationController extends Controller
 
     public function destroy(Quotation $quotation)
     {
+        $this->ensureNotSigned($quotation);
+
         $this->logActivity('deleted', 'Quotation', $quotation->id, "Menghapus penawaran: {$quotation->quotation_number}");
         $quotation->delete();
 
         return redirect()->back()->with('success', 'Penawaran dihapus.');
     }
 
-    public function downloadPdf(Quotation $quotation)
+    public function downloadPdf(Quotation $quotation): HttpResponse
     {
-        return $this->buildPdf($quotation)->download(str_replace('/', '-', $quotation->quotation_number).'.pdf');
+        $filename = str_replace('/', '-', $quotation->quotation_number).'.pdf';
+
+        return $this->signer->signedPdfResponse($quotation, $filename, 'attachment')
+            ?? $this->pdf->build($quotation)->download($filename);
     }
 
-    public function previewPdf(Quotation $quotation)
+    public function previewPdf(Quotation $quotation): HttpResponse
     {
-        return $this->buildPdf($quotation)->stream(str_replace('/', '-', $quotation->quotation_number).'.pdf');
+        $filename = str_replace('/', '-', $quotation->quotation_number).'.pdf';
+
+        return $this->signer->signedPdfResponse($quotation, $filename)
+            ?? $this->pdf->build($quotation)->stream($filename);
     }
 
     /**
@@ -372,64 +357,18 @@ class QuotationController extends Controller
         $quotation->setRelation('items', $items);
         $quotation->setRelation('creator', Auth::user());
 
-        return $this->buildPdf($quotation)->stream('pratinjau-penawaran.pdf');
-    }
-
-    private function buildPdf(Quotation $quotation)
-    {
-        // Model transien (pratinjau) sudah punya relasi yang di-set manual;
-        // hanya muat ulang dari DB bila record memang sudah tersimpan.
-        if ($quotation->exists) {
-            $quotation->load('items', 'creator', 'verifier');
-        }
-
-        $settings = CompanySetting::first();
-
-        $logo = null;
-        $logoPath = public_path('letter/main-logo.png');
-        if (is_file($logoPath) && extension_loaded('gd')) {
-            $logo = 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath));
-        }
-
-        $pdf = Pdf::loadView('pdf.quotation', [
-            'quotation' => $quotation,
-            'settings' => $settings,
-            'logo' => $logo,
-            'documentCode' => $this->documentCode($quotation),
-            'printedAt' => now()->locale('id')->translatedFormat('d M Y H:i'),
-            'isVerified' => ! empty($quotation->verified_at),
-            'verifierName' => $quotation->verifier?->name,
-            'verifiedAt' => $quotation->verified_at ? $quotation->verified_at->locale('id')->translatedFormat('d F Y') : null,
-        ]);
-        $pdf->setPaper('a4', 'portrait');
-        $pdf->setOption('isFontSubsettingEnabled', true);
-
-        return $pdf;
+        return $this->pdf->build($quotation)->stream('pratinjau-penawaran.pdf');
     }
 
     /**
-     * Kode dokumen deterministik untuk referensi arsip internal (bukan TTE).
+     * Penawaran yang sudah ditandatangani tidak boleh diubah/dihapus sebelum tanda tangannya dicabut.
      */
-    private function documentCode(Quotation $quotation): string
+    private function ensureNotSigned(Quotation $quotation): void
     {
-        $seed = implode('|', [
-            $quotation->quotation_number ?? '',
-            $quotation->id ?? 'preview',
-            optional($quotation->quotation_date)->format('Y-m-d') ?? '',
-        ]);
-
-        return implode('-', str_split(strtoupper(substr(hash('sha256', $seed), 0, 12)), 4));
-    }
-
-    /**
-     * Pastikan hanya Direktur Utama yang dapat memverifikasi/membatalkan verifikasi.
-     */
-    private function authorizeVerifier(): void
-    {
-        abort_unless(
-            Auth::user()?->role === MenuRegistry::SUPER_ROLE,
-            403,
-            'Hanya Direktur Utama yang dapat memverifikasi dokumen.'
+        abort_if(
+            $quotation->isSigned(),
+            423,
+            'Penawaran sudah ditandatangani. Cabut pengesahan terlebih dahulu untuk mengubah atau menghapus.'
         );
     }
 }

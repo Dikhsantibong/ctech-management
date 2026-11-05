@@ -1,12 +1,25 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Fragment } from 'react';
-import { ArrowLeft, Download, Eye, FileSpreadsheet, ShieldCheck, ShieldX, Clock, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Download, Eye, FileSpreadsheet, Clock, CheckCircle, ShieldCheck } from 'lucide-react';
+import { DocumentSignaturePanel, type DocumentSignatureInfo } from '@/components/document-signature-panel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { statusTone } from '@/components/status-badge';
 
-export default function QuotationShow({ quotation, can_verify }: { quotation: any; settings?: any; can_verify?: boolean }) {
+export default function QuotationShow({
+    quotation,
+    can_verify,
+    signature,
+    has_signature_image,
+}: {
+    quotation: any;
+    settings?: any;
+    can_verify?: boolean;
+    signature: DocumentSignatureInfo | null;
+    has_signature_image: boolean;
+}) {
     const isVerified = !!quotation.verified_at;
 
     const formatCurrency = (amount: number) =>
@@ -18,17 +31,8 @@ export default function QuotationShow({ quotation, can_verify }: { quotation: an
         router.put(`/quotations/${quotation.id}/status`, { status }, { preserveScroll: true });
     };
 
-    const verify = () => router.put(`/quotations/${quotation.id}/verify`, {}, { preserveScroll: true });
-    const unverify = () => router.put(`/quotations/${quotation.id}/unverify`, {}, { preserveScroll: true });
 
-    const statusBadge = (status: string) => {
-        switch (status) {
-            case 'Diterima': return 'default';
-            case 'Terkirim': return 'secondary';
-            case 'Ditolak': return 'destructive';
-            default: return 'outline';
-        }
-    };
+    const statusBadge = (status: string) => statusTone(status);
 
     const items: any[] = quotation.items || [];
     const hasCategories = items.some((it) => it.category);
@@ -81,22 +85,10 @@ export default function QuotationShow({ quotation, can_verify }: { quotation: an
                                 </SelectContent>
                             </Select>
                         </div>
-                        {isVerified ? (
-                            can_verify && (
-                                <Button variant="outline" onClick={unverify} className="text-amber-600">
-                                    <ShieldX className="mr-2 h-4 w-4" /> Batalkan Verifikasi
-                                </Button>
-                            )
-                        ) : (
-                            can_verify ? (
-                                <Button onClick={verify} className="bg-green-600 hover:bg-green-700">
-                                    <ShieldCheck className="mr-2 h-4 w-4" /> Verifikasi
-                                </Button>
-                            ) : (
-                                <span className="flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-700 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300">
-                                    <Clock className="h-4 w-4" /> Menunggu verifikasi Direktur Utama
-                                </span>
-                            )
+                        {!isVerified && !can_verify && (
+                            <span className="flex items-center gap-1.5 rounded-md bg-warning-soft px-3 py-1.5 text-sm font-medium text-warning-soft-foreground">
+                                <Clock className="h-4 w-4" /> Menunggu pengesahan Direktur Utama
+                            </span>
                         )}
                         <Button variant="outline" asChild>
                             <a href={`/quotations/${quotation.id}/preview`} target="_blank" rel="noopener noreferrer"><Eye className="mr-2 h-4 w-4" /> Preview PDF</a>
@@ -192,6 +184,15 @@ export default function QuotationShow({ quotation, can_verify }: { quotation: an
                     </div>
 
                     <div className="space-y-6">
+                        <DocumentSignaturePanel
+                            documentType="quotation"
+                            documentId={quotation.id}
+                            documentLabel="penawaran"
+                            signature={signature}
+                            canSign={!!can_verify}
+                            hasSignatureImage={has_signature_image}
+                            signBlocker={items.length === 0 ? 'Penawaran tanpa item tidak dapat ditandatangani.' : null}
+                        />
                         <Card>
                             <CardHeader><CardTitle>Detail Penawaran</CardTitle></CardHeader>
                             <CardContent className="space-y-4 text-sm">

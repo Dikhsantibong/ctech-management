@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import LetterEditor from '@/components/letter-editor';
 import LetterPageSettings from '@/components/letter-page-settings';
 import { LETTER_TEMPLATES } from '@/lib/letter-templates';
+import { statusTone } from '@/components/status-badge';
 
 const DEFAULT_PAGE_SETTINGS = {
     margin_top: 14,
@@ -196,12 +197,7 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
         };
     }, [pdfUrl]);
 
-    const statusBadgeColor = (status: string) => {
-        switch (status) {
-            case 'Final': return 'default';
-            default: return 'outline'; // Draft
-        }
-    };
+    const statusBadgeColor = (status: string) => statusTone(status);
 
     return (
         <>
@@ -209,8 +205,8 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Letters</h2>
-                        <p className="text-muted-foreground">Manage official company correspondence.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Letters</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Manage official company correspondence.</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <Button variant="outline" asChild>
@@ -244,7 +240,7 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <tr className="border-b transition-colors hover:bg-muted data-[state=selected]:bg-muted">
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Reference</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Subject</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Type</th>
@@ -257,7 +253,7 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                                 </thead>
                                 <tbody>
                                     {letters.map((letter) => (
-                                        <tr key={letter.id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                        <tr key={letter.id} className="border-b transition-colors hover:bg-muted data-[state=selected]:bg-muted">
                                             <td className="p-4 align-middle font-medium">
                                                 <Link href={`/letters/${letter.id}`} className="hover:underline flex items-center gap-2">
                                                     <Mail className="h-4 w-4 text-muted-foreground" />
@@ -303,7 +299,9 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                                                                 <Eye className="mr-2 h-4 w-4" /> View
                                                             </Link>
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem asChild><Link href={`/letters/${letter.id}/edit`} className="cursor-pointer flex items-center"><Edit2 className="mr-2 h-4 w-4" /> Edit</Link></DropdownMenuItem>
+                                                        {!letter.is_signed && (
+                                                            <DropdownMenuItem asChild><Link href={`/letters/${letter.id}/edit`} className="cursor-pointer flex items-center"><Edit2 className="mr-2 h-4 w-4" /> Edit</Link></DropdownMenuItem>
+                                                        )}
                                                         {letter.content && (
                                                             <DropdownMenuItem asChild>
                                                                 <a href={`/letters/${letter.id}/preview`} target="_blank" rel="noreferrer" className="cursor-pointer flex items-center">
@@ -311,9 +309,11 @@ export default function LettersIndex({ letters, search: initialSearch }: { lette
                                                                 </a>
                                                             </DropdownMenuItem>
                                                         )}
-                                                        <DropdownMenuItem onClick={() => openDeleteModal(letter)} className="text-destructive">
-                                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                                                        </DropdownMenuItem>
+                                                        {!letter.is_signed && (
+                                                            <DropdownMenuItem onClick={() => openDeleteModal(letter)} className="text-destructive">
+                                                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                                            </DropdownMenuItem>
+                                                        )}
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </td>

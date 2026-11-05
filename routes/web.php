@@ -21,6 +21,7 @@ use App\Http\Controllers\Crm\PipelineController as CrmPipelineController;
 use App\Http\Controllers\Crm\ProspectController;
 use App\Http\Controllers\Crm\ProspectImportController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\DocumentSignatureController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\IncomingLetterController;
 use App\Http\Controllers\InvoiceController;
@@ -64,6 +65,10 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 Route::get('/berita', [PublicController::class, 'newsIndex'])->name('public.news.index');
 Route::get('/berita/{slug}', [PublicController::class, 'newsShow'])->name('public.news.show');
 Route::get('/berita/{slug}/story.jpg', [PublicController::class, 'newsStory'])->name('public.news.story');
+
+// Verifikasi publik dokumen bertanda tangan elektronik (tujuan QR code di PDF)
+Route::get('/verifikasi-dokumen/{token}', [DocumentSignatureController::class, 'verify'])->name('public.documents.verify');
+Route::post('/verifikasi-dokumen/{token}', [DocumentSignatureController::class, 'verifyFile'])->middleware('throttle:20,1')->name('public.documents.verify-file');
 
 Route::get('/tentang', [PublicController::class, 'about'])->name('public.about');
 
@@ -118,6 +123,17 @@ Route::get('/portfolio', [PublicController::class, 'portfolioIndex'])->name('pub
 Route::get('/portfolio/{id}', [PublicController::class, 'portfolioShow'])->name('public.portfolio.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Tanda tangan elektronik & cetak TTD basah — otorisasi Direktur Utama di controller
+    Route::prefix('signatures/{documentType}/{documentId}')
+        ->whereIn('documentType', ['letter', 'quotation', 'kwitansi'])
+        ->whereNumber('documentId')
+        ->name('signatures.')
+        ->group(function () {
+            Route::put('sign', [DocumentSignatureController::class, 'sign'])->name('sign');
+            Route::put('revoke', [DocumentSignatureController::class, 'revoke'])->name('revoke');
+            Route::get('print-wet', [DocumentSignatureController::class, 'printForWetSignature'])->name('print-wet');
+        });
 
     // API Routes moved from api.php to allow Session Authentication
     Route::prefix('api/v1')->group(function () {
@@ -325,7 +341,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('content-plans/{content_plan}/publish', [ContentPlanController::class, 'publishNow'])->middleware('menu:content-plans')->name('content-plans.publish');
         Route::resource('content-plans', ContentPlanController::class)->except(['create', 'edit', 'show'])->middleware('menu:content-plans');
         Route::get('news/{news}/share-preview', [NewsController::class, 'sharePreview'])->middleware('menu:news')->name('news.share-preview');
-        Route::resource('news', NewsController::class)->except(['create', 'edit', 'show'])->middleware('menu:news');
+        Route::resource('news', NewsController::class)->except(['show'])->middleware('menu:news');
         Route::resource('portfolios', PortfolioController::class)->except(['create', 'edit', 'show'])->middleware('menu:portfolios');
         Route::get('calendar', [CalendarController::class, 'index'])->middleware('menu:calendar')->name('calendar.index');
     });
@@ -378,8 +394,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('quotations/preview-draft', [QuotationController::class, 'previewDraft'])->name('quotations.preview-draft');
         Route::resource('quotations', QuotationController::class);
         Route::put('quotations/{quotation}/status', [QuotationController::class, 'updateStatus'])->name('quotations.status');
-        Route::put('quotations/{quotation}/verify', [QuotationController::class, 'verifyDocument'])->name('quotations.verify');
-        Route::put('quotations/{quotation}/unverify', [QuotationController::class, 'unverifyDocument'])->name('quotations.unverify');
         Route::get('quotations/{quotation}/pdf', [QuotationController::class, 'downloadPdf'])->name('quotations.pdf');
         Route::get('quotations/{quotation}/preview', [QuotationController::class, 'previewPdf'])->name('quotations.preview');
     });
@@ -402,8 +416,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('letters/verify', [LetterController::class, 'verify'])->name('letters.verify');
         Route::post('letters/verify', [LetterController::class, 'verify'])->name('letters.verify.check');
         Route::resource('letters', LetterController::class);
-        Route::put('letters/{letter}/verify', [LetterController::class, 'verifyDocument'])->name('letters.verify-document');
-        Route::put('letters/{letter}/unverify', [LetterController::class, 'unverifyDocument'])->name('letters.unverify-document');
         Route::get('letters/{letter}/preview', [LetterController::class, 'previewPdf'])->name('letters.preview');
         Route::get('letters/{letter}/pdf', [LetterController::class, 'downloadPdf'])->name('letters.pdf');
     });

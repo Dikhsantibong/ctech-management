@@ -224,19 +224,35 @@
                         No. Rekening: {{ $bank['account_number'] ?? '-' }}<br>
                         Atas Nama: {{ $bank['account_name'] ?? '-' }}
                     </div>
+
+                    @if(!empty($signature))
+                        <div style="margin-top: 8px;">
+                            @include('pdf.partials.signature-qr', ['signature' => $signature, 'qrSize' => 52])
+                        </div>
+                    @endif
                 </td>
                 <td style="text-align: center; vertical-align: bottom; width: 40%;">
                     {{ $settings->city ?? 'Kendari' }}, {{ \Carbon\Carbon::parse($invoice->kwitansi_date ?? now())->locale('id')->translatedFormat('d F Y') }}<br>
                     Penerima,
-                    <div class="sign-area"></div>
-                    <div class="sign-name">{{ $invoice->kwitansi_signatory ?: ($settings->leader_name ?? 'Manajemen') }}</div>
+                    @if(!empty($signature))
+                        @include('pdf.partials.signature-mark', ['signature' => $signature, 'height' => 50])
+                    @else
+                        <div class="sign-area"></div>
+                    @endif
+                    <div class="sign-name">{{ $signature['name'] ?? ($invoice->kwitansi_signatory ?: ($settings->leader_name ?? 'Manajemen')) }}</div>
                     <div class="sign-title">{{ $settings->company_name ?? 'PT Kreatif Teknologi Maju Bersama' }}</div>
                 </td>
             </tr>
         </table>
 
         <div class="footer">
-            Dokumen ini diterbitkan secara elektronik dan sah sebagai bukti penerimaan pembayaran.
+            @if(!empty($signature))
+                Ditandatangani secara elektronik oleh {{ $signature['name'] }} ({{ $signature['title'] }}) &bull; Verifikasi: {{ $signature['url'] }}
+            @elseif(!empty($forWetSignature))
+                Sah sebagai bukti penerimaan pembayaran setelah ditandatangani dan dibubuhi cap resmi perusahaan.
+            @else
+                Dokumen ini diterbitkan secara elektronik dan sah sebagai bukti penerimaan pembayaran.
+            @endif
         </div>
     </div>
 </body>

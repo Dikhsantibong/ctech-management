@@ -21,6 +21,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { statusTone } from '@/components/status-badge';
 
 const projectTypes = ['Aplikasi', 'Video/Animasi', 'Desain', 'Lainnya'];
 
@@ -124,14 +125,7 @@ export default function ProjectsIndex({ projects, users, filters }: { projects: 
         });
     };
 
-    const statusBadgeColor = (status: string) => {
-        switch (status) {
-            case 'Completed': return 'default';
-            case 'Progress': return 'secondary';
-            case 'Review': return 'outline';
-            default: return 'outline';
-        }
-    };
+    const statusBadgeColor = (status: string) => statusTone(status);
 
     const typeIcon = (type: string) => {
         switch (type) {
@@ -361,8 +355,8 @@ export default function ProjectsIndex({ projects, users, filters }: { projects: 
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Projects</h2>
-                        <p className="text-muted-foreground">Manage your startup projects and clients.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Projects</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Manage your startup projects and clients.</p>
                     </div>
                     <div className="flex items-center gap-4">
                         <Input 
@@ -382,7 +376,7 @@ export default function ProjectsIndex({ projects, users, filters }: { projects: 
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <tr className="border-b transition-colors hover:bg-muted data-[state=selected]:bg-muted">
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Type</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Project Name</th>
                                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Client</th>
@@ -394,7 +388,7 @@ export default function ProjectsIndex({ projects, users, filters }: { projects: 
                                 </thead>
                                 <tbody>
                                     {(projects.data || projects).map((project: any) => (
-                                        <tr key={project.id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                        <tr key={project.id} className="border-b transition-colors hover:bg-muted data-[state=selected]:bg-muted">
                                             <td className="p-4 align-middle">
                                                 <div className="flex items-center text-muted-foreground text-xs font-medium">
                                                     {typeIcon(project.project_type || 'Lainnya')}

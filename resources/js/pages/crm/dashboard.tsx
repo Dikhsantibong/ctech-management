@@ -33,8 +33,8 @@ export default function CrmDashboard({ stats, pipeline, todayActivities, overdue
             <Head title="CRM Dashboard" />
             <div className="flex flex-1 flex-col gap-8 p-6">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight">CRM Dashboard</h2>
-                    <p className="text-muted-foreground">Pusat monitoring aktivitas dan pipeline penjualan.</p>
+                    <h2 className="text-2xl font-semibold tracking-tight">CRM Dashboard</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">Pusat monitoring aktivitas dan pipeline penjualan.</p>
                 </div>
 
                 {/* Ringkasan */}
@@ -94,7 +94,7 @@ export default function CrmDashboard({ stats, pipeline, todayActivities, overdue
                                 </thead>
                                 <tbody>
                                     {todayActivities.map((a) => (
-                                        <tr key={a.id} className="border-b last:border-0 hover:bg-muted/50">
+                                        <tr key={a.id} className="border-b last:border-0 hover:bg-muted">
                                             <td className="px-4 py-2.5">
                                                 <Link href={`/crm/prospek/${a.prospect?.id}`} className="font-medium hover:underline">{a.prospect?.company_name ?? '-'}</Link>
                                                 <div className="text-xs text-muted-foreground">{a.prospect?.pic_name}</div>
@@ -152,7 +152,7 @@ export default function CrmDashboard({ stats, pipeline, todayActivities, overdue
                             </thead>
                             <tbody>
                                 {overdueFollowUps.map((p) => (
-                                    <tr key={p.id} className="border-b last:border-0 hover:bg-muted/50">
+                                    <tr key={p.id} className="border-b last:border-0 hover:bg-muted">
                                         <td className="px-4 py-2.5"><Link href={`/crm/prospek/${p.id}`} className="font-medium hover:underline">{p.company_name}</Link></td>
                                         <td className="px-4 py-2.5"><Badge className={stageColor(p.stage)} variant="outline">{p.stage}</Badge></td>
                                         <td className="px-4 py-2.5 text-muted-foreground">{p.next_action ?? '-'}</td>

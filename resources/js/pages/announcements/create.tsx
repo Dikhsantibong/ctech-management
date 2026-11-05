@@ -49,8 +49,8 @@ export default function AnnouncementCreate() {
             <Head title="Buat Pengumuman" />
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Buat Pengumuman Baru</h2>
-                    <p className="text-muted-foreground">Buat pengumuman untuk tim Anda.</p>
+                    <h2 className="text-2xl font-semibold tracking-tight">Buat Pengumuman Baru</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">Buat pengumuman untuk tim Anda.</p>
                 </div>
 
                 <div className="rounded-lg border bg-card text-card-foreground p-6">

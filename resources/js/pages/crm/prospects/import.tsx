@@ -61,8 +61,8 @@ export default function ProspectImport({ preview }: { preview: Preview | null })
                 <div className="flex items-center gap-3">
                     <Link href="/crm/prospek" className="text-muted-foreground hover:text-foreground"><ArrowLeft className="h-5 w-5" /></Link>
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Import Prospek dari Excel</h2>
-                        <p className="text-muted-foreground">Unggah → validasi → cek duplikat → preview → konfirmasi.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Import Prospek dari Excel</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Unggah → validasi → cek duplikat → preview → konfirmasi.</p>
                     </div>
                 </div>
 

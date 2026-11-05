@@ -87,7 +87,7 @@ export function KpiMetricRow({
             </div>
 
             <div className="mb-1.5 flex items-baseline justify-between gap-2">
-                <span className={`text-lg font-bold ${tone.text}`}>{formatKpiValue(metric.actual, metric.unit)}</span>
+                <span className={`text-lg font-semibold ${tone.text}`}>{formatKpiValue(metric.actual, metric.unit)}</span>
                 <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     <TargetIcon className="h-3 w-3" />
                     Target {formatKpiValue(metric.target, metric.unit)}
@@ -140,7 +140,7 @@ export default function KpiPanel({
                     </p>
                 </div>
                 <div className="text-right">
-                    <p className={`text-2xl font-bold leading-none ${tone.text}`}>{kpi.score}%</p>
+                    <p className={`text-2xl font-semibold leading-none ${tone.text}`}>{kpi.score}%</p>
                     <p className="mt-0.5 text-[11px] text-muted-foreground">{tone.label}</p>
                 </div>
             </div>

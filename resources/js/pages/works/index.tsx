@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
+import { statusTone } from '@/components/status-badge';
 
 export default function WorksIndex({ works, projects, clients, users, filters }: { works: any[], projects: any[], clients: any[], users: any[], filters: any }) {
     const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
@@ -189,14 +190,7 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
         setData('checklist', data.checklist.filter(item => item.id !== id));
     };
 
-    const priorityBadgeColor = (priority: string) => {
-        switch (priority) {
-            case 'Critical': return 'destructive';
-            case 'High': return 'destructive';
-            case 'Medium': return 'secondary';
-            default: return 'outline';
-        }
-    };
+    const priorityBadgeColor = (priority: string) => statusTone(priority);
 
     const statusColumns = ['Inbox', 'Todo', 'In Progress', 'Waiting', 'Review', 'Done'];
 
@@ -434,8 +428,8 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
             <div className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Work Management</h2>
-                        <p className="text-muted-foreground">Manage operational, administrative, and strategic works.</p>
+                        <h2 className="text-2xl font-semibold tracking-tight">Work Management</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Manage operational, administrative, and strategic works.</p>
                     </div>
                     
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -495,7 +489,7 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
                                     <thead>
-                                        <tr className="border-b transition-colors hover:bg-muted/50">
+                                        <tr className="border-b transition-colors hover:bg-muted">
                                             <th className="h-12 px-4 text-left font-medium text-muted-foreground">Title</th>
                                             <th className="h-12 px-4 text-left font-medium text-muted-foreground">Category</th>
                                             <th className="h-12 px-4 text-left font-medium text-muted-foreground">Status</th>
@@ -506,7 +500,7 @@ export default function WorksIndex({ works, projects, clients, users, filters }:
                                     </thead>
                                     <tbody>
                                         {works.map((work) => (
-                                            <tr key={work.id} className="border-b transition-colors hover:bg-muted/50">
+                                            <tr key={work.id} className="border-b transition-colors hover:bg-muted">
                                                 <td className="p-4">{work.title}</td>
                                                 <td className="p-4 text-muted-foreground">{work.category}</td>
                                                 <td className="p-4">
