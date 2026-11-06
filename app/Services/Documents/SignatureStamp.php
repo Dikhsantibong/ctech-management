@@ -17,11 +17,13 @@ use Illuminate\Support\Facades\Storage;
 class SignatureStamp
 {
     /**
-     * @return array{name: string, title: string, signed_at: string, url: string, qr: string, hash_hint: string, signature_image: ?string, stamp_image: ?string}
+     * @return array{name: string, title: string, signed_at: string, url: string, qr: string, hash_hint: string, signature_image: ?string, signature_ratio: float, stamp_image: ?string, stamp_ratio: float}
      */
     public function forPdf(DocumentSignature $signature, ?CompanySetting $settings): array
     {
         $url = $signature->verificationUrl();
+        $signatureImage = $this->privateImage($settings?->signature_image);
+        $stampImage = $this->privateImage($settings?->stamp_image);
 
         return [
             'name' => $signature->signer_name,
@@ -30,8 +32,10 @@ class SignatureStamp
             'url' => $url,
             'qr' => 'data:image/svg+xml;base64,'.base64_encode($this->qrSvg($url)),
             'hash_hint' => strtoupper(substr($signature->token, 0, 8)),
-            'signature_image' => $this->privateImageDataUri($settings?->signature_image),
-            'stamp_image' => $this->privateImageDataUri($settings?->stamp_image),
+            'signature_image' => $signatureImage['uri'] ?? null,
+            'signature_ratio' => $signatureImage['ratio'] ?? 1.0,
+            'stamp_image' => $stampImage['uri'] ?? null,
+            'stamp_ratio' => $stampImage['ratio'] ?? 1.0,
         ];
     }
 
@@ -56,7 +60,13 @@ class SignatureStamp
         return (new Writer($renderer))->writeString($content);
     }
 
-    private function privateImageDataUri(?string $path): ?string
+    /**
+     * Gambar privat sebagai data URI + rasio lebar/tinggi, agar template dapat menghitung
+     * ukuran yang muat di kotak tanpa mengubah proporsi.
+     *
+     * @return array{uri: string, ratio: float}|null
+     */
+    private function privateImage(?string $path): ?array
     {
         $disk = Storage::disk('local');
 
@@ -64,6 +74,48 @@ class SignatureStamp
             return null;
         }
 
-        return 'data:'.($disk->mimeType($path) ?: 'image/png').';base64,'.base64_encode($disk->get($path));
+        $contents = $disk->get($path);
+        $trimmed = $this->trimEmptyMargins($contents);
+        $size = @getimagesizefromstring($trimmed ?? $contents);
+
+        return [
+            'uri' => $trimmed
+                ? 'data:image/png;base64,'.base64_encode($trimmed)
+                : 'data:'.($disk->mimeType($path) ?: 'image/png').';base64,'.base64_encode($contents),
+            'ratio' => $size && $size[1] > 0 ? $size[0] / $size[1] : 1.0,
+        ];
+    }
+
+    /**
+     * Buang tepi kosong (transparan atau putih) di sekitar TTD/cap. Ukuran di PDF dikunci
+     * lewat tinggi, jadi tepi kosong membuat cap/TTD tercetak jauh lebih kecil dari seharusnya.
+     *
+     * @return string|null PNG hasil pangkas, atau null bila tidak ada yang perlu dipangkas.
+     */
+    private function trimEmptyMargins(string $contents): ?string
+    {
+        $image = @imagecreatefromstring($contents);
+
+        if (! $image) {
+            return null;
+        }
+
+        imagesavealpha($image, true);
+
+        // SIDES memakai warna sudut (transparan maupun putih). TRANSPARENT di GD tidak gagal
+        // walau tidak memotong apa pun, jadi tiap mode dicek apakah benar-benar memperkecil gambar.
+        foreach ([IMG_CROP_SIDES, IMG_CROP_TRANSPARENT, IMG_CROP_WHITE] as $mode) {
+            $cropped = @imagecropauto($image, $mode);
+
+            if ($cropped && (imagesx($cropped) < imagesx($image) || imagesy($cropped) < imagesy($image))) {
+                imagesavealpha($cropped, true);
+                ob_start();
+                imagepng($cropped);
+
+                return ob_get_clean();
+            }
+        }
+
+        return null;
     }
 }
